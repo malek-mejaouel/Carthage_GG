@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Matches - CarthageGG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('assets/styles/styles.css') }}" />
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-[#0a0a0f]/95 backdrop-blur-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex h-16 items-center justify-between">
+                <a href="{{ path('app_index') }}" class="flex items-center space-x-2">
+                    <img src="{{ asset('assets/images/zz.png') }}" alt="CarthageGG Logo" class="h-14 w-14 rounded-lg shadow-lg object-cover">
+                    <span class="text-2xl font-bold text-[#D4AF37]">Carthage</span>
+                    <span class="text-2xl font-bold text-white">GG</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="{{ path('app_tournaments') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Tournaments</a>
+                    <a href="{{ path('app_teams') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Teams</a>
+                    <a href="{{ path('app_matches') }}" class="px-4 py-2 rounded-md bg-[#D4AF37]/10 text-[#D4AF37]">Matches</a>
+                    <a href="{{ path('app_leaderboard') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Leaderboard</a>
+                    <a href="{{ path('app_support') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Support</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ path('app_login') }}" class="text-gray-300 hover:text-white px-4 py-2 text-sm font-medium">Login</a>
+                    <a href="{{ path('app_dashboard') }}" class="px-4 py-2 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] text-sm font-medium">Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="container mx-auto px-4 py-12">
+        <h1 class="text-4xl font-bold mb-4">Matches</h1>
+        <p class="text-gray-400">Follow live and upcoming matches across all tournaments</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="container mx-auto px-4 mb-8">
+        <div class="flex flex-wrap gap-2 mb-6">
+            <button class="px-4 py-2 rounded-md bg-[#D4AF37]/10 text-[#D4AF37] font-medium">All Matches</button>
+            <button class="px-4 py-2 rounded-md border border-gray-400 text-gray-300 hover:bg-[#1e1e2e]">Live</button>
+            <button class="px-4 py-2 rounded-md border border-gray-400 text-gray-300 hover:bg-[#1e1e2e]">Today</button>
+            <button class="px-4 py-2 rounded-md border border-gray-400 text-gray-300 hover:bg-[#1e1e2e]">Tomorrow</button>
+            <button class="px-4 py-2 rounded-md border border-gray-400 text-gray-300 hover:bg-[#1e1e2e]">This Week</button>
+        </div>
+    </div>
+
+    <!-- Matches List -->
+    <div class="container mx-auto px-4 mb-12">
+        <div class="space-y-4">
+            <!-- Match 1 - Live -->
+            <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition-all">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-4 mb-2">
+                            <span class="inline-block px-3 py-1 rounded-full bg-[#DC2626] text-white text-xs font-medium">LIVE</span>
+                        </div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <div>
+                                <h3 class="font-bold text-lg">Phoenicians Elite</h3>
+                                <span class="text-2xl font-bold text-[#D4AF37]">2</span>
+                            </div>
+                            <span class="text-gray-400 font-semibold">VS</span>
+                            <div>
+                                <h3 class="font-bold text-lg">Dido Warriors</h3>
+                                <span class="text-2xl font-bold text-[#D4AF37]">1</span>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-400">
+                            <p>Carthage Championship 2026 • CS:GO • Best of 3</p>
+                            <p>Map 2/3 - Round 12/30</p>
+                        </div>
+                    </div>
+                    <button class="px-6 py-2 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] font-medium hover:opacity-90">Watch Live</button>
+                </div>
+            </div>
+
+            <!-- Match 2 -->
+            <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition-all">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-4 mb-2">
+                            <span class="inline-block px-3 py-1 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] text-xs font-medium">TODAY 18:00</span>
+                        </div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <div>
+                                <h3 class="font-bold text-lg">Hannibal Squad</h3>
+                            </div>
+                            <span class="text-gray-400 font-semibold">VS</span>
+                            <div>
+                                <h3 class="font-bold text-lg">Carthage Titans</h3>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-400">
+                            <p>Carthage Championship 2026 • Valorant • Best of 3</p>
+                        </div>
+                    </div>
+                    <button class="px-6 py-2 rounded-md border-2 border-[#D4AF37] text-[#D4AF37] font-medium hover:bg-[#D4AF37]/10">Remind Me</button>
+                </div>
+            </div>
+
+            <!-- Match 3 -->
+            <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition-all">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-4 mb-2">
+                            <span class="inline-block px-3 py-1 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] text-xs font-medium">TODAY 20:00</span>
+                        </div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <div>
+                                <h3 class="font-bold text-lg">Tunisia Legends</h3>
+                            </div>
+                            <span class="text-gray-400 font-semibold">VS</span>
+                            <div>
+                                <h3 class="font-bold text-lg">Mediterranean Force</h3>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-400">
+                            <p>Tunisia League • League of Legends • Best of 5</p>
+                        </div>
+                    </div>
+                    <button class="px-6 py-2 rounded-md border-2 border-[#D4AF37] text-[#D4AF37] font-medium hover:bg-[#D4AF37]/10">Remind Me</button>
+                </div>
+            </div>
+
+            <!-- Match 4 -->
+            <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition-all">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-4 mb-2">
+                            <span class="inline-block px-3 py-1 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] text-xs font-medium">TOMORROW 16:00</span>
+                        </div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <div>
+                                <h3 class="font-bold text-lg">Ancient Heroes</h3>
+                            </div>
+                            <span class="text-gray-400 font-semibold">VS</span>
+                            <div>
+                                <h3 class="font-bold text-lg">Modern Kings</h3>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-400">
+                            <p>Regional Qualifier • Dota 2 • Best of 3</p>
+                        </div>
+                    </div>
+                    <button class="px-6 py-2 rounded-md border-2 border-[#D4AF37] text-[#D4AF37] font-medium hover:bg-[#D4AF37]/10">Remind Me</button>
+                </div>
+            </div>
+
+            <!-- Match 5 -->
+            <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition-all">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-4 mb-2">
+                            <span class="inline-block px-3 py-1 rounded-full bg-gray-500/20 text-gray-400 text-xs font-medium">COMPLETED</span>
+                        </div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <div>
+                                <h3 class="font-bold text-lg">Phoenicians Elite</h3>
+                                <span class="text-2xl font-bold text-[#D4AF37]">3</span>
+                            </div>
+                            <span class="text-gray-400 font-semibold">VS</span>
+                            <div>
+                                <h3 class="font-bold text-lg">Tunisia Legends</h3>
+                                <span class="text-2xl font-bold">0</span>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-400">
+                            <p>Carthage Championship 2026 • CS:GO • Best of 3</p>
+                        </div>
+                    </div>
+                    <button class="px-6 py-2 rounded-md border-2 border-gray-500 text-gray-400 font-medium">View Replay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#D4AF37]/20 bg-[#0a0a0f] mt-16">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-[#D4AF37] mb-4">CarthageGG</h3>
+                    <p class="text-gray-400 text-sm">Tunisia's premier esports platform</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Platform</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="{{ path('app_tournaments') }}" class="hover:text-[#D4AF37]">Tournaments</a></li>
+                        <li><a href="{{ path('app_teams') }}" class="hover:text-[#D4AF37]">Teams</a></li>
+                        <li><a href="{{ path('app_matches') }}" class="hover:text-[#D4AF37]">Matches</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Compete</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="{{ path('app_leaderboard') }}" class="hover:text-[#D4AF37]">Leaderboard</a></li>
+                        <li><a href="{{ path('app_register') }}" class="hover:text-[#D4AF37]">Register</a></li>
+                        <li><a href="{{ path('app_support') }}" class="hover:text-[#D4AF37]">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Follow</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37]">Twitter</a>
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37]">Discord</a>
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37]">YouTube</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-[#D4AF37]/20 pt-8 text-center text-gray-400 text-sm">
+                <p>&copy; 2026 CarthageGG. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ asset('assets/main.js') }}"></script>
+</body>
+</html>
+

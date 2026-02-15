@@ -1,3 +1,50 @@
+# Static page routes
+app_index:
+    path: /
+    controller: App\Controller\PageController::index
+
+app_dashboard:
+    path: /dashboard
+    controller: App\Controller\PageController::dashboard
+
+app_login:
+    path: /login
+    controller: App\Controller\PageController::login
+
+app_register:
+    path: /register
+    controller: App\Controller\PageController::register
+
+app_leaderboard:
+    path: /leaderboard
+    controller: App\Controller\PageController::leaderboard
+
+app_support:
+    path: /support
+    controller: App\Controller\PageController::support
+
+app_store:
+    path: /store
+    controller: App\Controller\PageController::store
+
+app_store_cart:
+    path: /store/cart
+    controller: App\Controller\PageController::storeCart
+
+app_store_management:
+    path: /admin/store-management
+    controller: App\Controller\PageController::storeManagement
+
+app_admin:
+    path: /admin
+    controller: App\Controller\PageController::admin
+
+app_profile_edit:
+    path: /admin/profile-edit/{id}
+    controller: App\Controller\PageController::profileEdit
+    requirements:
+        id: \d+
+
 controllers:
     resource:
         path: ../src/Controller/

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Player #{{ matchPlayer.getId() }} - CarthageGG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .btn-primary {
+            background: linear-gradient(to right, #D4AF37, #B8941F);
+            color: #0a0a0f;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7] min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-[#0a0a0f]/95 backdrop-blur-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex h-16 items-center justify-between">
+                <a href="{{ path('app_index') }}" class="flex items-center space-x-2">
+                    <img src="{{ asset('assets/images/zz.png') }}" alt="CarthageGG Logo" class="h-14 w-14 rounded-lg shadow-lg object-cover">
+                    <span class="text-2xl font-bold text-[#D4AF37]">Carthage</span>
+                    <span class="text-2xl font-bold text-white">GG</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="{{ path('tournament_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Tournaments</a>
+                    <a href="{{ path('team_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Teams</a>
+                    <a href="{{ path('match_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Matches</a>
+                    <a href="{{ path('match_player_index') }}" class="px-4 py-2 rounded-md bg-[#D4AF37]/20 text-[#D4AF37] hover:bg-[#D4AF37]/30">MatchPlayer</a>
+                    <a href="{{ path('team_player_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">TeamPlayer</a>
+                    <a href="{{ path('game_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Game</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ path('app_login') }}" class="text-gray-300 hover:text-white px-4 py-2 text-sm font-medium">Login</a>
+                    <a href="{{ path('app_dashboard') }}" class="px-4 py-2 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] text-sm font-medium">Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header Section -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-4xl font-bold text-[#D4AF37] mb-2">Match Player #{{ matchPlayer.getId() }}</h1>
+                    <p class="text-gray-400">Player Assignment Details</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{{ path('match_player_index') }}" class="inline-flex items-center px-6 py-3 rounded-md border-2 border-[#D4AF37] text-[#D4AF37] font-medium hover:bg-[#D4AF37]/10 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Back to List
+                    </a>
+                    <a href="{{ path('match_player_edit', {id: matchPlayer.getId()}) }}" class="inline-flex items-center px-6 py-3 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] font-medium hover:opacity-90 transition-opacity">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Edit Assignment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match Player Details Card -->
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-[#12121a] border border-[#D4AF37]/20 rounded-lg p-8 mb-8">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Left Column: Assignment Details -->
+                    <div>
+                        <h2 class="text-2xl font-bold text-[#D4AF37] mb-6">Assignment Information</h2>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <div class="w-32 text-[#D4AF37] font-medium">Assignment ID</div>
+                                <div class="flex-1">
+                                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] font-bold">
+                                        {{ matchPlayer.getId() }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="w-32 text-[#D4AF37] font-medium">Match</div>
+                                <div class="flex-1">
+                                    {% if matchPlayer.getMatch() %}
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center mr-3">
+                                                <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <div class="font-bold">Match #{{ matchPlayer.getMatch().getMatchId() }}</div>
+                                                <div class="text-sm text-gray-400">Click to view match details</div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-gray-500 italic">No match assigned</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="w-32 text-[#D4AF37] font-medium">Player</div>
+                                <div class="flex-1">
+                                    {% if matchPlayer.getUser() %}
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center mr-3">
+                                                <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13-5.5a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <div class="font-bold">{{ matchPlayer.getUser().getUsername() }}</div>
+                                                <div class="text-sm text-gray-400">Registered player</div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-gray-500 italic">No player assigned</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="w-32 text-[#D4AF37] font-medium">Team</div>
+                                <div class="flex-1">
+                                    {% if matchPlayer.getTeam() %}
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 rounded-lg bg-[#D4AF37]/20 flex items-center justify-center mr-3">
+                                                <svg class="w-5 h-5 text-[#D4AF37]" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <div class="font-bold">{{ matchPlayer.getTeam().getTeamName() }}</div>
+                                                <div class="text-sm text-gray-400">Participating team</div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-gray-500 italic">No team assigned</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Role & Actions -->
+                    <div>
+                        <!-- Role Card -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-bold text-[#D4AF37] mb-4">🎭 Role Information</h3>
+                            <div class="border border-[#D4AF37]/20 rounded-lg p-6">
+                                {% set roleColor = {
+                                    'Captain': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+                                    'Player': 'bg-green-500/20 text-green-400 border-green-500/30',
+                                    'Substitute': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+                                    'Coach': 'bg-purple-500/20 text-purple-400 border-purple-500/30'
+                                } %}
+                                
+                                <div class="flex items-center justify-center mb-4">
+                                    <div class="{{ roleColor[matchPlayer.getRole()] ?? 'bg-gray-500/20 text-gray-400 border-gray-500/30' }} border-2 rounded-full w-24 h-24 flex items-center justify-center">
+                                        <span class="text-3xl font-bold">{{ matchPlayer.getRole()|first|upper }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <h4 class="text-xl font-bold mb-2">{{ matchPlayer.getRole() }}</h4>
+                                    <p class="text-gray-400 text-sm">
+                                        {% if matchPlayer.getRole() == 'Captain' %}
+                                            Team leader responsible for strategic decisions and representing the team.
+                                        {% elseif matchPlayer.getRole() == 'Player' %}
+                                            Active competitor participating in matches as a core team member.
+                                        {% elseif matchPlayer.getRole() == 'Substitute' %}
+                                            Backup player available to replace main players when needed.
+                                        {% elseif matchPlayer.getRole() == 'Coach' %}
+                                            Strategic advisor providing guidance and analysis during matches.
+                                        {% else %}
+                                            Custom role assigned for this match.
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="border-t border-[#D4AF37]/20 pt-6">
+                            <h3 class="text-lg font-bold text-[#D4AF37] mb-4">⚡ Quick Actions</h3>
+                            <div class="space-y-3">
+                                <a href="{{ path('match_player_edit', {id: matchPlayer.getId()}) }}" 
+                                   class="w-full flex items-center justify-center px-4 py-3 rounded-md bg-[#D4AF37]/10 text-[#D4AF37] hover:bg-[#D4AF37]/20 transition-colors">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    Edit Assignment
+                                </a>
+                                
+                                <a href="{{ path('match_player_index') }}" 
+                                   class="w-full flex items-center justify-center px-4 py-3 rounded-md border border-[#D4AF37]/20 text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-colors">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+                                    </svg>
+                                    View All Assignments
+                                </a>
+                                
+                                <form method="post" action="{{ path('match_player_delete', {id: matchPlayer.getId()}) }}" 
+                                      onsubmit="return confirm('Are you sure you want to delete this match player assignment? This action cannot be undone.');"
+                                      class="w-full">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ matchPlayer.getId()) }}">
+                                    <button type="submit" 
+                                            class="w-full flex items-center justify-center px-4 py-3 rounded-md bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        Delete Assignment
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="bg-[#12121a] border border-[#D4AF37]/20 rounded-lg p-6 mb-8">
+                <h3 class="text-xl font-bold text-[#D4AF37] mb-4">📊 Assignment Details</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="border border-[#D4AF37]/20 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-300 mb-2">Match Context</h4>
+                        <p class="text-sm text-gray-400">
+                            This assignment links a specific player to a particular match with a designated role. 
+                            It determines who participates in which match and for which team.
+                        </p>
+                    </div>
+                    <div class="border border-[#D4AF37]/20 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-300 mb-2">Role Importance</h4>
+                        <p class="text-sm text-gray-400">
+                            Roles define responsibilities and permissions during matches. Captains make strategic 
+                            calls, while coaches provide external guidance during pauses.
+                        </p>
+                    </div>
+                    <div class="border border-[#D4AF37]/20 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-300 mb-2">Team Representation</h4>
+                        <p class="text-sm text-gray-400">
+                            Players represent specific teams in matches. A player can only represent one team 
+                            per match but can play for different teams in different matches.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related Information -->
+            <div class="bg-[#12121a] border border-[#D4AF37]/20 rounded-lg p-6">
+                <h3 class="text-xl font-bold text-[#D4AF37] mb-4">🔗 Related Information</h3>
+                <div class="grid md:grid-cols-3 gap-4">
+                    {% if matchPlayer.getMatch() %}
+                    <a href="#" class="border border-blue-500/20 rounded-lg p-4 hover:border-blue-500/50 transition-colors text-center">
+                        <div class="text-blue-400 font-medium">View Match</div>
+                        <div class="text-xs text-gray-400 mt-1">Match #{{ matchPlayer.getMatch().getMatchId() }}</div>
+                    </a>
+                    {% endif %}
+                    
+                    {% if matchPlayer.getTeam() %}
+                    <a href="#" class="border border-[#D4AF37]/20 rounded-lg p-4 hover:border-[#D4AF37]/50 transition-colors text-center">
+                        <div class="text-[#D4AF37] font-medium">View Team</div>
+                        <div class="text-xs text-gray-400 mt-1">{{ matchPlayer.getTeam().getTeamName() }}</div>
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{{ path('match_player_index') }}" class="border border-gray-500/20 rounded-lg p-4 hover:border-gray-500/50 transition-colors text-center">
+                        <div class="text-gray-300 font-medium">All Assignments</div>
+                        <div class="text-xs text-gray-400 mt-1">View all match player assignments</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#D4AF37]/20 bg-[#0a0a0f] mt-16">
+        <div class="container mx-auto px-4 py-8">
+            <div class="text-center text-gray-400 text-sm">
+                <p>&copy; 2026 CarthageGG. All rights reserved.</p>
+                <p class="mt-2">Tunisia's Premier Esports Platform</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Add confirmation for delete action
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteForm = document.querySelector('form[onsubmit*="confirm"]');
+            if (deleteForm) {
+                deleteForm.onsubmit = function(e) {
+                    return confirm('Are you sure you want to delete this match player assignment? This will remove the player from this match and cannot be undone.');
+                };
+            }
+        });
+    </script>
+</body>
+</html>

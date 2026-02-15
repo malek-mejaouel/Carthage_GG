@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>User Teams</title>
+</head>
+<body>
+    <h1>Teams for User #{{ userId }}</h1>
+
+    <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+            <tr><th>ID</th><th>Team Name</th><th>Logo</th><th>Created Date</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        {% for team in teams %}
+            <tr>
+                <td>{{ team.getTeamId() }}</td>
+                <td>{{ team.getTeamName() }}</td>
+                <td>{% if team.getLogo() %}<img src="{{ team.getLogo() }}" alt="Logo" style="max-width: 50px;">{% endif %}</td>
+                <td>{{ team.getCreationDate() ? team.getCreationDate()|date('Y-m-d') : 'N/A' }}</td>
+                <td>
+                    <a href="{{ path('team_show', {id: team.getTeamId()}) }}">show</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="5">No teams found for this user.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('team_index') }}">Back to all teams</a>
+</body>
+</html>

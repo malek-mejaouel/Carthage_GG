@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Team Player - CarthageGG</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        input, select, textarea {
+            background-color: #0a0a0f;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            color: #e4e4e7;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #D4AF37;
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+        }
+
+        label {
+            color: #D4AF37;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body class="bg-[#0a0a0f] text-[#e4e4e7] min-h-screen">
+
+<!-- ================= NAVBAR ================= -->
+<nav class="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-[#0a0a0f]/95 backdrop-blur-sm">
+    <div class="container mx-auto px-4">
+        <div class="flex h-16 items-center justify-between">
+            <a href="{{ path('app_index') }}" class="flex items-center space-x-2">
+                <img src="{{ asset('assets/images/zz.png') }}" class="h-14 w-14 rounded-lg shadow-lg object-cover">
+                <span class="text-2xl font-bold text-[#D4AF37]">Carthage</span>
+                <span class="text-2xl font-bold text-white">GG</span>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- ================= CONTENT ================= -->
+<div class="container mx-auto px-4 py-10">
+
+    <!-- Header -->
+    <div class="mb-8 flex justify-between items-center">
+        <div>
+            <h1 class="text-4xl font-bold text-[#D4AF37]">Edit Team Player</h1>
+            <p class="text-gray-400">Update Team Player #{{ teamPlayer.getId() }}</p>
+        </div>
+
+        <a href="{{ path('team_player_index') }}"
+           class="px-6 py-3 rounded-md border-2 border-[#D4AF37] text-[#D4AF37] font-medium hover:bg-[#D4AF37]/10 transition-colors">
+            ← Back to List
+        </a>
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="max-w-2xl mx-auto bg-[#12121a] border border-[#D4AF37]/20 rounded-lg p-8">
+
+        {{ form_start(form, { 'attr': { 'class': 'space-y-6' } }) }}
+
+        {% for child in form %}
+            {% if child.vars.name != '_token' %}
+                <div class="space-y-2">
+                    {{ form_label(child, null, {
+                        'label_attr': {'class': 'block text-sm font-medium text-[#D4AF37]'}
+                    }) }}
+
+                    {{ form_widget(child, {
+                        'attr': {
+                            'class': 'w-full px-4 py-3 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded-md focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] text-[#e4e4e7]'
+                        }
+                    }) }}
+
+                    {{ form_errors(child, {'attr': {'class': 'text-red-400 text-sm'}}) }}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Actions -->
+        <div class="pt-6 border-t border-[#D4AF37]/20 flex justify-between items-center">
+
+            <a href="{{ path('team_player_index') }}"
+               class="px-6 py-3 rounded-md border-2 border-[#D4AF37] text-[#D4AF37] font-medium hover:bg-[#D4AF37]/10 transition-colors">
+                Cancel
+            </a>
+
+            <button type="submit"
+                    class="px-6 py-3 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] font-medium hover:opacity-90 transition-opacity">
+                Save Changes
+            </button>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+
+    <!-- CURRENT INFO CARD -->
+    <div class="max-w-2xl mx-auto mt-8 bg-[#12121a] border border-[#D4AF37]/20 rounded-lg p-6">
+
+        <h3 class="text-lg font-bold text-[#D4AF37] mb-4">📋 Current Team Player Info</h3>
+
+        <ul class="space-y-2 text-gray-400 text-sm">
+            <li><span class="text-[#D4AF37]">ID:</span> {{ teamPlayer.getId() }}</li>
+
+            <li>
+                <span class="text-[#D4AF37]">Player:</span>
+                {% if teamPlayer.getUser() %}
+                    {{ teamPlayer.getUser().getUsername() }}
+                {% else %}
+                    <span class="italic text-gray-500">Not assigned</span>
+                {% endif %}
+            </li>
+
+            <li>
+                <span class="text-[#D4AF37]">Team:</span>
+                {% if teamPlayer.getTeam() %}
+                    {{ teamPlayer.getTeam().getTeamName() }}
+                {% else %}
+                    <span class="italic text-gray-500">Not assigned</span>
+                {% endif %}
+            </li>
+        </ul>
+    </div>
+
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer class="border-t border-[#D4AF37]/20 bg-[#0a0a0f] mt-16">
+    <div class="container mx-auto px-4 py-8 text-center text-gray-400 text-sm">
+        © 2026 CarthageGG. All rights reserved.
+    </div>
+</footer>
+
+</body>
+</html>

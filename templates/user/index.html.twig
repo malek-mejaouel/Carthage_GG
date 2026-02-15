@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Users</title>
+</head>
+<body>
+    <h1>Users</h1>
+    <p><a href="{{ path('user_new') }}">Create new user</a> | <a href="{{ path('app_index') }}">Back to site</a></p>
+
+    <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+            <tr><th>ID</th><th>Username</th><th>Email</th><th>Active</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.getUserId() }}</td>
+                <td>{{ user.getUsername() }}</td>
+                <td>{{ user.getEmail() }}</td>
+                <td>{{ user.isActive() ? 'yes' : 'no' }}</td>
+                <td>
+                    <a href="{{ path('user_show', {id: user.getUserId()}) }}">show</a>
+                    <a href="{{ path('user_edit', {id: user.getUserId()}) }}">edit</a>
+                    <form method="post" action="{{ path('user_delete', {id: user.getUserId()}) }}" style="display:inline" onsubmit="return confirm('Delete?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.getUserId()) }}">
+                        <button type="submit">delete</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="5">No users found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if total is defined %}
+        <p>Page {{ page }} — total: {{ total }}</p>
+    {% endif %}
+</body>
+</html>

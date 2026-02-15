@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CarthageGG – Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('assets/styles/styles.css') }}" />
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7] min-h-screen">
+
+    {# Navigation Bar #}
+    <nav class="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-[#0a0a0f]/95 backdrop-blur-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex h-16 items-center justify-between">
+                <a href="{{ path('app_index') }}" class="flex items-center space-x-2">
+                    <img src="{{ asset('assets/images/zz.png') }}" alt="CarthageGG Logo" class="h-14 w-14 rounded-lg shadow-lg object-cover">
+                    <span class="text-2xl font-bold text-[#D4AF37]">Carthage</span>
+                    <span class="text-2xl font-bold text-white">GG</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="{{ path('tournament_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Tournaments</a>
+                    <a href="{{ path('team_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Teams</a>
+                    <a href="{{ path('match_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Matches</a>
+                    <a href="{{ path('match_player_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">MatchPlayers</a>
+                    <a href="{{ path('team_player_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">TeamPlayers</a>
+                    <a href="{{ path('game_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Games</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ path('app_login') }}" class="text-gray-300 hover:text-white px-4 py-2 text-sm font-medium">Login</a>
+                    <a href="{{ path('app_dashboard') }}" class="px-4 py-2 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] text-sm font-medium">Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {# Hero Section #}
+    <section class="relative overflow-hidden border-b border-[#D4AF37]/20 bg-gradient-to-b from-[#0a0a0f] via-[#12121a] to-[#0a0a0f]">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyMTIsIDE3NSwgNTUsIDAuMDUpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-40"></div>
+        <div class="container relative mx-auto px-4 py-24">
+            <div class="mx-auto max-w-4xl text-center">
+                <span class="inline-block mb-6 px-3 py-1 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] text-xs font-bold border border-[#D4AF37]/30">
+                    Tunisia's Premier Esports Platform
+                </span>
+                <h1 class="mb-6 text-5xl md:text-6xl font-bold">
+                    <span class="bg-gradient-to-r from-[#D4AF37] via-[#F4D03F] to-[#D4AF37] bg-clip-text text-transparent">
+                        Compete. Conquer. Claim Glory.
+                    </span>
+                </h1>
+                <p class="mb-8 text-xl text-gray-400">
+                    Join the ultimate competitive gaming platform inspired by the legendary legacy of Carthage
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="{{ path('app_register') }}" class="inline-flex items-center px-6 py-3 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] font-medium hover:opacity-90 transition-opacity">
+                        <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        Start Competing
+                    </a>
+                    <a href="{{ path('tournament_index') }}" class="inline-flex items-center px-6 py-3 rounded-md border-2 border-[#D4AF37] text-[#D4AF37] font-medium hover:bg-[#D4AF37]/10 transition-colors">
+                        Browse Tournaments
+                    </a>
+                </div>
+
+                {# Stats #}
+                <div class="mt-16 grid grid-cols-2 gap-8 md:grid-cols-4">
+                    <div>
+                        <div class="text-3xl font-bold text-[#D4AF37]">{{ total_players|default('2,500+') }}</div>
+                        <div class="text-sm text-gray-400">Active Players</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-[#D4AF37]">{{ total_tournaments|default('150+') }}</div>
+                        <div class="text-sm text-gray-400">Tournaments</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-[#D4AF37]">${{ total_prize_pool|default('500K+') }}</div>
+                        <div class="text-sm text-gray-400">Prize Pool</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-[#D4AF37]">{{ total_teams|default('80+') }}</div>
+                        <div class="text-sm text-gray-400">Teams</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Featured Tournaments #}
+    <section class="container mx-auto px-4 py-16">
+        <div class="mb-12">
+            <h2 class="text-4xl font-bold mb-4">Featured Tournaments</h2>
+            <p class="text-gray-400">Showcase of our most prestigious competitions</p>
+        </div>
+
+        {% if featured_tournaments is defined and featured_tournaments|length > 0 %}
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {% for tournament in featured_tournaments %}
+                    {% set now = date() %}
+                    {% set start = tournament.startDate %}
+                    {% set end = tournament.endDate %}
+                    {% if start <= now and end >= now %}
+                        {% set status = 'Live' %}
+                        {% set status_class = 'bg-[#DC2626] text-white' %}
+                    {% else %}
+                        {% set status = 'Upcoming' %}
+                        {% set status_class = 'bg-[#D4AF37]/20 text-[#D4AF37]' %}
+                    {% endif %}
+
+                    <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition-all">
+                        <div class="h-2 bg-gradient-to-r from-[#D4AF37] to-[#DC2626] rounded-t-lg mb-4"></div>
+                        <div class="flex items-start justify-between mb-4">
+                            <h3 class="text-xl font-bold">{{ tournament.tournamentName }}</h3>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold {{ status_class }}">{{ status }}</span>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-4">{{ tournament.game ? tournament.game.name : 'N/A' }}</p>
+                        <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                            <div>
+                                <span class="text-gray-400 block">Prize Pool</span>
+                                <span class="font-bold text-[#D4AF37]">${{ tournament.prizePool|default('0')|number_format(0) }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400 block">Teams</span>
+                                <span class="font-medium">{{ tournament.teamCount }}</span>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-400 mb-6">
+                            {{ tournament.startDate|date('M d') }} - {{ tournament.endDate|date('M d') }}
+                        </div>
+                        
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-12 bg-[#12121a] rounded-lg border border-[#D4AF37]/20">
+                <p class="text-gray-400">No tournaments available at the moment.</p>
+                <p class="text-sm text-gray-500 mt-2">Check back soon!</p>
+            </div>
+        {% endif %}
+    </section>
+
+    {# Upcoming Matches – styled like the image #}
+    <section class="container mx-auto px-4 py-16 bg-[#12121a]/50 border-y border-[#D4AF37]/20">
+        <div class="mb-12">
+            <h2 class="text-4xl font-bold mb-4">Upcoming Matches</h2>
+            <p class="text-gray-400">Don't miss these exciting matchups</p>
+        </div>
+
+        {% if upcoming_matches is defined and upcoming_matches|length > 0 %}
+            <div class="space-y-4">
+                {% for match in upcoming_matches|slice(0, 3) %}
+                    <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition-all">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-4">
+                                    <span class="font-bold">{{ match.teamA ? match.teamA.teamName : 'TBD' }}</span>
+                                    <span class="text-gray-400">vs</span>
+                                    <span class="font-bold">{{ match.teamB ? match.teamB.teamName : 'TBD' }}</span>
+                                </div>
+                                <p class="text-sm text-gray-400 mt-2">
+                                    {{ match.tournament ? match.tournament.tournamentName : 'Tournament TBD' }}
+                                    • {{ match.matchDate ? match.matchDate|date('M d, H:i') : 'TBD' }}
+                                </p>
+                            </div>
+                            <a href="{{ path('match_show', {id: match.matchId}) }}" 
+                               class="px-6 py-2 rounded-md bg-[#D4AF37]/10 text-[#D4AF37] hover:bg-[#D4AF37]/20 transition-colors text-sm font-medium">
+                                Watch
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-12 bg-[#12121a] rounded-lg border border-[#D4AF37]/20">
+                <p class="text-gray-400">No upcoming matches at the moment.</p>
+                <p class="text-sm text-gray-500 mt-2">Check back soon!</p>
+            </div>
+        {% endif %}
+    </section>
+   {# Top Teams – with team name, owner, members, and creation date #}
+<section class="container mx-auto px-4 py-16">
+    <div class="mb-12">
+        <h2 class="text-4xl font-bold mb-4">Teams</h2>
+        <p class="text-gray-400">The teams in our platform</p>
+    </div>
+
+    {% if top_teams is defined and top_teams|length > 0 %}
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {% for team in top_teams|slice(0, 4) %}
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition-all">
+                    <h3 class="text-lg font-bold mb-4">{{ team.teamName }}</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Owner</span>
+                            <span class="font-medium">{{ team.user ? team.user.username : 'N/A' }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Members</span>
+                            <span class="font-medium">{{ team.teamPlayers|length }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Created</span>
+                            <span class="font-medium">{{ team.creationDate ? team.creationDate|date('Y-m-d') : 'N/A' }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-12 bg-[#12121a] rounded-lg border border-[#D4AF37]/20">
+            <p class="text-gray-400">No teams yet.</p>
+        </div>
+    {% endif %}
+</section>
+    {# Call to Action #}
+    <section class="container mx-auto px-4 py-24">
+        <div class="border border-[#D4AF37]/20 rounded-lg bg-gradient-to-br from-[#12121a] to-[#0a0a0f] p-12 text-center">
+            <svg class="mx-auto mb-6 h-16 w-16 text-[#D4AF37]" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <h2 class="mb-4 text-3xl font-bold">Ready to Join the Battle?</h2>
+            <p class="mx-auto mb-8 max-w-2xl text-gray-400">
+                Create your account today and start competing in Tunisia's most prestigious esports tournaments
+            </p>
+            <a href="{{ path('app_register') }}" class="inline-flex items-center px-6 py-3 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] font-medium hover:opacity-90 transition-opacity">
+                Create Free Account
+            </a>
+        </div>
+    </section>
+
+    {# Footer #}
+    <footer class="border-t border-[#D4AF37]/20 bg-[#0a0a0f]">
+        <div class="container mx-auto px-4 py-8">
+            <div class="text-center text-gray-400 text-sm">
+                <p>&copy; {{ 'now'|date('Y') }} CarthageGG. All rights reserved.</p>
+                <p class="mt-2">Tunisia's Premier Esports Platform</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ asset('js/main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Support - CarthageGG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('assets/styles/styles.css') }}" />
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-[#0a0a0f]/95 backdrop-blur-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex h-16 items-center justify-between">
+                <a href="{{ path('app_index') }}" class="flex items-center space-x-2">
+                    <img src="{{ asset('assets/images/zz.png') }}" alt="CarthageGG Logo" class="h-14 w-14 rounded-lg shadow-lg object-cover">
+                    <span class="text-2xl font-bold text-[#D4AF37]">Carthage</span>
+                    <span class="text-2xl font-bold text-white">GG</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="{{ path('tournament_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Tournaments</a>
+                    <a href="{{ path('team_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Teams</a>
+                    <a href="{{ path('match_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Matches</a>
+                    <a href="{{ path('app_leaderboard') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Leaderboard</a>
+                    <a href="{{ path('app_support') }}" class="px-4 py-2 rounded-md bg-[#D4AF37]/10 text-[#D4AF37]">Support</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ path('app_login') }}" class="text-gray-300 hover:text-white px-4 py-2 text-sm font-medium">Login</a>
+                    <a href="{{ path('app_dashboard') }}" class="px-4 py-2 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] text-sm font-medium">Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="container mx-auto px-4 py-12">
+        <h1 class="text-4xl font-bold mb-4">Support Center</h1>
+        <p class="text-gray-400">Get help and support for your CarthageGG account</p>
+    </div>
+
+    <!-- Support Options -->
+    <div class="container mx-auto px-4 mb-16">
+        <div class="grid gap-6 md:grid-cols-3 mb-12">
+            <!-- FAQ -->
+            <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-8 text-center">
+                <div class="flex justify-center mb-4">
+                    <div class="flex h-16 w-16 items-center justify-center rounded-lg bg-[#D4AF37]/20">
+                        <svg class="h-8 w-8 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mb-2">FAQ</h3>
+                <p class="text-gray-400 mb-6">Find answers to frequently asked questions</p>
+                <button class="w-full px-4 py-2 rounded-md bg-[#D4AF37]/10 text-[#D4AF37] hover:bg-[#D4AF37]/20 font-medium">Browse FAQ</button>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-8 text-center">
+                <div class="flex justify-center mb-4">
+                    <div class="flex h-16 w-16 items-center justify-center rounded-lg bg-[#D4AF37]/20">
+                        <svg class="h-8 w-8 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Email Support</h3>
+                <p class="text-gray-400 mb-6">Get in touch with our support team</p>
+                <button class="w-full px-4 py-2 rounded-md bg-[#D4AF37]/10 text-[#D4AF37] hover:bg-[#D4AF37]/20 font-medium">Send Email</button>
+            </div>
+
+            <!-- Discord -->
+            <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-8 text-center">
+                <div class="flex justify-center mb-4">
+                    <div class="flex h-16 w-16 items-center justify-center rounded-lg bg-[#D4AF37]/20">
+                        <svg class="h-8 w-8 text-[#D4AF37]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M13.545 2.907a13.227 13.227 0 00-3.573-1.04c-.522.224-.923.605-.998 1.11-.09.662.03 1.344.477 1.986.5.817 1.401 1.487 2.568 1.91.859.33 1.921.645 3.12.81 1.024.129 2.059.129 3.012 0 1.199-.165 2.261-.48 3.12-.81 1.167-.423 2.068-1.093 2.568-1.91.447-.642.567-1.324.477-1.986-.075-.505-.476-.886-.998-1.11-.tm-offset.4-.375-3.073-1.04zm-5.44 7.993a1.25 1.25 0 10-2.5 0 1.25 1.25 0 002.5 0zm6.45 0a1.25 1.25 0 10-2.5 0 1.25 1.25 0 002.5 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Discord</h3>
+                <p class="text-gray-400 mb-6">Join our community Discord server</p>
+                <button class="w-full px-4 py-2 rounded-md bg-[#D4AF37]/10 text-[#D4AF37] hover:bg-[#D4AF37]/20 font-medium">Join Discord</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="container mx-auto px-4 mb-16 max-w-2xl">
+        <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-8">
+            <h2 class="text-2xl font-bold mb-6">Send us a Message</h2>
+            <form onsubmit="handleSupportForm(event)" class="space-y-6">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Name -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium">Name</label>
+                        <input
+                            type="text"
+                            placeholder="Your name"
+                            required
+                            class="w-full px-4 py-2 rounded-md bg-[#1e1e2e] border border-[#D4AF37]/20 focus:outline-none focus:border-[#D4AF37]/50"
+                        />
+                    </div>
+
+                    <!-- Email -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium">Email</label>
+                        <input
+                            type="email"
+                            placeholder="your@email.com"
+                            required
+                            class="w-full px-4 py-2 rounded-md bg-[#1e1e2e] border border-[#D4AF37]/20 focus:outline-none focus:border-[#D4AF37]/50"
+                        />
+                    </div>
+                </div>
+
+                <!-- Subject -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium">Subject</label>
+                    <input
+                        type="text"
+                        placeholder="What is this about?"
+                        required
+                        class="w-full px-4 py-2 rounded-md bg-[#1e1e2e] border border-[#D4AF37]/20 focus:outline-none focus:border-[#D4AF37]/50"
+                    />
+                </div>
+
+                <!-- Category -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium">Category</label>
+                    <select class="w-full px-4 py-2 rounded-md bg-[#1e1e2e] border border-[#D4AF37]/20 focus:outline-none focus:border-[#D4AF37]/50">
+                        <option>Select a category</option>
+                        <option>Account Issues</option>
+                        <option>Tournament Support</option>
+                        <option>Technical Issues</option>
+                        <option>General Inquiry</option>
+                        <option>Report a Bug</option>
+                    </select>
+                </div>
+
+                <!-- Message -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium">Message</label>
+                    <textarea
+                        placeholder="Tell us what's happening..."
+                        rows="6"
+                        required
+                        class="w-full px-4 py-2 rounded-md bg-[#1e1e2e] border border-[#D4AF37]/20 focus:outline-none focus:border-[#D4AF37]/50 resize-none"
+                    ></textarea>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="w-full px-6 py-3 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] font-medium hover:opacity-90 transition-opacity">
+                    Send Message
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#D4AF37]/20 bg-[#0a0a0f] mt-16">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-[#D4AF37] mb-4">CarthageGG</h3>
+                    <p class="text-gray-400 text-sm">Tunisia's premier esports platform</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Platform</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="{{ path('tournament_index') }}" class="hover:text-[#D4AF37]">Tournaments</a></li>
+                        <li><a href="{{ path('team_index') }}" class="hover:text-[#D4AF37]">Teams</a></li>
+                        <li><a href="{{ path('match_index') }}" class="hover:text-[#D4AF37]">Matches</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Compete</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="{{ path('app_leaderboard') }}" class="hover:text-[#D4AF37]">Leaderboard</a></li>
+                        <li><a href="{{ path('app_register') }}" class="hover:text-[#D4AF37]">Register</a></li>
+                        <li><a href="{{ path('app_support') }}" class="hover:text-[#D4AF37]">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Follow</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37]">Twitter</a>
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37]">Discord</a>
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37]">YouTube</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-[#D4AF37]/20 pt-8 text-center text-gray-400 text-sm">
+                <p>&copy; 2026 CarthageGG. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ asset('assets/main.js') }}"></script>
+    <script>
+        function handleSupportForm(event) {
+            event.preventDefault();
+            alert('Thank you for your message! Our support team will get back to you soon.');
+            event.target.reset();
+        }
+    </script>
+</body>
+</html>
+

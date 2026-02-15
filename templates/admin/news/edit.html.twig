@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit News - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8 max-w-2xl">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-white">Edit News</h1>
+        <a href="{{ path('app_admin_dash_news') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg font-bold hover:bg-[#B8941F] transition">Back to News</a>
+    </div>
+
+    <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 p-8">
+        <form action="{{ path('app_admin_news_edit', {'newsId': news.newsId}) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            
+            <!-- Title -->
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Title</label>
+                <input type="text" name="titre" value="{{ news.titre }}" required class="w-full px-3 py-2 bg-[#1a1a24] border border-[#D4AF37]/20 rounded-lg text-white focus:outline-none focus:border-[#D4AF37]">
+            </div>
+
+            <!-- Category -->
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Category</label>
+                <select name="categorie" required class="w-full px-3 py-2 bg-[#1a1a24] border border-[#D4AF37]/20 rounded-lg text-white focus:outline-none focus:border-[#D4AF37]">
+                    <option value="">Select a category</option>
+                    <option value="tournaments" {% if news.categorie == 'tournaments' %}selected{% endif %}>Tournaments</option>
+                    <option value="matches" {% if news.categorie == 'matches' %}selected{% endif %}>Matches</option>
+                    <option value="players" {% if news.categorie == 'players' %}selected{% endif %}>Players</option>
+                    <option value="events" {% if news.categorie == 'events' %}selected{% endif %}>Events</option>
+                    <option value="updates" {% if news.categorie == 'updates' %}selected{% endif %}>Updates</option>
+                    <option value="announcements" {% if news.categorie == 'announcements' %}selected{% endif %}>Announcements</option>
+                    <option value="results" {% if news.categorie == 'results' %}selected{% endif %}>Results</option>
+                    <option value="statistics" {% if news.categorie == 'statistics' %}selected{% endif %}>Statistics</option>
+                </select>
+            </div>
+
+            <!-- Content -->
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Content</label>
+                <textarea name="contenu" required rows="10" class="w-full px-3 py-2 bg-[#1a1a24] border border-[#D4AF37]/20 rounded-lg text-white focus:outline-none focus:border-[#D4AF37]">{{ news.contenu }}</textarea>
+            </div>
+
+            <!-- Current Image -->
+            {% if news.image and news.image != 'default-news.jpg' %}
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Current Image</label>
+                    <img src="{{ asset('uploads/news/' ~ news.image) }}" alt="{{ news.titre }}" class="max-h-48 rounded-lg mb-4">
+                </div>
+            {% else %}
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Current Image</label>
+                    <img src="{{ asset('assets/images/zz.png') }}" alt="{{ news.titre }}" class="max-h-48 rounded-lg mb-4 opacity-80">
+                </div>
+            {% endif %}
+
+            <!-- New Image -->
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Replace Image (Optional)</label>
+                <input type="file" name="image" accept="image/*" class="w-full px-3 py-2 bg-[#1a1a24] border border-[#D4AF37]/20 rounded-lg text-white focus:outline-none focus:border-[#D4AF37]">
+                <p class="text-gray-500 text-sm mt-2">Leave empty to keep current image</p>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-3 justify-end pt-4">
+                <a href="{{ path('app_admin_dash_news') }}" class="px-4 py-2 bg-gray-600/20 text-gray-400 rounded-lg hover:bg-gray-600/30 transition">Cancel</a>
+                <button type="submit" class="px-6 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg font-bold hover:bg-[#B8941F] transition">Update News</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

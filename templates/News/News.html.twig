@@ -1,0 +1,169 @@
+{% extends "base.html.twig" %}
+
+{% block title %}News - CarthageGG{% endblock %}
+
+{% block content %}
+<section class="py-12 px-6 bg-gradient-to-b from-[#0a0a0f] to-[#1a1a24]">
+    <div class="container mx-auto max-w-6xl">
+        <!-- Header -->
+        <div class="mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Latest News</h1>
+            <p class="text-lg text-gray-400">Stay updated with the latest news from CarthageGG</p>
+        </div>
+
+        {% if app.flashes %}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="mb-6 px-6 py-4 rounded-lg border {% if label == 'success' %}bg-green-500/10 text-green-500 border-green-500/20{% else %}bg-red-500/10 text-red-500 border-red-500/20{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+
+        <!-- Search & Filter Bar -->
+        <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 p-6 mb-8">
+            <form method="GET" action="{{ path('app_news_list') }}" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Search by Title -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Search by Title</label>
+                        <input 
+                            type="text" 
+                            name="search" 
+                            value="{{ search }}"
+                            placeholder="Search news title..."
+                            class="w-full px-4 py-2 bg-[#1a1a24] border border-[#D4AF37]/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"
+                        >
+                    </div>
+
+                    <!-- Filter by Category -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Category</label>
+                        <select 
+                            name="category"
+                            class="w-full px-4 py-2 bg-[#1a1a24] border border-[#D4AF37]/20 rounded-lg text-white focus:outline-none focus:border-[#D4AF37] transition"
+                        >
+                            <option value="">All Categories</option>
+                            {% for label, value in categories %}
+                                <option value="{{ value }}" {% if category == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Sort Options -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Sort By</label>
+                        <select 
+                            name="sort"
+                            class="w-full px-4 py-2 bg-[#1a1a24] border border-[#D4AF37]/20 rounded-lg text-white focus:outline-none focus:border-[#D4AF37] transition"
+                        >
+                            <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest First</option>
+                            <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                        </select>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex items-end">
+                        <button 
+                            type="submit"
+                            class="w-full px-6 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg font-bold hover:bg-[#B8941F] transition"
+                        >
+                            Search
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Clear Filters Button -->
+                {% if search or category or sort != 'newest' %}
+                    <div class="flex justify-end">
+                        <a href="{{ path('app_news_list') }}" class="text-sm text-[#D4AF37] hover:text-[#B8941F] transition">
+                            Clear all filters
+                        </a>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Active Filters Display -->
+        {% if search or category %}
+            <div class="mb-6 flex flex-wrap gap-2 items-center">
+                <span class="text-sm text-gray-400">Active filters:</span>
+                {% if search %}
+                    <span class="inline-block px-3 py-1 bg-[#D4AF37]/10 text-[#D4AF37] rounded-full text-xs font-medium">
+                        Title: "{{ search }}"
+                        <a href="{{ path('app_news_list', {'category': category, 'sort': sort}) }}" class="ml-2 hover:text-[#B8941F]">✕</a>
+                    </span>
+                {% endif %}
+                {% if category %}
+                    <span class="inline-block px-3 py-1 bg-blue-500/10 text-blue-500 rounded-full text-xs font-medium">
+                        Category: {{ category|capitalize }}
+                        <a href="{{ path('app_news_list', {'search': search, 'sort': sort}) }}" class="ml-2 hover:text-blue-400">✕</a>
+                    </span>
+                {% endif %}
+                {% if sort != 'newest' %}
+                    <span class="inline-block px-3 py-1 bg-purple-500/10 text-purple-500 rounded-full text-xs font-medium">
+                        Sort: {{ sort|capitalize }}
+                        <a href="{{ path('app_news_list', {'search': search, 'category': category}) }}" class="ml-2 hover:text-purple-400">✕</a>
+                    </span>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <!-- News Grid -->
+        {% if newsList|length > 0 %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for news in newsList %}
+                    <article class="bg-[#12121a] rounded-xl overflow-hidden border border-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition group cursor-pointer">
+                        <!-- Image -->
+                        <div class="relative h-48 overflow-hidden bg-[#1a1a24]">
+                            {% if news.image and news.image != 'default-news.jpg' %}
+                                <img src="{{ asset('uploads/news/' ~ news.image) }}" alt="{{ news.titre }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+                            {% else %}
+                                <img src="{{ asset('assets/images/zz.png') }}" alt="{{ news.titre }}" class="w-full h-full object-cover opacity-70">
+                            {% endif %}
+                        </div>
+
+                        <!-- Content -->
+                        <div class="p-6">
+                            <!-- Category Badge -->
+                            <div class="mb-3">
+                                <span class="inline-block px-3 py-1 bg-[#D4AF37]/10 text-[#D4AF37] rounded-full text-xs font-semibold uppercase">
+                                    {{ news.categorie ?? 'General' }}
+                                </span>
+                            </div>
+
+                            <!-- Title -->
+                            <h2 class="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-[#D4AF37] transition">
+                                {{ news.titre }}
+                            </h2>
+
+                            <!-- Date -->
+                            <p class="text-sm text-gray-400 mb-4">
+                                {% if news.datePublication %}
+                                    {{ news.datePublication|date('F d, Y') }}
+                                {% endif %}
+                            </p>
+
+                            <!-- Excerpt -->
+                            <p class="text-gray-400 text-sm line-clamp-3 mb-4">
+                                {{ news.contenu[:150] }}...
+                            </p>
+
+                            <!-- Read More Link -->
+                            <a href="{{ path('app_news_detail', {'id': news.newsId}) }}" class="inline-block px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg font-bold text-sm hover:bg-[#B8941F] transition">
+                                Read More →
+                            </a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-16">
+                <p class="text-xl text-gray-400 mb-4">No news articles found yet.</p>
+                <p class="text-gray-500">Check back soon for exciting updates!</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

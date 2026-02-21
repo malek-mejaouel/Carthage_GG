@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Entity\FaceAuthentication;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -55,6 +56,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $updatedAt = null;
+
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: FaceAuthentication::class, cascade: ['persist', 'remove'])]
+    private ?FaceAuthentication $faceAuthentication = null;
 
     public function __construct()
     {
@@ -219,6 +223,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUpdatedAt(\DateTimeInterface $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getFaceAuthentication(): ?FaceAuthentication
+    {
+        return $this->faceAuthentication;
+    }
+
+    public function setFaceAuthentication(?FaceAuthentication $faceAuthentication): static
+    {
+        $this->faceAuthentication = $faceAuthentication;
+
+        if ($faceAuthentication !== null && $faceAuthentication->getUser() !== $this) {
+            $faceAuthentication->setUser($this);
+        }
 
         return $this;
     }

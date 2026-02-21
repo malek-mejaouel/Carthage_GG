@@ -179,6 +179,34 @@
                     </div>
                 </div>
             </div>
+            {% if app.user and app.user.id == user.id %}
+            <div class="mt-8 border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-[#D4AF37] mb-2">Face Authentication</h3>
+                        {% set faceAuth = user.faceAuthentication %}
+                        <p class="text-gray-400 text-sm mb-2">
+                            {% if faceAuth and faceAuth.enabled %}
+                                Face registered on {{ faceAuth.registeredAt|date('M d, Y - H:i') }}
+                            {% else %}
+                                No face data registered for this account.
+                            {% endif %}
+                        </p>
+                        <p id="face-status-message" class="text-sm"></p>
+                    </div>
+                    <div class="flex flex-col items-end gap-2">
+                        <button id="open-face-modal" type="button" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">
+                            {% if faceAuth and faceAuth.enabled %}
+                                Re-register Face
+                            {% else %}
+                                Register Face
+                            {% endif %}
+                        </button>
+                        <span class="text-xs text-gray-500">Used for passwordless login.</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
 
         <!-- Permissions Tab -->
@@ -339,8 +367,204 @@
         </div>
     </div>
 
+    {% if app.user and app.user.id == user.id %}
+    <div id="face-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden">
+        <div class="bg-[#12121a] border border-[#D4AF37]/30 rounded-lg p-6 w-full max-w-lg">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-[#D4AF37]">Register Face</h3>
+                <button id="close-face-modal" type="button" class="text-gray-400 hover:text-[#D4AF37]">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <div class="relative bg-black rounded-lg overflow-hidden h-64 flex items-center justify-center">
+                    <video id="face-video" autoplay playsinline class="w-full h-full object-cover"></video>
+                    <canvas id="face-canvas" class="hidden"></canvas>
+                    <img id="face-preview" alt="Face preview" class="hidden w-full h-full object-cover">
+                    <div id="face-loading" class="hidden absolute inset-0 flex items-center justify-center bg-black/60">
+                        <div class="h-10 w-10 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button id="capture-face" type="button" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">Capture</button>
+                    <button id="confirm-face" type="button" class="px-4 py-2 bg-transparent border border-[#D4AF37]/40 text-[#D4AF37] rounded hover:bg-[#1a1a24] transition font-bold">Save</button>
+                </div>
+                <p class="text-xs text-gray-400">Ensure your face is well lit and clearly visible.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <script src="{{ asset('assets/main.js') }}"></script>
-    <script></script>
+    <script>
+        function switchTab(id) {
+            var contents = document.querySelectorAll('.tab-content');
+            contents.forEach(function (el) {
+                el.classList.add('hidden');
+            });
+            var buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(function (btn) {
+                btn.classList.remove('border-[#D4AF37]', 'text-[#D4AF37]');
+                btn.classList.add('border-transparent', 'text-gray-400');
+            });
+            var active = document.getElementById(id);
+            if (active) {
+                active.classList.remove('hidden');
+            }
+            var button = Array.prototype.find.call(buttons, function (b) {
+                return b.getAttribute('onclick') === "switchTab('" + id + "')";
+            });
+            if (button) {
+                button.classList.add('border-[#D4AF37]', 'text-[#D4AF37]');
+                button.classList.remove('border-transparent', 'text-gray-400');
+            }
+        }
+
+        function showNotification(message, type) {
+            var colorClasses = type === 'info'
+                ? 'bg-blue-500/20 text-blue-400 border-blue-500/20'
+                : type === 'error'
+                    ? 'bg-red-500/20 text-red-400 border-red-500/20'
+                    : 'bg-green-500/20 text-green-400 border-green-500/20';
+            var container = document.createElement('div');
+            container.className = 'fixed top-4 right-4 z-50';
+            var alert = document.createElement('div');
+            alert.className = 'px-4 py-3 rounded-lg border ' + colorClasses;
+            alert.textContent = message;
+            container.appendChild(alert);
+            document.body.appendChild(container);
+            setTimeout(function () {
+                container.remove();
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var openButton = document.getElementById('open-face-modal');
+            var modal = document.getElementById('face-modal');
+            if (!openButton || !modal) {
+                return;
+            }
+
+            var closeButton = document.getElementById('close-face-modal');
+            var video = document.getElementById('face-video');
+            var canvas = document.getElementById('face-canvas');
+            var preview = document.getElementById('face-preview');
+            var captureButton = document.getElementById('capture-face');
+            var confirmButton = document.getElementById('confirm-face');
+            var loading = document.getElementById('face-loading');
+            var statusMessage = document.getElementById('face-status-message');
+            var stream = null;
+            var capturedImage = null;
+
+            function openModal() {
+                modal.classList.remove('hidden');
+                capturedImage = null;
+                preview.classList.add('hidden');
+                video.classList.remove('hidden');
+                loading.classList.add('hidden');
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    if (statusMessage) {
+                        statusMessage.textContent = 'Camera not supported in this browser.';
+                        statusMessage.className = 'text-sm text-red-400';
+                    }
+                    return;
+                }
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function (mediaStream) {
+                        stream = mediaStream;
+                        video.srcObject = mediaStream;
+                    })
+                    .catch(function () {
+                        if (statusMessage) {
+                            statusMessage.textContent = 'Unable to access camera.';
+                            statusMessage.className = 'text-sm text-red-400';
+                        }
+                    });
+            }
+
+            function closeModal() {
+                modal.classList.add('hidden');
+                if (stream) {
+                    stream.getTracks().forEach(function (track) {
+                        track.stop();
+                    });
+                    stream = null;
+                }
+            }
+
+            function captureFrame() {
+                if (!video || video.readyState < 2) {
+                    return;
+                }
+                var width = video.videoWidth;
+                var height = video.videoHeight;
+                if (!width || !height) {
+                    return;
+                }
+                canvas.width = width;
+                canvas.height = height;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, width, height);
+                capturedImage = canvas.toDataURL('image/jpeg', 0.9);
+                preview.src = capturedImage;
+                preview.classList.remove('hidden');
+                video.classList.add('hidden');
+            }
+
+            function submitFace() {
+                if (!capturedImage) {
+                    if (statusMessage) {
+                        statusMessage.textContent = 'Capture an image before saving.';
+                        statusMessage.className = 'text-sm text-yellow-400';
+                    }
+                    return;
+                }
+                loading.classList.remove('hidden');
+                fetch('{{ path('profile_face_register') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ image: capturedImage })
+                })
+                    .then(function (response) {
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        loading.classList.add('hidden');
+                        if (data && data.success) {
+                            if (statusMessage) {
+                                statusMessage.textContent = 'Face registered successfully.';
+                                statusMessage.className = 'text-sm text-green-400';
+                            }
+                            closeModal();
+                            window.location.reload();
+                        } else {
+                            if (statusMessage) {
+                                statusMessage.textContent = data && data.message ? data.message : 'Unable to register face.';
+                                statusMessage.className = 'text-sm text-red-400';
+                            }
+                        }
+                    })
+                    .catch(function () {
+                        loading.classList.add('hidden');
+                        if (statusMessage) {
+                            statusMessage.textContent = 'Error communicating with server.';
+                            statusMessage.className = 'text-sm text-red-400';
+                        }
+                    });
+            }
+
+            openButton.addEventListener('click', openModal);
+            closeButton.addEventListener('click', closeModal);
+            captureButton.addEventListener('click', captureFrame);
+            confirmButton.addEventListener('click', submitFace);
+            modal.addEventListener('click', function (event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
 

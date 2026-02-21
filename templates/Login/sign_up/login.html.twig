@@ -78,6 +78,8 @@
                     <div class="text-red-400 text-sm mt-2">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                 {% endif %}
 
+                <div id="face-login-error" class="text-red-400 text-sm mt-2 hidden"></div>
+
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
                 <!-- Divider -->
@@ -91,7 +93,7 @@
                 </div>
 
                 <!-- OAuth Buttons -->
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-3 gap-4">
                     <a href="{{ path('connect_google') }}" class="flex items-center justify-center px-4 py-2 rounded-md border border-[#D4AF37]/20 hover:bg-[#1e1e2e] transition-colors">
                         <svg class="h-4 w-4" viewBox="0 0 24 24">
                             <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -104,6 +106,9 @@
                         <svg class="mx-auto h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
                         </svg>
+                    </button>
+                    <button type="button" id="open-face-login" class="flex items-center justify-center px-4 py-2 rounded-md border border-[#D4AF37]/20 hover:bg-[#1e1e2e] transition-colors text-sm font-medium">
+                        Login with Face
                     </button>
                 </div>
 
@@ -155,7 +160,152 @@
         </div>
     </footer>
 
+    <div id="face-login-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden">
+        <div class="bg-[#12121a] border border-[#D4AF37]/30 rounded-lg p-6 w-full max-w-lg">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-[#D4AF37]">Login with Face</h3>
+                <button id="close-face-login" type="button" class="text-gray-400 hover:text-[#D4AF37]">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <div class="relative bg-black rounded-lg overflow-hidden h-64 flex items-center justify-center">
+                    <video id="face-login-video" autoplay playsinline class="w-full h-full object-cover"></video>
+                    <canvas id="face-login-canvas" class="hidden"></canvas>
+                    <img id="face-login-preview" alt="Face preview" class="hidden w-full h-full object-cover">
+                    <div id="face-login-loading" class="hidden absolute inset-0 flex items-center justify-center bg-black/60">
+                        <div class="h-10 w-10 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button id="capture-face-login" type="button" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">Capture</button>
+                    <button id="submit-face-login" type="button" class="px-4 py-2 bg-transparent border border-[#D4AF37]/40 text-[#D4AF37] rounded hover:bg-[#1a1a24] transition font-bold">Login</button>
+                </div>
+                <p class="text-xs text-gray-400">Ensure your face is clearly visible. Password login remains available.</p>
+            </div>
+        </div>
+    </div>
+
     <script src="{{ asset('assets/main.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var openButton = document.getElementById('open-face-login');
+            var modal = document.getElementById('face-login-modal');
+            var closeButton = document.getElementById('close-face-login');
+            var video = document.getElementById('face-login-video');
+            var canvas = document.getElementById('face-login-canvas');
+            var preview = document.getElementById('face-login-preview');
+            var captureButton = document.getElementById('capture-face-login');
+            var submitButton = document.getElementById('submit-face-login');
+            var loading = document.getElementById('face-login-loading');
+            var errorBox = document.getElementById('face-login-error');
+            var stream = null;
+            var capturedImage = null;
+            var emailInput = document.querySelector('input[name=\"_username\"]');
+
+            if (!openButton || !modal) {
+                return;
+            }
+
+            function openModal() {
+                modal.classList.remove('hidden');
+                capturedImage = null;
+                preview.classList.add('hidden');
+                video.classList.remove('hidden');
+                loading.classList.add('hidden');
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    showFaceError('Camera not supported in this browser.');
+                    return;
+                }
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function (mediaStream) {
+                        stream = mediaStream;
+                        video.srcObject = mediaStream;
+                    })
+                    .catch(function () {
+                        showFaceError('Unable to access camera.');
+                    });
+            }
+
+            function closeModal() {
+                modal.classList.add('hidden');
+                if (stream) {
+                    stream.getTracks().forEach(function (track) {
+                        track.stop();
+                    });
+                    stream = null;
+                }
+            }
+
+            function captureFrame() {
+                if (!video || video.readyState < 2) {
+                    return;
+                }
+                var width = video.videoWidth;
+                var height = video.videoHeight;
+                if (!width || !height) {
+                    return;
+                }
+                canvas.width = width;
+                canvas.height = height;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, width, height);
+                capturedImage = canvas.toDataURL('image/jpeg', 0.9);
+                preview.src = capturedImage;
+                preview.classList.remove('hidden');
+                video.classList.add('hidden');
+            }
+
+            function showFaceError(message) {
+                if (!errorBox) {
+                    return;
+                }
+                errorBox.textContent = message;
+                errorBox.classList.remove('hidden');
+            }
+
+            function submitFaceLogin() {
+                if (!capturedImage) {
+                    showFaceError('Capture an image before logging in.');
+                    return;
+                }
+                loading.classList.remove('hidden');
+                errorBox.classList.add('hidden');
+                fetch('{{ path('face_login') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ image: capturedImage, email: emailInput ? emailInput.value : '' })
+                })
+                    .then(function (response) {
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        loading.classList.add('hidden');
+                        if (data && data.success && data.redirect) {
+                            window.location.href = data.redirect;
+                        } else if (data && data.message) {
+                            showFaceError(data.message);
+                        } else {
+                            showFaceError('Unable to login with face.');
+                        }
+                    })
+                    .catch(function () {
+                        loading.classList.add('hidden');
+                        showFaceError('Error communicating with server.');
+                    });
+            }
+
+            openButton.addEventListener('click', openModal);
+            closeButton.addEventListener('click', closeModal);
+            captureButton.addEventListener('click', captureFrame);
+            submitButton.addEventListener('click', submitFaceLogin);
+            modal.addEventListener('click', function (event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
-

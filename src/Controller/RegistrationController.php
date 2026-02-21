@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class RegistrationController extends AbstractController
 {
@@ -17,7 +18,8 @@ class RegistrationController extends AbstractController
     public function register(
         Request $request,
         UserPasswordHasherInterface $userPasswordHasher,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        HttpClientInterface $httpClient
     ): Response {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -51,6 +53,22 @@ class RegistrationController extends AbstractController
             // Persist and flush
             $entityManager->persist($user);
             $entityManager->flush();
+
+            try {
+                $fullName = trim(($user->getFirstName() ?? '') . ' ' . ($user->getLastName() ?? ''));
+                if ($fullName === '') {
+                    $fullName = (string) $user->getUsername();
+                }
+                $response = $httpClient->request('POST', 'https://michealt1.app.n8n.cloud/webhook-test/welcome-user', [
+                    'json' => [
+                        'name' => $fullName,
+                        'email' => (string) $user->getEmail(),
+                    ],
+                    'timeout' => 3.0,
+                ]);
+                $response->getStatusCode();
+            } catch (\Throwable $e) {
+            }
 
             // Redirect to login or dashboard
             return $this->redirectToRoute('app_login');

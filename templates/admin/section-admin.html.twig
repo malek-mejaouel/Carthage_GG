@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Management | CarthageGG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ asset('assets/styles/admin.css') }}">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    {% include 'admin/_sidebar.html.twig' %}
+    <div class="lg:ml-64 flex flex-col min-h-screen">
+    <main class="flex-1 p-6">
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-white">Admin Management</h1>
+            <a href="{{ path('app_admin_dashboard') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg font-bold hover:bg-[#B8941F] transition">Back to Dashboard</a>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="lg:col-span-2 bg-[#12121a] rounded-xl border border-[#D4AF37]/10 p-6">
+                <h3 class="text-lg font-bold text-white mb-4">User Roles Distribution</h3>
+                <div class="relative h-80">
+                    <canvas id="rolesChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 p-6">
+                <h3 class="text-lg font-bold text-white mb-4">New Registrations</h3>
+                <div class="relative h-64">
+                    <canvas id="registrationsChartAdmin"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 overflow-hidden">
+            <div class="p-6 border-b border-[#D4AF37]/10 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white">Users</h3>
+                <div class="flex gap-2">
+                    <button class="px-4 py-2 bg-[#D4AF37]/10 text-[#D4AF37] rounded-lg text-sm font-medium hover:bg-[#D4AF37]/20 transition">Export</button>
+                    <button class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg text-sm font-bold hover:bg-[#B8941F] transition">Add</button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-gray-400">
+                    <thead class="bg-[#1a1a24] text-[#D4AF37] uppercase font-bold text-xs">
+                        <tr>
+                            <th class="px-6 py-4">ID</th>
+                            <th class="px-6 py-4">Username</th>
+                            <th class="px-6 py-4">Email</th>
+                            <th class="px-6 py-4">Role</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D4AF37]/10">
+                        <tr class="table-row-hover transition">
+                            <td class="px-6 py-4 font-medium text-white">#001</td>
+                            <td class="px-6 py-4">ShadowKnight</td>
+                            <td class="px-6 py-4">shadow@esports.com</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-[#D4AF37]/20 text-[#D4AF37] rounded-full text-xs">Admin</span></td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-xs">Active</span></td>
+                            <td class="px-6 py-4 text-center"><button class="text-gray-400 hover:text-[#D4AF37] transition">Edit</button></td>
+                        </tr>
+                        <tr class="table-row-hover transition">
+                            <td class="px-6 py-4 font-medium text-white">#002</td>
+                            <td class="px-6 py-4">ProGamer99</td>
+                            <td class="px-6 py-4">pro99@esports.com</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-blue-500/10 text-blue-500 rounded-full text-xs">Moderator</span></td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-xs">Active</span></td>
+                            <td class="px-6 py-4 text-center"><button class="text-gray-400 hover:text-[#D4AF37] transition">Edit</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="px-6 py-4 border-t border-[#D4AF37]/10 flex justify-between items-center">
+                <span class="text-sm text-gray-500">Showing 1-2 of 2</span>
+                <div class="flex gap-2">
+                    <button class="px-3 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded-lg text-sm text-gray-400">Prev</button>
+                    <button class="px-3 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg text-sm font-bold">1</button>
+                    <button class="px-3 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded-lg text-sm text-gray-400">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </main>
+    </div>
+    <script>
+        const rolesCtx = document.getElementById('rolesChart');
+        new Chart(rolesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Admin', 'Moderator', 'Player'],
+                datasets: [{ data: [5, 20, 75], backgroundColor: ['#D4AF37', '#3B82F6', '#A855F7'] }]
+            },
+            options: { plugins: { legend: { labels: { color: '#e4e4e7' } } } }
+        });
+        const regCtx = document.getElementById('registrationsChartAdmin');
+        new Chart(regCtx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{ label: 'Registrations', data: [12, 19, 7, 14, 22, 18, 25], borderColor: '#D4AF37', backgroundColor: 'rgba(212,175,55,0.1)' }]
+            },
+            options: { scales: { x: { ticks: { color: '#9CA3AF' } }, y: { ticks: { color: '#9CA3AF' } } } }
+        });
+    </script>
+</script>
+<script src="{{ asset('assets/js/admin-dashboard.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - CarthageGG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('assets/styles/styles.css') }}" />
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-[#0a0a0f]/95 backdrop-blur-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex h-16 items-center justify-between">
+                <a href="{{ path('app_index') }}" class="flex items-center space-x-2">
+                    <img src="{{ asset('assets/images/zz.png') }}" alt="CarthageGG Logo" class="h-14 w-14 rounded-lg shadow-lg object-cover">
+                    <span class="text-2xl font-bold text-[#D4AF37]">Carthage</span>
+                    <span class="text-2xl font-bold text-white">GG</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Form -->
+    <div class="container mx-auto flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
+        <div class="w-full max-w-md border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-8">
+            <div class="space-y-1 text-center mb-8">
+                <img src="{{ asset('assets/images/zz.png') }}" alt="CarthageGG Logo" class="h-16 w-16 rounded-lg mx-auto mb-4">
+                <h2 class="text-2xl font-bold">Welcome Back</h2>
+                <p class="text-gray-400">Sign in to your CarthageGG account</p>
+            </div>
+
+            <form method="post" action="{{ path('app_login') }}" class="space-y-4">
+                <!-- Email -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium">Email</label>
+                    <div class="relative">
+                        <svg class="absolute left-3 top-3 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <input
+                            type="email"
+                            name="_username"
+                            value="{{ last_username|default('') }}"
+                            placeholder="your@email.com"
+                            required
+                            class="w-full pl-10 pr-4 py-2 rounded-md bg-[#1e1e2e] border border-[#D4AF37]/20 focus:outline-none focus:border-[#D4AF37]/50"
+                        />
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm font-medium">Password</label>
+                        <a href="#" class="text-sm text-[#D4AF37] hover:underline">Forgot password?</a>
+                    </div>
+                    <div class="relative">
+                        <svg class="absolute left-3 top-3 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <input
+                            type="password"
+                            name="_password"
+                            placeholder="••••••••"
+                            required
+                            class="w-full pl-10 pr-4 py-2 rounded-md bg-[#1e1e2e] border border-[#D4AF37]/20 focus:outline-none focus:border-[#D4AF37]/50"
+                        />
+                    </div>
+                </div>
+
+                <!-- Sign In Button -->
+                <button type="submit" class="w-full px-6 py-2 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] font-medium hover:opacity-90 transition-opacity">
+                    Sign In
+                </button>
+
+                {% if error %}
+                    <div class="text-red-400 text-sm mt-2">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <!-- Divider -->
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <span class="w-full border-t border-[#D4AF37]/20" />
+                    </div>
+                    <div class="relative flex justify-center text-xs uppercase">
+                        <span class="bg-[#12121a] px-2 text-gray-400">Or continue with</span>
+                    </div>
+                </div>
+
+                <!-- OAuth Buttons -->
+                <div class="grid grid-cols-2 gap-4">
+                    <a href="{{ path('connect_google') }}" class="flex items-center justify-center px-4 py-2 rounded-md border border-[#D4AF37]/20 hover:bg-[#1e1e2e] transition-colors">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                    </a>
+                    <button type="button" class="px-4 py-2 rounded-md border border-[#D4AF37]/20 hover:bg-[#1e1e2e] transition-colors">
+                        <svg class="mx-auto h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Sign Up Link -->
+                <div class="text-center text-sm">
+                    Don't have an account?
+                    <a href="{{ path('app_register') }}" class="text-[#D4AF37] hover:underline">Sign up</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#D4AF37]/20 bg-[#0a0a0f]">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-[#D4AF37] mb-4">CarthageGG</h3>
+                    <p class="text-gray-400 text-sm">Tunisia's premier esports platform</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Platform</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="{{ path('app_index') }}" class="hover:text-[#D4AF37] transition-colors">Tournaments</a></li>
+                        <li><a href="{{ path('app_index') }}" class="hover:text-[#D4AF37] transition-colors">Teams</a></li>
+                        <li><a href="{{ path('app_index') }}" class="hover:text-[#D4AF37] transition-colors">Matches</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Compete</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="{{ path('app_index') }}" class="hover:text-[#D4AF37] transition-colors">Leaderboard</a></li>
+                        <li><a href="{{ path('app_register') }}" class="hover:text-[#D4AF37] transition-colors">Register</a></li>
+                        <li><a href="{{ path('app_index') }}" class="hover:text-[#D4AF37] transition-colors">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Follow</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37] transition-colors">Twitter</a>
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37] transition-colors">Discord</a>
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37] transition-colors">YouTube</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-[#D4AF37]/20 pt-8 text-center text-gray-400 text-sm">
+                <p>&copy; 2026 CarthageGG. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ asset('assets/main.js') }}"></script>
+</body>
+</html>
+

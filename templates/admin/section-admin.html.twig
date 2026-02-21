@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Admin Management | CarthageGG</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    font-family: 'Inter', sans-serif;
+    background:#0a0a0f;
+    color:#e4e4e7;
+}
+
+/* ===== Panels ===== */
+
+.panel {
+    background:#12121a;
+    border:1px solid rgba(212,175,55,.15);
+    border-radius:14px;
+    box-shadow:0 0 25px rgba(212,175,55,.05);
+}
+
+/* ===== Search Bar ===== */
+
+.search-panel {
+    padding:18px;
+}
+
+.search-input,
+.search-select {
+    background:#0f0f16;
+    border:1px solid rgba(212,175,55,.2);
+    border-radius:10px;
+    padding:10px 14px;
+    width:100%;
+    transition:.2s;
+}
+
+.search-input:focus,
+.search-select:focus {
+    outline:none;
+    border-color:#D4AF37;
+    box-shadow:0 0 0 2px rgba(212,175,55,.2);
+}
+
+.search-icon {
+    position:absolute;
+    left:12px;
+    top:50%;
+    transform:translateY(-50%);
+    opacity:.5;
+}
+
+/* ===== Table ===== */
+
+.table-wrapper {
+    overflow:auto;
+}
+
+.user-table {
+    width:100%;
+    border-collapse:collapse;
+    min-width:900px;
+}
+
+.user-table th {
+    position:sticky;
+    top:0;
+    background:#1a1a24;
+    color:#D4AF37;
+    font-weight:600;
+    text-align:left;
+    padding:14px 18px;
+}
+
+.user-table td {
+    padding:14px 18px;
+    border-top:1px solid rgba(212,175,55,.08);
+}
+
+.user-table tbody tr:nth-child(even) {
+    background:rgba(255,255,255,.02);
+}
+
+.user-table tbody tr:hover {
+    background:rgba(212,175,55,.08);
+}
+
+/* ===== Badges ===== */
+
+.badge {
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:500;
+}
+
+.badge-role {
+    background:rgba(212,175,55,.2);
+    color:#D4AF37;
+}
+
+.badge-active {
+    background:rgba(34,197,94,.2);
+    color:#22c55e;
+}
+
+.badge-inactive {
+    background:rgba(234,179,8,.2);
+    color:#facc15;
+}
+
+/* ===== Buttons ===== */
+
+.btn {
+    padding:10px 16px;
+    border-radius:10px;
+    font-weight:600;
+    transition:.2s;
+}
+
+.btn-primary {
+    background:#D4AF37;
+    color:#0a0a0f;
+}
+
+.btn-primary:hover {
+    background:#b8941f;
+}
+
+.btn-ghost {
+    background:#0f0f16;
+    border:1px solid rgba(212,175,55,.2);
+}
+
+.btn-ghost:hover {
+    background:rgba(212,175,55,.15);
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width:768px) {
+    .filter-stack {
+        flex-direction:column;
+    }
+}
+.chart-box {
+    height:100px;
+}
+</style>
+</head>
+
+<body>
+
+{% include 'admin/_sidebar.html.twig' %}
+
+<div class="lg:ml-64 p-6 space-y-8">
+
+<!-- HEADER -->
+
+<div class="flex justify-between items-center">
+<h1 class="text-2xl font-bold">Admin Management</h1>
+<a href="{{ path('app_admin_dashboard') }}" class="btn btn-primary">Dashboard</a>
+</div>
+
+<!-- CHART -->
+
+<div class="panel p-6">
+<h3 class="font-bold mb-4">User Roles Distribution</h3>
+<div class="chart-box"><canvas id="rolesChart"></canvas></div>
+</div>
+
+<!-- USERS PANEL -->
+
+<div class="panel">
+
+<div class="search-panel">
+
+<form method="get" action="{{ path('app_admin') }}" class="flex gap-4 filter-stack">
+
+<div class="relative flex-1">
+<span class="search-icon">🔍</span>
+<input type="text" name="q"
+value="{{ app.request.query.get('q') }}"
+placeholder="Search users..."
+class="search-input pl-10">
+</div>
+
+<select name="status" class="search-select">
+<option value="">All Status</option>
+<option value="active" {{ app.request.query.get('status') == 'active' ? 'selected' : '' }}>Active</option>
+<option value="inactive" {{ app.request.query.get('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+</select>
+
+<select name="sort" onchange="this.form.submit()" class="search-select">
+<option value="newest">Newest</option>
+<option value="oldest">Oldest</option>
+<option value="id_asc">ID ↑</option>
+<option value="id_desc">ID ↓</option>
+</select>
+
+<button class="btn btn-primary">Search</button>
+
+{% if app.request.query.get('q') or app.request.query.get('status') or app.request.query.get('sort') %}
+<a href="{{ path('app_admin') }}" class="btn btn-ghost">Clear</a>
+{% endif %}
+
+</form>
+
+</div>
+
+<!-- TABLE -->
+
+<div class="table-wrapper">
+
+<table class="user-table">
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Username</th>
+<th>Email</th>
+<th>Role</th>
+<th>Status</th>
+<th>Joined</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for user in users %}
+{% set role = user.roles|first|default('ROLE_USER') %}
+<tr data-role="{{ role }}" data-active="{{ user.isActive ? 'active' : 'inactive' }}">
+
+<td>#{{ user.id }}</td>
+
+<td class="font-semibold">
+{{ user.firstName ~ '_' ~ user.lastName }}
+</td>
+
+<td class="opacity-70">{{ user.email }}</td>
+
+<td>
+<span class="badge badge-role">
+{{ role|replace({'ROLE_':'','_':' '}) }}
+</span>
+</td>
+
+<td>
+<span class="badge {{ user.isActive ? 'badge-active' : 'badge-inactive' }}">
+{{ user.isActive ? 'Active' : 'Inactive' }}
+</span>
+</td>
+
+<td class="opacity-70">
+{{ user.createdAt ? user.createdAt|date('M d, Y') : '-' }}
+</td>
+
+<td class="space-x-2">
+
+<a href="{{ path('app_profile_edit', {'id': user.id}) }}"
+class="text-[#D4AF37] hover:underline">
+Edit
+</a>
+
+<form method="post"
+action="{{ path('app_user_delete', {'id': user.id}) }}"
+class="inline">
+
+<input type="hidden"
+name="_token"
+value="{{ csrf_token('delete_user_' ~ user.id) }}">
+
+<button class="text-red-400 hover:underline">
+Suspend
+</button>
+
+</form>
+
+</td>
+
+</tr>
+
+{% else %}
+
+<tr>
+<td colspan="7" class="text-center opacity-60 py-6">
+No users found
+</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const rolesCtx = document.getElementById('rolesChart');
+const roleOrder = ['ROLE_ADMIN','ROLE_MODERATOR','ROLE_USER','ROLE_ORGANISER','ROLE_COACH','ROLE_VIEWER'];
+const roleLabel = {
+    'ROLE_ADMIN':'Admin',
+    'ROLE_MODERATOR':'Moderator',
+    'ROLE_USER':'Player',
+    'ROLE_ORGANISER':'Organiser',
+    'ROLE_COACH':'Coach',
+    'ROLE_VIEWER':'Viewer'
+};
+const roleColor = {
+    'Admin':'#D4AF37',
+    'Moderator':'#3B82F6',
+    'Player':'#A855F7',
+    'Organiser':'#22c55e',
+    'Coach':'#ef4444',
+    'Viewer':'#f59e0b'
+};
+function computeRoleCounts() {
+    const rows = Array.from(document.querySelectorAll('.user-table tbody tr'));
+    const counts = {};
+    rows.filter(r => r.style.display !== 'none').forEach(r => {
+        const code = r.dataset.role || 'ROLE_USER';
+        const label = roleLabel[code] || code.replace('ROLE_','').replace('_',' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+        counts[label] = (counts[label] || 0) + 1;
+    });
+    const labels = [];
+    roleOrder.forEach(code => {
+        const lbl = roleLabel[code];
+        if (lbl && counts[lbl]) labels.push(lbl);
+    });
+    Object.keys(counts).forEach(lbl => {
+        if (!labels.includes(lbl)) labels.push(lbl);
+    });
+    const data = labels.map(lbl => counts[lbl] || 0);
+    const colors = labels.map(lbl => roleColor[lbl] || '#9CA3AF');
+    return { labels, data, colors };
+}
+const initial = computeRoleCounts();
+const rolesChart = new Chart(rolesCtx, {
+    type:'doughnut',
+    data:{
+        labels: initial.labels,
+        datasets:[{
+            data: initial.data,
+            backgroundColor: initial.colors
+        }]
+    },
+    options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:'#e4e4e7'}}}
+    }
+});
+function updateRolesChart() {
+    const next = computeRoleCounts();
+    rolesChart.data.labels = next.labels;
+    rolesChart.data.datasets[0].data = next.data;
+    rolesChart.data.datasets[0].backgroundColor = next.colors;
+    rolesChart.update();
+}
+const rows = Array.from(document.querySelectorAll('.user-table tbody tr'));
+const search = document.querySelector('[name="q"]');
+const statusSelect = document.querySelector('select[name="status"]');
+function applyFilters() {
+    const term = (search?.value || '').toLowerCase().trim();
+    const status = statusSelect?.value || '';
+    rows.forEach(row => {
+        const matchesText = row.textContent.toLowerCase().includes(term);
+        const matchesStatus = status === '' || (row.dataset.active === status);
+        row.style.display = (matchesText && matchesStatus) ? '' : 'none';
+    });
+    updateRolesChart();
+}
+if (search) search.addEventListener('input', applyFilters);
+if (statusSelect) statusSelect.addEventListener('change', applyFilters);
+applyFilters();
+
+</script>
+
+</body>
+</html>

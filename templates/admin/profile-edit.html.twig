@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile | CarthageGG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('assets/styles/styles.css') }}">
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    <!-- Navigation -->
+    <nav class="bg-[#12121a] border-b border-[#D4AF37]/20 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <img src="{{ asset('assets/images/zz.png') }}" alt="CarthageGG Logo" class="w-14 h-14 rounded-lg shadow-lg object-cover">
+                <span class=\"font-bold text-[#D4AF37]\">CarthageGG</span>
+            </div>
+            <div class="flex gap-8 items-center">
+                <a href="{{ path('app_index') }}" class="hover:text-[#D4AF37] transition">Home</a>
+                {% if 'ROLE_ADMIN' in user.roles %}
+                    <a href="{{ path('app_admin_dashboard') }}" class="hover:text-[#D4AF37] transition">Dashboard</a>
+                {% endif %}
+                <h3 class="hover:text-[#D4AF37] transition">{{ app.user.roles[0]|replace({'ROLE_': ''})|lower|capitalize }}</h3>
+                <a href="{{ path('app_login') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg hover:bg-[#B8941F] transition">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-12 max-w-4xl">
+        <!-- Header -->
+        <div class="mb-12">
+            <h1 class="text-4xl font-bold text-[#D4AF37] mb-2">Edit User Profile</h1>
+            <p class="text-gray-400">Manage user account and permissions</p>
+        </div>
+        {% if app.flashes %}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="mb-6 px-4 py-3 rounded-lg border {% if label == 'success' %}bg-green-500/10 text-green-500 border-green-500/20{% else %}bg-red-500/10 text-red-500 border-red-500/20{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+
+        <!-- Profile Tabs -->
+        <div class="mb-8 border-b border-[#D4AF37]/20">
+            <div class="flex gap-8">
+                <button onclick="switchTab('basicInfo')" class="tab-button px-4 py-3 border-b-2 border-[#D4AF37] text-[#D4AF37] font-bold">📋 Basic Info</button>
+                <button onclick="switchTab('permissions')" class="tab-button px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-[#D4AF37]">🔐 Permissions</button>
+                <button onclick="switchTab('activity')" class="tab-button px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-[#D4AF37]">📊 Activity</button>
+            </div>
+        </div>
+
+        <!-- Basic Info Tab -->
+        <div id="basicInfo" class="tab-content">
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Profile Picture -->
+                <div class="md:col-span-1">
+                    <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 text-center">
+                        <form method="post" action="{{ path('app_profile_edit', {'id': user.id}) }}" enctype="multipart/form-data" id="avatarForm">
+                            <input type="hidden" name="_token" value="{{ csrf_token('profile_edit_' ~ user.id) }}">
+                            <div class="w-24 h-24 bg-gradient-to-br from-[#D4AF37] to-[#B8941F] rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                                {% if user.avatar %}
+                                    <img src="{{ asset(user.avatar) }}" alt="Avatar" class="w-full h-full object-cover rounded-full">
+                                {% else %}
+                                    <svg class="w-12 h-12 text-[#0a0a0f]" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                {% endif %}
+                            </div>
+                            <h3 class="font-bold mb-2">{{ user.firstName ? (user.firstName ~ ' ' ~ (user.lastName ?: '')) : (user.username ?: user.email) }}</h3>
+                            <p class="text-gray-400 text-sm mb-4">
+                                {% set role = user.roles|first %}
+                                {{ role|default('User')|replace({'ROLE_':'', '_':' '}) }}
+                            </p>
+                            <input type="file" name="avatar" id="avatarInput" accept="image/*" class="hidden" onchange="document.getElementById('avatarForm').submit();">
+                            <label for="avatarInput" class="w-full px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition text-sm font-bold cursor-pointer inline-block">Change Avatar</label>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- User Info Form -->
+                <div class="md:col-span-2">
+                    <form method="post" action="{{ path('app_profile_edit', {'id': user.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('profile_edit_' ~ user.id) }}">
+                        <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 space-y-6">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-bold mb-2">First Name</label>
+                                    <input type="text" name="firstName" value="{{ user.firstName ?? '' }}" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold mb-2">Last Name</label>
+                                    <input type="text" name="lastName" value="{{ user.lastName ?? '' }}" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Username</label>
+                                <input type="text" name="username" value="{{ user.username ?? '' }}" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Email Address</label>
+                                <input type="email" name="email" value="{{ user.email ?? '' }}" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Bio</label>
+                                <textarea name="bio" rows="4" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none"></textarea>
+                            </div>
+
+                            <div class="flex gap-4 pt-4">
+                                <button type="submit" class="flex-1 px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">Save Changes</button>
+                                <button type="button" onclick="showNotification('Changes discarded', 'info')" class="flex-1 px-4 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded hover:border-[#D4AF37] transition font-bold">Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Settings -->
+            <div class="mt-8 border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6">
+                <h3 class="text-xl font-bold text-[#D4AF37] mb-6">Account Settings</h3>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="font-bold mb-4">Change Password</h4>
+                        <form method="post" action="{{ path('app_profile_change_password', {'id': user.id}) }}" class="space-y-4">
+                            <input type="hidden" name="_token" value="{{ csrf_token('change_password_' ~ user.id) }}">
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Current Password</label>
+                                <input type="password" name="current_password" placeholder="••••••••" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">New Password</label>
+                                <input type="password" name="new_password" placeholder="••••••••" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Confirm Password</label>
+                                <input type="password" name="confirm_password" placeholder="••••••••" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                            </div>
+                            <button type="submit" class="w-full px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">Update Password</button>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold mb-4">Account Status</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-3 bg-[#0a0a0f] rounded border border-[#D4AF37]/20">
+                                <div>
+                                    <p class="font-bold">Account Status</p>
+                                    <p class="text-gray-400 text-sm">{{ user.isActive ? 'Currently Active' : 'Currently Inactive' }}</p>
+                                </div>
+                                <span class="px-3 py-1 {{ user.isActive ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400' }} rounded-full text-sm">{{ user.isActive ? 'Active' : 'Inactive' }}</span>
+                            </div>
+
+                            <div class="flex justify-between items-center p-3 bg-[#0a0a0f] rounded border border-[#D4AF37]/20">
+                                <div>
+                                    <p class="font-bold">Email Verified</p>
+                                    <p class="text-gray-400 text-sm">{{ user.createdAt ? user.createdAt|date('M d, Y') : '-' }}</p>
+                                </div>
+                                <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">✓</span>
+                            </div>
+
+                            <div class="flex justify-between items-center p-3 bg-[#0a0a0f] rounded border border-[#D4AF37]/20">
+                                <div>
+                                    <p class="font-bold">Last Login</p>
+                                    <p class="text-gray-400 text-sm">{{ user.lastLoginAt ? user.lastLoginAt|date('M d, Y - h:i A') : 'Never' }}</p>
+                                </div>
+                                {% if user.lastLoginAt %}
+                                    <span class="text-[#D4AF37] font-bold">{{ user.lastLoginAt|date('M d') }}</span>
+                                {% else %}
+                                    <span class="text-gray-400 font-bold">-</span>
+                                {% endif %}
+                            </div>
+
+                            <button onclick="showNotification('Account suspended', 'info')" class="w-full px-4 py-2 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition font-bold">Suspend Account</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Permissions Tab -->
+        <div id="permissions" class="tab-content hidden">
+            <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6">
+                <form method="post" action="{{ path('app_profile_edit', {'id': user.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('profile_edit_' ~ user.id) }}">
+                    <div class="mb-8">
+                        <h3 class="text-xl font-bold text-[#D4AF37] mb-6">User Role & Permissions</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mb-8">
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Current Role</label>
+                                <select name="role" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                                    {% set currentRole = user.roles|first|default('ROLE_USER') %}
+                                    <option value="ROLE_ADMIN" {{ currentRole == 'ROLE_ADMIN' ? 'selected' : '' }}>Admin</option>
+                                    <option value="ROLE_MODERATOR" {{ currentRole == 'ROLE_MODERATOR' ? 'selected' : '' }}>Moderator</option>
+                                    <option value="ROLE_USER" {{ currentRole == 'ROLE_USER' ? 'selected' : '' }}>Player</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Status</label>
+                                <select name="status" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                                    <option value="active" {{ user.isActive ? 'selected' : '' }}>Active</option>
+                                    <option value="inactive" {{ not user.isActive ? 'selected' : '' }}>Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                <!-- Permissions Grid -->
+                <h4 class="font-bold text-[#D4AF37] mb-4">Specific Permissions</h4>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" checked class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">Manage Users</p>
+                                <p class="text-gray-400 text-sm">Add, edit, and remove user accounts</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" checked class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">Edit Tournaments</p>
+                                <p class="text-gray-400 text-sm">Create and modify tournament settings</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" checked class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">View Analytics</p>
+                                <p class="text-gray-400 text-sm">Access platform statistics and reports</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" checked class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">System Settings</p>
+                                <p class="text-gray-400 text-sm">Modify platform configuration</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" checked class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">Moderate Content</p>
+                                <p class="text-gray-400 text-sm">Remove or flag inappropriate content</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">View User Logs</p>
+                                <p class="text-gray-400 text-sm">Access detailed user activity logs</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" checked class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">Manage Payouts</p>
+                                <p class="text-gray-400 text-sm">Process prize distributions</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">Export Data</p>
+                                <p class="text-gray-400 text-sm">Download platform data exports</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                    <div class="mt-8 flex gap-4">
+                        <button type="submit" class="flex-1 px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">Save Permissions</button>
+                        <button type="button" onclick="window.location.reload()" class="flex-1 px-4 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded hover:border-[#D4AF37] transition font-bold">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Activity Tab -->
+        <div id="activity" class="tab-content hidden">
+            <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-[#1a1a24] border-b border-[#D4AF37]/20">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-[#D4AF37] font-bold">Date & Time</th>
+                            <th class="px-6 py-4 text-left text-[#D4AF37] font-bold">Action</th>
+                            <th class="px-6 py-4 text-left text-[#D4AF37] font-bold">IP Address</th>
+                            <th class="px-6 py-4 text-left text-[#D4AF37] font-bold">Device</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D4AF37]/20">
+                        <tr class="hover:bg-[#1a1a24] transition">
+                            <td class="px-6 py-4">Feb 3, 2026 - 10:35 AM</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded text-sm">Login</span></td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">192.168.1.1</td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">Windows - Chrome</td>
+                        </tr>
+                        <tr class="hover:bg-[#1a1a24] transition">
+                            <td class="px-6 py-4">Feb 2, 2026 - 3:22 PM</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-green-500/20 text-green-400 rounded text-sm">Profile Updated</span></td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">192.168.1.1</td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">Windows - Chrome</td>
+                        </tr>
+                        <tr class="hover:bg-[#1a1a24] transition">
+                            <td class="px-6 py-4">Feb 1, 2026 - 8:15 PM</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded text-sm">User Suspended</span></td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">192.168.1.2</td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">Windows - Firefox</td>
+                        </tr>
+                        <tr class="hover:bg-[#1a1a24] transition">
+                            <td class="px-6 py-4">Jan 30, 2026 - 2:45 PM</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded text-sm">Password Changed</span></td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">192.168.1.1</td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">Windows - Chrome</td>
+                        </tr>
+                        <tr class="hover:bg-[#1a1a24] transition">
+                            <td class="px-6 py-4">Jan 25, 2026 - 11:20 AM</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded text-sm">Login</span></td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">192.168.1.3</td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">Mac OS - Safari</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ asset('assets/main.js') }}"></script>
+    <script></script>
+</body>
+</html>
+

@@ -13,6 +13,10 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Service\UserBanService;
+use App\Repository\UserRepository as AppUserRepository;
+use App\Entity\User as AppUser;
 class AdminDashboardController extends AbstractController
 {
       #[Route('/admin/dashboard/news', name: 'app_admin_dash_news')]
@@ -37,6 +41,58 @@ class AdminDashboardController extends AbstractController
         return $this->render('admin/section-admin.html.twig', [
             'users' => $users->findAll(),
         ]);
+    }
+    #[Route('/admin/user/{id}/ban', name: 'admin_user_ban', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function banUser(
+        int $id,
+        Request $request,
+        AppUserRepository $userRepository,
+        UserBanService $banService
+    ): Response {
+        $admin = $this->getUser();
+        if (!$admin instanceof AppUser) {
+            return new JsonResponse(['success' => false, 'message' => 'Authentication required'], Response::HTTP_UNAUTHORIZED);
+        }
+        $target = $userRepository->find($id);
+        if (!$target instanceof AppUser) {
+            return new JsonResponse(['success' => false, 'message' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+        $data = json_decode($request->getContent(), true) ?: [];
+        $value = (int)($data['value'] ?? 0);
+        $unit = trim((string)($data['unit'] ?? 'minutes'));
+        $reason = isset($data['reason']) ? trim((string)$data['reason']) : null;
+        try {
+            $banService->applyBan($admin, $target, $value, $unit, $reason);
+            return new JsonResponse(['success' => true, 'remaining' => $target->getRemainingBanTime()]);
+        } catch (\InvalidArgumentException $e) {
+            return new JsonResponse(['success' => false, 'message' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+        } catch (\Throwable $e) {
+            return new JsonResponse(['success' => false, 'message' => $e->getMessage()], Response::HTTP_FORBIDDEN);
+        }
+    }
+
+    #[Route('/admin/user/{id}/unban', name: 'admin_user_unban', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function unbanUser(
+        int $id,
+        AppUserRepository $userRepository,
+        UserBanService $banService
+    ): Response {
+        $admin = $this->getUser();
+        if (!$admin instanceof AppUser) {
+            return new JsonResponse(['success' => false, 'message' => 'Authentication required'], Response::HTTP_UNAUTHORIZED);
+        }
+        $target = $userRepository->find($id);
+        if (!$target instanceof AppUser) {
+            return new JsonResponse(['success' => false, 'message' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+        try {
+            $banService->removeBan($admin, $target);
+            return new JsonResponse(['success' => true]);
+        } catch (\Throwable $e) {
+            return new JsonResponse(['success' => false, 'message' => $e->getMessage()], Response::HTTP_FORBIDDEN);
+        }
     }
 
     #[Route('/admin/dashboard/game', name: 'app_admin_dash_game')]

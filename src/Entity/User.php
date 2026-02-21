@@ -60,6 +60,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: FaceAuthentication::class, cascade: ['persist', 'remove'])]
     private ?FaceAuthentication $faceAuthentication = null;
 
+    #[ORM\Column(name: 'banned_until', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $bannedUntil = null;
+
+    #[ORM\Column(name: 'ban_reason', length: 255, nullable: true)]
+    private ?string $banReason = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -241,6 +247,52 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    public function getBannedUntil(): ?\DateTimeInterface
+    {
+        return $this->bannedUntil;
+    }
+
+    public function setBannedUntil(?\DateTimeInterface $bannedUntil): static
+    {
+        $this->bannedUntil = $bannedUntil;
+        return $this;
+    }
+
+    public function getBanReason(): ?string
+    {
+        return $this->banReason;
+    }
+
+    public function setBanReason(?string $banReason): static
+    {
+        $this->banReason = $banReason;
+        return $this;
+    }
+
+    public function isBanned(): bool
+    {
+        if ($this->bannedUntil === null) {
+            return false;
+        }
+        $now = new \DateTime();
+        return $this->bannedUntil > $now;
+    }
+
+    public function getRemainingBanTime(): string
+    {
+        if (!$this->isBanned() || $this->bannedUntil === null) {
+            return '0s';
+        }
+        $now = new \DateTime();
+        $diff = $now->diff($this->bannedUntil);
+        $parts = [];
+        if ($diff->d > 0) $parts[] = $diff->d . 'd';
+        if ($diff->h > 0) $parts[] = $diff->h . 'h';
+        if ($diff->i > 0) $parts[] = $diff->i . 'm';
+        if ($diff->s > 0) $parts[] = $diff->s . 's';
+        return implode(' ', $parts) ?: '0s';
     }
 
     /**

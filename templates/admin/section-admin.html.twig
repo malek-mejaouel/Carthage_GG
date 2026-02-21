@@ -228,6 +228,7 @@ class="search-input pl-10">
 <th>Email</th>
 <th>Role</th>
 <th>Status</th>
+<th>Ban</th>
 <th>Joined</th>
 <th>Actions</th>
 </tr>
@@ -263,6 +264,16 @@ class="search-input pl-10">
 {{ user.createdAt ? user.createdAt|date('M d, Y') : '-' }}
 </td>
 
+<td>
+    {% if user.bannedUntil %}
+        <span class="badge badge-inactive">Banned ({{ user.getRemainingBanTime() }})</span>
+        {% if user.banReason %}
+            <div class="text-xs opacity-70">Reason: {{ user.banReason }}</div>
+        {% endif %}
+    {% else %}
+        <span class="badge badge-active">Not Banned</span>
+    {% endif %}
+</td>
 <td class="space-x-2">
 
 <a href="{{ path('app_profile_edit', {'id': user.id}) }}"
@@ -278,8 +289,8 @@ class="inline">
 name="_token"
 value="{{ csrf_token('delete_user_' ~ user.id) }}">
 
-<button class="text-red-400 hover:underline">
-Suspend
+<button type="button" class="text-red-400 hover:underline ban-btn" data-user="{{ user.id }}">
+    Ban
 </button>
 
 </form>
@@ -371,6 +382,41 @@ function updateRolesChart() {
     rolesChart.data.datasets[0].backgroundColor = next.colors;
     rolesChart.update();
 }
+document.addEventListener('DOMContentLoaded', () => {
+    function postJSON(url, payload) {
+        return fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json', 'X-Requested-With':'XMLHttpRequest' },
+            body: JSON.stringify(payload || {})
+        }).then(r => r.json());
+    }
+    function promptBan(userId) {
+        const value = parseInt(prompt('Enter duration value:', '30') || '0', 10);
+        if (!value || value <= 0) return;
+        const unit = prompt('Enter unit (minutes/hours/days):', 'minutes') || 'minutes';
+        const reason = prompt('Optional reason:', '') || '';
+        postJSON('{{ path('admin_user_ban', {'id': 0}) }}'.replace('/0/', '/' + userId + '/'), { value, unit, reason })
+            .then(data => { if (data && data.success) location.reload(); else alert(data.message || 'Failed to ban'); })
+            .catch(() => alert('Error'));
+    }
+    function promptUnban(userId) {
+        postJSON('{{ path('admin_user_unban', {'id': 0}) }}'.replace('/0/', '/' + userId + '/'))
+            .then(data => { if (data && data.success) location.reload(); else alert(data.message || 'Failed to unban'); })
+            .catch(() => alert('Error'));
+    }
+    document.querySelectorAll('.ban-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tr = btn.closest('tr');
+            const userId = btn.dataset.user;
+            const isBanned = tr && tr.querySelector('.badge-inactive');
+            if (isBanned) {
+                if (confirm('Unban this user?')) promptUnban(userId);
+            } else {
+                promptBan(userId);
+            }
+        });
+    });
+});
 const rows = Array.from(document.querySelectorAll('.user-table tbody tr'));
 const search = document.querySelector('[name="q"]');
 const statusSelect = document.querySelector('select[name="status"]');

@@ -3,6 +3,9 @@
 namespace App\Controller;
 use App\Entity\News;
 use App\Repository\NewsRepository;
+use App\Repository\GameRepository;
+use App\Repository\MatchRepository;
+use App\Repository\CommentaireRepository;
 use App\Repository\TournamentRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,6 +20,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Service\UserBanService;
 use App\Repository\UserRepository as AppUserRepository;
 use App\Entity\User as AppUser;
+#[IsGranted('ROLE_ADMIN')]
 class AdminDashboardController extends AbstractController
 {
       #[Route('/admin/dashboard/news', name: 'app_admin_dash_news')]
@@ -96,15 +100,21 @@ class AdminDashboardController extends AbstractController
     }
 
     #[Route('/admin/dashboard/game', name: 'app_admin_dash_game')]
-    public function gameSection(): Response
+    public function gameSection(GameRepository $gameRepository): Response
     {
-        return $this->render('admin/section-game.html.twig');
+        $games = $gameRepository->findAll();
+        return $this->render('admin/section-game.html.twig', [
+            'games' => $games,
+        ]);
     }
 
     #[Route('/admin/dashboard/matches', name: 'app_admin_dash_matches')]
-    public function matchesSection(): Response
+    public function matchesSection(MatchRepository $matchRepository): Response
     {
-        return $this->render('admin/section-matches.html.twig');
+        $matches = $matchRepository->findAll();
+        return $this->render('admin/section-matches.html.twig', [
+            'matches' => $matches,
+        ]);
     }
 
     #[Route('/admin/dashboard/tournament', name: 'app_admin_dash_tournament')]
@@ -135,15 +145,21 @@ class AdminDashboardController extends AbstractController
     }
 
     #[Route('/admin/dashboard/comments', name: 'app_admin_dash_comments')]
-    public function commentsSection(): Response
+    public function commentsSection(CommentaireRepository $commentaireRepository): Response
     {
-        return $this->render('admin/section-comments.html.twig');
+        $comments = $commentaireRepository->findAllOrderedByDate();
+        return $this->render('admin/section-comments.html.twig', [
+            'comments' => $comments,
+        ]);
     }
 
     #[Route('/admin/dashboard/posts', name: 'app_admin_dash_posts')]
-    public function postsSection(): Response
+    public function postsSection(NewsRepository $newsRepository): Response
     {
-        return $this->render('admin/section-posts.html.twig');
+        $posts = $newsRepository->findAllOrderedByDate();
+        return $this->render('admin/section-posts.html.twig', [
+            'posts' => $posts,
+        ]);
     }
 
     #[Route('/admin/dashboard/teams', name: 'app_admin_dash_teams')]

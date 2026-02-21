@@ -37,41 +37,42 @@
         </div>
         <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 overflow-hidden">
             <div class="p-6 border-b border-[#D4AF37]/10 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-white">Recent Matches</h3>
+                <h3 class="text-lg font-bold text-white">Matches Management</h3>
                 <div class="flex gap-2">
-                    <button class="px-4 py-2 bg-[#D4AF37]/10 text-[#D4AF37] rounded-lg text-sm font-medium hover:bg-[#D4AF37]/20 transition">Export</button>
-                    <button class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg text-sm font-bold hover:bg-[#B8941F] transition">Add</button>
+                    <a href="{{ path('match_new') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg text-sm font-bold hover:bg-[#B8941F] transition">Add Match</a>
                 </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-gray-400">
                     <thead class="bg-[#1a1a24] text-[#D4AF37] uppercase font-bold text-xs">
                         <tr>
-                            <th class="px-6 py-4">Match ID</th>
+                            <th class="px-6 py-4">ID</th>
                             <th class="px-6 py-4">Team A</th>
                             <th class="px-6 py-4">Team B</th>
                             <th class="px-6 py-4">Date</th>
-                            <th class="px-6 py-4">Score</th>
-                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-[#D4AF37]/10">
-                        <tr class="table-row-hover transition">
-                            <td class="px-6 py-4 font-medium text-white">#M-1001</td>
-                            <td class="px-6 py-4">Eagle Squad</td>
-                            <td class="px-6 py-4">VortexMain</td>
-                            <td class="px-6 py-4">Oct 24, 2025</td>
-                            <td class="px-6 py-4">16 - 14</td>
-                            <td class="px-6 py-4"><span class="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-xs">Completed</span></td>
-                        </tr>
-                        <tr class="table-row-hover transition">
-                            <td class="px-6 py-4 font-medium text-white">#M-1002</td>
-                            <td class="px-6 py-4">LunaStrike</td>
-                            <td class="px-6 py-4">ShadowKnight</td>
-                            <td class="px-6 py-4">Oct 23, 2025</td>
-                            <td class="px-6 py-4">2 - 1</td>
-                            <td class="px-6 py-4"><span class="px-3 py-1 bg-yellow-500/10 text-yellow-500 rounded-full text-xs">Pending</span></td>
-                        </tr>
+                        {% for match in matches %}
+                            <tr class="table-row-hover transition">
+                                <td class="px-6 py-4 font-medium text-white">{{ match.matchId }}</td>
+                                <td class="px-6 py-4">{{ match.teamA ? match.teamA.teamName : 'TBD' }}</td>
+                                <td class="px-6 py-4">{{ match.teamB ? match.teamB.teamName : 'TBD' }}</td>
+                                <td class="px-6 py-4">{{ match.matchDate ? match.matchDate|date('Y-m-d H:i') : 'N/A' }}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <a href="{{ path('match_edit', {id: match.matchId}) }}" class="text-blue-400 hover:text-blue-300 mr-3">Edit</a>
+                                    <form method="post" action="{{ path('match_delete', {id: match.matchId}) }}" class="inline" onsubmit="return confirm('Delete this match?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ match.matchId) }}">
+                                        <button type="submit" class="text-red-400 hover:text-red-300">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center opacity-60 py-6">No matches found</td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>

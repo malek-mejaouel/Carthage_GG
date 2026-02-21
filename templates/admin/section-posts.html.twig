@@ -37,10 +37,9 @@
         </div>
         <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 overflow-hidden">
             <div class="p-6 border-b border-[#D4AF37]/10 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-white">Recent Posts</h3>
+                <h3 class="text-lg font-bold text-white">Posts Management</h3>
                 <div class="flex gap-2">
-                    <button class="px-4 py-2 bg-[#D4AF37]/10 text-[#D4AF37] rounded-lg text-sm font-medium hover:bg-[#D4AF37]/20 transition">Export</button>
-                    <button class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg text-sm font-bold hover:bg-[#B8941F] transition">Add</button>
+                    <a href="{{ path('app_admin_dash_news') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg text-sm font-bold hover:bg-[#B8941F] transition">Add News</a>
                 </div>
             </div>
             <div class="overflow-x-auto">
@@ -50,22 +49,28 @@
                             <th class="px-6 py-4">Title</th>
                             <th class="px-6 py-4">Author</th>
                             <th class="px-6 py-4">Date</th>
-                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-[#D4AF37]/10">
-                        <tr class="table-row-hover transition">
-                            <td class="px-6 py-4 font-medium text-white">Weekly Recap</td>
-                            <td class="px-6 py-4">Admin</td>
-                            <td class="px-6 py-4">Oct 24, 2025</td>
-                            <td class="px-6 py-4"><span class="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-xs">Published</span></td>
-                        </tr>
-                        <tr class="table-row-hover transition">
-                            <td class="px-6 py-4 font-medium text-white">Strategy Tips</td>
-                            <td class="px-6 py-4">Moderator</td>
-                            <td class="px-6 py-4">Oct 22, 2025</td>
-                            <td class="px-6 py-4"><span class="px-3 py-1 bg-yellow-500/10 text-yellow-500 rounded-full text-xs">Draft</span></td>
-                        </tr>
+                        {% for post in posts %}
+                            <tr class="table-row-hover transition">
+                                <td class="px-6 py-4 font-medium text-white">{{ post.titre }}</td>
+                                <td class="px-6 py-4">N/A</td>
+                                <td class="px-6 py-4">{{ post.datePublication ? post.datePublication|date('Y-m-d') : 'N/A' }}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <a href="{{ path('app_admin_news_edit', {'newsId': post.newsId}) }}" class="text-blue-400 hover:text-blue-300 mr-3">Edit</a>
+                                    <form action="{{ path('app_admin_news_delete', {'newsId': post.newsId}) }}" method="POST" class="inline" onsubmit="return confirm('Delete this post?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.newsId) }}">
+                                        <button type="submit" class="text-red-400 hover:text-red-300">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center opacity-60 py-6">No posts found</td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>

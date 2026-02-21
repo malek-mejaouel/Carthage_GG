@@ -5,6 +5,19 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     face_recognition.api_base_url: '%env(FACE_API_BASE_URL)%'
+    role_verification_threshold: 0.32
+    role_verification_require_both: true
+    role_verification_corr_threshold: 0.78
+    role_verification_pre_crop: true
+    role_verification_hist_threshold: 0.6
+    role_verification_edge_threshold: 0.65
+    role_verification_name_similarity_threshold: 0.75
+    role_verification_skip_name_check_if_no_ocr: false
+    role_verification_strict_names: true
+    role_verification_require_role_match: true
+    role_verification_ocr_provider: 'optiic'
+    role_verification_ocr_endpoint: 'https://api.optiic.dev/process'
+    role_verification_ocr_api_key: '%env(resolve:ROLE_VERIF_OCR_API_KEY)%'
 services:
     # default configuration for services in *this* file
     _defaults:

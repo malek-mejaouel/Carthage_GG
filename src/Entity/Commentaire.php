@@ -79,14 +79,9 @@ class Commentaire
     #[ORM\JoinColumn(name:"news_id", referencedColumnName:"news_id", nullable:false)]
     private ?News $news = null;
 
-    /**
-     * COMMENTED OUT: User relationship
-     * Can be uncommented when User entity is properly implemented
-     * Would link each comment to the user who created it
-     */
-    // #[ORM\ManyToOne(targetEntity: User::class)]
-    // #[ORM\JoinColumn(name:"user_id", referencedColumnName:"user_id", nullable:false)]
-    // private ?User $user = null;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'comments')]
+    #[ORM\JoinColumn(name:"user_id", referencedColumnName:"user_id", nullable:true, onDelete:"SET NULL")]
+    private ?User $user = null;
 
     // ==================== GETTER METHODS ====================
     

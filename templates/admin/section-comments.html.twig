@@ -37,35 +37,39 @@
         </div>
         <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 overflow-hidden">
             <div class="p-6 border-b border-[#D4AF37]/10 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-white">Recent Comments</h3>
-                <div class="flex gap-2">
-                    <button class="px-4 py-2 bg-[#D4AF37]/10 text-[#D4AF37] rounded-lg text-sm font-medium hover:bg-[#D4AF37]/20 transition">Export</button>
-                    <button class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg text-sm font-bold hover:bg-[#B8941F] transition">Add</button>
-                </div>
+                <h3 class="text-lg font-bold text-white">Comments Management</h3>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-gray-400">
                     <thead class="bg-[#1a1a24] text-[#D4AF37] uppercase font-bold text-xs">
                         <tr>
-                            <th class="px-6 py-4">Author</th>
-                            <th class="px-6 py-4">Post</th>
+                            <th class="px-6 py-4">Content</th>
                             <th class="px-6 py-4">Date</th>
-                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">News</th>
+                            <th class="px-6 py-4">Author</th>
+                            <th class="px-6 py-4 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-[#D4AF37]/10">
-                        <tr class="table-row-hover transition">
-                            <td class="px-6 py-4 font-medium text-white">ShadowKnight</td>
-                            <td class="px-6 py-4">Top Strategies</td>
-                            <td class="px-6 py-4">Oct 24, 2025</td>
-                            <td class="px-6 py-4"><span class="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-xs">Approved</span></td>
-                        </tr>
-                        <tr class="table-row-hover transition">
-                            <td class="px-6 py-4 font-medium text-white">ProGamer99</td>
-                            <td class="px-6 py-4">Weekly Recap</td>
-                            <td class="px-6 py-4">Oct 23, 2025</td>
-                            <td class="px-6 py-4"><span class="px-3 py-1 bg-yellow-500/10 text-yellow-500 rounded-full text-xs">Pending</span></td>
-                        </tr>
+                        {% for comment in comments %}
+                            <tr class="table-row-hover transition">
+                                <td class="px-6 py-4 max-w-md truncate text-white">{{ comment.contenu }}</td>
+                                <td class="px-6 py-4">{{ comment.dateCommentaire ? comment.dateCommentaire|date('Y-m-d H:i') : 'N/A' }}</td>
+                                <td class="px-6 py-4">{{ comment.news ? comment.news.titre : 'N/A' }}</td>
+                                <td class="px-6 py-4">{{ comment.user ? comment.user.username : 'N/A' }}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <button class="text-blue-400 hover:text-blue-300 mr-3" onclick="editComment({{ comment.commentaireId }}, '{{ comment.contenu|e('js') }}')">Edit</button>
+                                    <form method="post" action="{{ path('api_comments_delete', {id: comment.commentaireId}) }}" class="inline" onsubmit="return confirm('Delete this comment?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_comment' ~ comment.commentaireId) }}">
+                                        <button type="submit" class="text-red-400 hover:text-red-300">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center opacity-60 py-6">No comments found</td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -92,6 +96,20 @@
             },
             options: { plugins: { legend: { labels: { color: '#e4e4e7' } } } }
         });
+        async function editComment(id, currentText) {
+            const updated = prompt('Edit comment content:', currentText);
+            if (updated === null) return;
+            const res = await fetch(`/api/comments/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contenu: updated })
+            });
+            if (res.ok) {
+                location.reload();
+            } else {
+                alert('Failed to update comment');
+            }
+        }
     </script>
 </script>
 <script src="{{ asset('assets/js/admin-dashboard.js') }}"></script>

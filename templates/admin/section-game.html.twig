@@ -37,48 +37,42 @@
         </div>
         <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 overflow-hidden">
             <div class="p-6 border-b border-[#D4AF37]/10 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-white">Popular Games</h3>
+                <h3 class="text-lg font-bold text-white">Games Management</h3>
                 <div class="flex gap-2">
-                    <button class="px-4 py-2 bg-[#D4AF37]/10 text-[#D4AF37] rounded-lg text-sm font-medium hover:bg-[#D4AF37]/20 transition">Export</button>
-                    <button class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg text-sm font-bold hover:bg-[#B8941F] transition">Add</button>
+                    <a href="{{ path('game_new') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg text-sm font-bold hover:bg-[#B8941F] transition">Add Game</a>
                 </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-gray-400">
                     <thead class="bg-[#1a1a24] text-[#D4AF37] uppercase font-bold text-xs">
                         <tr>
-                            <th class="px-6 py-4">Game</th>
-                            <th class="px-6 py-4">Active Players</th>
-                            <th class="px-6 py-4">Avg. Session</th>
-                            <th class="px-6 py-4">Win Rate</th>
-                            <th class="px-6 py-4 text-center">Action</th>
+                            <th class="px-6 py-4">ID</th>
+                            <th class="px-6 py-4">Name</th>
+                            <th class="px-6 py-4">Genre</th>
+                            <th class="px-6 py-4 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-[#D4AF37]/10">
-                        <tr class="table-row-hover transition">
-                            <td class="px-6 py-4 font-medium text-white">Valorant</td>
-                            <td class="px-6 py-4">12,340</td>
-                            <td class="px-6 py-4">34m</td>
-                            <td class="px-6 py-4">52%</td>
-                            <td class="px-6 py-4 text-center"><button class="text-gray-400 hover:text-[#D4AF37] transition">View</button></td>
-                        </tr>
-                        <tr class="table-row-hover transition">
-                            <td class="px-6 py-4 font-medium text-white">CS2</td>
-                            <td class="px-6 py-4">9,850</td>
-                            <td class="px-6 py-4">41m</td>
-                            <td class="px-6 py-4">49%</td>
-                            <td class="px-6 py-4 text-center"><button class="text-gray-400 hover:text-[#D4AF37] transition">View</button></td>
-                        </tr>
+                        {% for game in games %}
+                            <tr class="table-row-hover transition">
+                                <td class="px-6 py-4 font-medium text-white">{{ game.gameId }}</td>
+                                <td class="px-6 py-4">{{ game.name }}</td>
+                                <td class="px-6 py-4">{{ game.genre ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <a href="{{ path('game_edit', {id: game.gameId}) }}" class="text-blue-400 hover:text-blue-300 mr-3">Edit</a>
+                                    <form method="post" action="{{ path('game_delete', {id: game.gameId}) }}" class="inline" onsubmit="return confirm('Delete this game?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ game.gameId) }}">
+                                        <button type="submit" class="text-red-400 hover:text-red-300">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center opacity-60 py-6">No games found</td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
-            </div>
-            <div class="px-6 py-4 border-t border-[#D4AF37]/10 flex justify-between items-center">
-                <span class="text-sm text-gray-500">Showing 1-2 of 2</span>
-                <div class="flex gap-2">
-                    <button class="px-3 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded-lg text-sm text-gray-400">Prev</button>
-                    <button class="px-3 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg text-sm font-bold">1</button>
-                    <button class="px-3 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded-lg text-sm text-gray-400">Next</button>
-                </div>
             </div>
         </div>
     </div>

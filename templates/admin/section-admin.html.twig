@@ -252,6 +252,12 @@ class="search-input pl-10">
 <span class="badge badge-role">
 {{ role|replace({'ROLE_':'','_':' '}) }}
 </span>
+{% if user.isVerified %}
+<span class="badge badge-active">Verified</span>
+{% if user.verifiedRoleBadge %}
+<span class="badge badge-role">{{ user.verifiedRoleBadge }}</span>
+{% endif %}
+{% endif %}
 </td>
 
 <td>
@@ -265,7 +271,7 @@ class="search-input pl-10">
 </td>
 
 <td>
-    {% if user.bannedUntil %}
+    {% if user.isBanned() %}
         <span class="badge badge-inactive">Banned ({{ user.getRemainingBanTime() }})</span>
         {% if user.banReason %}
             <div class="text-xs opacity-70">Reason: {{ user.banReason }}</div>

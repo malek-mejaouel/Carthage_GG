@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
@@ -60,16 +62,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: FaceAuthentication::class, cascade: ['persist', 'remove'])]
     private ?FaceAuthentication $faceAuthentication = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $isVerified = false;
+
+    #[ORM\Column(length: 120, nullable: true)]
+    private ?string $verifiedRoleBadge = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $verificationDate = null;
     #[ORM\Column(name: 'banned_until', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $bannedUntil = null;
 
     #[ORM\Column(name: 'ban_reason', length: 255, nullable: true)]
     private ?string $banReason = null;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Commentaire::class)]
+    private Collection $comments;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -249,6 +263,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+        return $this;
+    }
+
+    public function getVerifiedRoleBadge(): ?string
+    {
+        return $this->verifiedRoleBadge;
+    }
+
+    public function setVerifiedRoleBadge(?string $verifiedRoleBadge): static
+    {
+        $this->verifiedRoleBadge = $verifiedRoleBadge;
+        return $this;
+    }
+
+    public function getVerificationDate(): ?\DateTimeInterface
+    {
+        return $this->verificationDate;
+    }
+
+    public function setVerificationDate(?\DateTimeInterface $verificationDate): static
+    {
+        $this->verificationDate = $verificationDate;
+        return $this;
+    }
+
     public function getBannedUntil(): ?\DateTimeInterface
     {
         return $this->bannedUntil;
@@ -293,6 +340,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($diff->i > 0) $parts[] = $diff->i . 'm';
         if ($diff->s > 0) $parts[] = $diff->s . 's';
         return implode(' ', $parts) ?: '0s';
+    }
+
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Commentaire $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeComment(Commentaire $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            if ($comment->getUser() === $this) {
+                $comment->setUser(null);
+            }
+        }
+        return $this;
     }
 
     /**

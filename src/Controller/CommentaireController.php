@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Commentaire;
 use App\Entity\News;
+use App\Entity\User;
 use App\Repository\CommentaireRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -97,6 +98,12 @@ class CommentaireController extends AbstractController
                 'downvotes' => $comment->getDownvotes(),
                 'news_id' => $comment->getNews()?->getNewsId(),
                 'news_title' => $comment->getNews()?->getTitre(),
+                'user' => $comment->getUser() ? [
+                    'id' => $comment->getUser()->getId(),
+                    'username' => $comment->getUser()->getUsername(),
+                    'avatar' => $comment->getUser()->getAvatar(),
+                    'profile_url' => $this->generateUrl('app_profile_edit', ['id' => $comment->getUser()->getId()]),
+                ] : null,
             ], $comments);
 
             return $this->json($data);
@@ -186,6 +193,12 @@ class CommentaireController extends AbstractController
                     'downvotes' => $comment->getDownvotes(),
                     'news_id' => $comment->getNews()?->getNewsId(),
                     'parent_id' => $parentId,
+                    'user' => $comment->getUser() ? [
+                        'id' => $comment->getUser()->getId(),
+                        'username' => $comment->getUser()->getUsername(),
+                        'avatar' => $comment->getUser()->getAvatar(),
+                        'profile_url' => $this->generateUrl('app_profile_edit', ['id' => $comment->getUser()->getId()]),
+                    ] : null,
                 ];
             }, $comments);
 
@@ -257,6 +270,10 @@ class CommentaireController extends AbstractController
             $comment->setUpvotes(0);
             $comment->setDownvotes(0);
             $comment->setNews($news);
+            $current = $this->getUser();
+            if ($current instanceof User) {
+                $comment->setUser($current);
+            }
 
             // Save to database
             $this->entityManager->persist($comment);
@@ -275,6 +292,12 @@ class CommentaireController extends AbstractController
                     'downvotes' => $comment->getDownvotes(),
                     'news_id' => $comment->getNews()?->getNewsId(),
                     'parent_id' => !empty($data['parent_id']) && is_numeric($data['parent_id']) ? (int)$data['parent_id'] : null,
+                    'user' => $comment->getUser() ? [
+                        'id' => $comment->getUser()->getId(),
+                        'username' => $comment->getUser()->getUsername(),
+                        'avatar' => $comment->getUser()->getAvatar(),
+                        'profile_url' => $this->generateUrl('app_profile_edit', ['id' => $comment->getUser()->getId()]),
+                    ] : null,
                 ]
             ], Response::HTTP_CREATED);
         } catch (\Exception $e) {
@@ -307,6 +330,13 @@ class CommentaireController extends AbstractController
                     ['error' => 'Comment not found'],
                     Response::HTTP_NOT_FOUND
                 );
+            }
+
+            // Authorization: only owner or admin
+            $current = $this->getUser();
+            $isOwner = $current instanceof User && $comment->getUser() && $comment->getUser()->getId() === $current->getId();
+            if (!$isOwner && !$this->isGranted('ROLE_ADMIN')) {
+                return $this->json(['error' => 'You are not allowed to edit this comment'], Response::HTTP_FORBIDDEN);
             }
 
             // Extract new content
@@ -366,6 +396,20 @@ class CommentaireController extends AbstractController
                     ['error' => 'Comment not found'],
                     Response::HTTP_NOT_FOUND
                 );
+            }
+
+            // Authorization: only owner or admin
+            $current = $this->getUser();
+            $isOwner = $current instanceof User && $comment->getUser() && $comment->getUser()->getId() === $current->getId();
+            if (!$isOwner && !$this->isGranted('ROLE_ADMIN')) {
+                return $this->json(['error' => 'You are not allowed to delete this comment'], Response::HTTP_FORBIDDEN);
+            }
+
+            if ($request->isMethod('POST')) {
+                $token = $request->request->get('_token');
+                if (!$this->isCsrfTokenValid('delete_comment' . $id, $token)) {
+                    return $this->json(['error' => 'Invalid CSRF token'], Response::HTTP_FORBIDDEN);
+                }
             }
 
             // Delete comment

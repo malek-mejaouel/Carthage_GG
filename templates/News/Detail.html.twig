@@ -298,9 +298,26 @@
         container.innerHTML = comments.map(comment => {
             const voteKey = `comment_vote_${comment.commentaire_id}`;
             const userVote = localStorage.getItem(voteKey) || 'none'; // 'none', 'upvote', 'downvote'
+            const isAuth = !!comment.user;
+            const avatarUrl = isAuth && comment.user.avatar ? comment.user.avatar : null;
+            const displayName = isAuth ? (comment.user.username || 'User') : 'Anonymous';
+            const profileLink = isAuth && comment.user.profile_url ? comment.user.profile_url : null;
             
             return `
                 <div class="bg-[#12121a] rounded-lg border border-[#D4AF37]/10 p-6">
+                    <div class="flex items-center gap-3 mb-3">
+                        ${avatarUrl 
+                            ? `<img src="${avatarUrl}" alt="${displayName}" class="w-8 h-8 rounded-full object-cover border border-[#D4AF37]/50">`
+                            : `<div class="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37]">
+                                   ${displayName.substring(0,1).toUpperCase()}
+                               </div>`
+                        }
+                        ${profileLink 
+                            ? `<a href="${profileLink}" class="text-sm font-semibold hover:text-[#D4AF37]">${displayName}</a>`
+                            : `<span class="text-sm font-semibold">${displayName}</span>`
+                        }
+                        <span class="text-xs text-gray-400 ml-auto">${comment.date_commentaire || ''}</span>
+                    </div>
                     <!-- Comment Text & GIF -->
                     <div class="mb-4">
                         <p id="comment-content-${comment.commentaire_id}" class="text-gray-300 mb-3">${escapeHtml(comment.contenu)}</p>

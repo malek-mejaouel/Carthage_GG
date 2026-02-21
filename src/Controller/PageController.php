@@ -76,6 +76,11 @@ class PageController extends AbstractController
             'top_teams' => $topTeams,
         ]);
     }
+    #[Route('/games-link', name: 'app_games')]
+    public function games(): Response
+    {
+        return $this->redirectToRoute('game_show');
+    }
 
     #[Route('/matches', name: 'app_matches')]
     public function matches(\App\Repository\MatchRepository $matchRepository): Response

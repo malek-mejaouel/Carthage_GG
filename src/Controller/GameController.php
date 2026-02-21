@@ -21,17 +21,19 @@ final class GameController extends AbstractController
     }
 
     #[Route('', name: 'game_index', methods: ['GET'])]
+    #[Route('', name: 'game_show', methods: ['GET'])]
     public function index(Request $request): Response
     {
-        $page = $request->query->getInt('page', 1);
-        $games = $this->gameRepository->findGamesPaginated($page, 10);
-        $total = $this->gameRepository->getTotalCount();
+        $games = $this->gameRepository->findAll();
+        $total = count($games);
+        $page = 1;
+        $perPage = $total ?: 10;
 
         return $this->render('game/index.html.twig', [
             'games' => $games,
             'total' => $total,
             'page' => $page,
-            'perPage' => 10,
+            'perPage' => $perPage,
         ]);
     }
 
@@ -45,7 +47,7 @@ final class GameController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->gameRepository->save($game, true);
 
-            return $this->redirectToRoute('game_show', ['id' => $game->getGameId()], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('game_detail', ['id' => $game->getGameId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('game/new.html.twig', [
@@ -54,7 +56,7 @@ final class GameController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'game_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'game_detail', methods: ['GET'])]
     public function show(Game $game): Response
     {
         return $this->render('game/show.html.twig', [
@@ -71,7 +73,7 @@ final class GameController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->gameRepository->save($game, true);
 
-            return $this->redirectToRoute('game_show', ['id' => $game->getGameId()], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('game_detail', ['id' => $game->getGameId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('game/edit.html.twig', [

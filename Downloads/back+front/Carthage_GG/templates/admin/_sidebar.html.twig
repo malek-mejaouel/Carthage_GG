@@ -1,0 +1,69 @@
+{# Admin Sidebar Partial #}
+<div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity lg:hidden"></div>
+<aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-[#12121a] border-r border-[#D4AF37]/20 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out sidebar-scroll overflow-y-auto">
+    <div class="h-16 flex items-center justify-center border-b border-[#D4AF37]/10 px-6">
+        <a href="{{ path('app_index') }}" class="flex items-center gap-3">
+            <img src="{{ asset('images/zz.png') }}" class="w-10 h-10 rounded-lg shadow-md object-cover" alt="Logo">
+            <span class="text-xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] bg-clip-text text-transparent">CarthageGG</span>
+        </a>
+    </div>
+    <nav class="p-4 space-y-1">
+        <a href="{{ path('app_admin_dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-[#1a1a24] hover:text-white rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            <span class="font-medium">Dashboard</span>
+        </a>
+        <div class="pt-4 pb-2">
+            <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Management</p>
+        </div>
+        <a href="{{ path('app_admin_dash_admin') }}" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-[#1a1a24] hover:text-white rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            <span class="font-medium">Admin</span>
+        </a>
+        <a href="{{ path('app_admin_dash_game') }}" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-[#1a1a24] hover:text-white rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span class="font-medium">Game</span>
+        </a>
+        <a href="{{ path('app_admin_dash_matches') }}" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-[#1a1a24] hover:text-white rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            <span class="font-medium">Matches</span>
+        </a>
+        <a href="{{ path('app_admin_dash_tournament') }}" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-[#1a1a24] hover:text-white rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            <span class="font-medium">Tournament</span>
+        </a>
+        <div class="pt-4 pb-2">
+            <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Commerce</p>
+        </div>
+        <a href="{{ path('app_admin_dash_products') }}" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-[#1a1a24] hover:text-white rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+            <span class="font-medium">Products</span>
+        </a>
+        <a href="{{ path('app_admin_dash_sales') }}" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-[#1a1a24] hover:text-white rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span class="font-medium">Sales</span>
+        </a>
+        <div class="pt-4 pb-2">
+            <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Community</p>
+        </div>
+        <a href="{{ path('app_streams_index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-[#1a1a24] hover:text-white rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A2 2 0 0122 9.618v4.764a2 2 0 01-2.447 1.894L15 14v4a2 2 0 01-2.894 1.789l-8-4A2 2 0 013 13.999v-4a2 2 0 011.106-1.789l8-4A2 2 0 0114 5v5z"></path></svg>
+            <span class="font-medium">Streams (Public)</span>
+        </a>
+        <a href="{{ path('app_admin_dash_comments') }}" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-[#1a1a24] hover:text-white rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
+            <span class="font-medium">Comments</span>
+        </a>
+        <a href="{{ path('app_admin_dash_posts') }}" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-[#1a1a24] hover:text-white rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+            <span class="font-medium">Posts</span>
+        </a>
+        <a href="{{ path('app_admin_dash_teams') }}" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-[#1a1a24] hover:text-white rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            <span class="font-medium">Teams</span>
+        </a>
+        <a href="{{ path('app_admin_dash_places') }}" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-[#1a1a24] hover:text-white rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span class="font-medium">Places</span>
+        </a>
+    </nav>
+</aside>

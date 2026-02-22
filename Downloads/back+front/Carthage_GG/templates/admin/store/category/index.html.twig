@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+{% block title %}Categories | Store Admin{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-[#D4AF37]">Categories</h1>
+        <div class="flex items-center gap-2">
+            <a href="{{ path('app_admin_dash_products') }}" class="px-4 py-2 border border-[#D4AF37]/40 text-[#D4AF37] rounded hover:bg-[#D4AF37]/10">Products Dashboard</a>
+            <a href="{{ path('admin_categories_new') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F]">New Category</a>
+        </div>
+    </div>
+    <div class="overflow-x-auto border border-[#D4AF37]/20 rounded-lg">
+        <table class="min-w-full bg-[#12121a]">
+            <thead>
+                <tr class="text-left text-gray-400">
+                    <th class="p-3">ID</th>
+                    <th class="p-3">Name</th>
+                    <th class="p-3">Description</th>
+                    <th class="p-3">Created</th>
+                    <th class="p-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-[#D4AF37]/20">
+                {% for c in categories %}
+                    <tr class="text-sm">
+                        <td class="p-3">{{ c.id }}</td>
+                        <td class="p-3 font-semibold">{{ c.name }}</td>
+                        <td class="p-3 text-gray-400">{{ c.description|default('')|slice(0,120) }}</td>
+                        <td class="p-3 text-gray-400">{{ c.createdAt|date('Y-m-d H:i') }}</td>
+                        <td class="p-3">
+                            <a href="{{ path('admin_categories_edit', {id: c.id}) }}" class="text-[#D4AF37] hover:underline">Edit</a>
+                            <form action="{{ path('admin_categories_delete', {id: c.id}) }}" method="post" class="inline ml-2" onsubmit="return confirm('Delete this category?')">
+                                <button class="text-red-400 hover:underline">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="5" class="p-6 text-center text-gray-400">No categories</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

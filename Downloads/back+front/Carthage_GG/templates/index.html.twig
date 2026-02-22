@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tournaments - CarthageGG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('styles/styles.css') }}" />
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-[#0a0a0f]/95 backdrop-blur-sm">
+        <div class="w-full px-4">
+            <div class="flex h-16 items-center justify-between">
+                <a href="{{ path('app_index') }}" class="flex items-center space-x-2 flex-shrink-0">
+                    <img src="{{ asset('images/zz.png') }}" alt="CarthageGG Logo" class="h-14 w-14 rounded-lg shadow-lg object-cover">
+                    <span class="text-2xl font-bold text-[#D4AF37]">Carthage</span>
+                    <span class="text-2xl font-bold text-white">GG</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-1 flex-1 justify-center ml-8">
+                    <a href="{{ path('app_tournaments') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Tournaments</a>
+                    <a href="{{ path('app_teams') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Teams</a>
+                    <a href="{{ path('app_matches') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Matches</a>
+                    <a href="{{ path('app_games') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Games</a>
+                    <a href="{{ path('app_store') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Store</a>
+                    <a href="{{ path('app_news') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">News</a>
+                    <a href="{{ path('app_streams_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Streams</a>
+                </div>
+              <div class="flex items-center space-x-3">
+                     {% if app.user %}
+                    <a href="{{ path('app_profile_edit', {'id': app.user.id}) }}" class="text-[#e4e4e7] hover:text-[#D4AF37] transition font-bold flex items-center gap-2">
+                        {% if app.user.avatar %}
+                            <img src="{{ asset(app.user.avatar) }}" alt="Avatar" class="w-8 h-8 rounded-full object-cover border border-[#D4AF37]/50">
+                        {% else %}
+                            <div class="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37]">
+                                {{ app.user.firstName ? app.user.firstName|first|upper : app.user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                        {{ app.user.firstName ? app.user.firstName : app.user.username }}
+                    </a>
+                {% endif %}
+                {% if app.user is defined and app.user %}
+                    <a href="{{ path('app_logout') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg hover:bg-[#B8941F] transition">Logout</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg hover:bg-[#B8941F] transition">Login</a>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden border-b border-[#D4AF37]/20 bg-gradient-to-b from-[#0a0a0f] via-[#12121a] to-[#0a0a0f]">
+        <div class="container relative mx-auto px-4 py-24">
+            <div class="mx-auto max-w-4xl text-center">
+                <div class="mb-6 inline-block px-4 py-2 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/30">
+                    Tunisia's Premier Esports Platform
+                </div>
+                <h1 class="mb-6 text-5xl md:text-6xl font-bold">
+                    <span class="bg-gradient-to-r from-[#D4AF37] via-[#F4D03F] to-[#D4AF37] bg-clip-text text-transparent">
+                        Compete. Conquer. Claim Glory.
+                    </span>
+                </h1>
+                <p class="mb-8 text-xl text-gray-400">
+                    Join the ultimate competitive gaming platform inspired by the legendary legacy of Carthage
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="register.html" class="inline-flex items-center px-6 py-3 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] font-medium hover:opacity-90 transition-opacity">
+                        <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        Start Competing
+                    </a>
+                    <a href="tournaments.html" class="inline-flex items-center px-6 py-3 rounded-md border-2 border-[#D4AF37] text-[#D4AF37] font-medium hover:bg-[#D4AF37]/10 transition-colors">
+                        Browse Tournaments
+                    </a>
+                    <a href="{{ path('app_streams_index') }}" class="inline-flex items-center px-6 py-3 rounded-md border-2 border-[#D4AF37] text-[#D4AF37] font-medium hover:bg-[#D4AF37]/10 transition-colors">
+                        Browse Streams
+                    </a>
+                </div>
+
+                <!-- Stats -->
+                <div class="mt-16 grid grid-cols-2 gap-8 md:grid-cols-4">
+                    <div>
+                        <div class="text-3xl font-bold text-[#D4AF37]">2,500+</div>
+                        <div class="text-sm text-gray-400">Active Players</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-[#D4AF37]">150+</div>
+                        <div class="text-sm text-gray-400">Tournaments</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-[#D4AF37]">$500K+</div>
+                        <div class="text-sm text-gray-400">Prize Pool</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-[#D4AF37]">80+</div>
+                        <div class="text-sm text-gray-400">Teams</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Tournaments -->
+        <div class="mb-12 text-center">
+            <h2 class="text-4xl font-bold mb-4">Featured Tournaments</h2>
+            <p class="text-gray-400">Showcase of our most prestigious competitions</p>
+        </div>
+
+        {% if featured_tournaments is defined and featured_tournaments|length > 0 %}
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 justify-items-center max-w-6xl mx-auto">
+                {% for tournament in featured_tournaments %}
+                    {% set now = date() %}
+                    {% set start = tournament.startDate %}
+                    {% set end = tournament.endDate %}
+                    {% if start <= now and end >= now %}
+                        {% set status = 'Live' %}
+                        {% set status_class = 'bg-[#DC2626] text-white' %}
+                    {% else %}
+                        {% set status = 'Upcoming' %}
+                        {% set status_class = 'bg-[#D4AF37]/20 text-[#D4AF37]' %}
+                    {% endif %}
+
+                    <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition-all w-full max-w-md text-center">
+                        <div class="h-2 bg-gradient-to-r from-[#D4AF37] to-[#DC2626] rounded-t-lg mb-4"></div>
+                        <div class="flex items-start justify-between mb-4">
+                            <h3 class="text-xl font-bold">{{ tournament.tournamentName }}</h3>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold {{ status_class }}">{{ status }}</span>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-4">{{ tournament.game ? tournament.game.name : 'N/A' }}</p>
+                        <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                            <div>
+                                <span class="text-gray-400 block">Prize Pool</span>
+                                <span class="font-bold text-[#D4AF37]">${{ tournament.prizePool|default('0')|number_format(0) }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400 block">Teams</span>
+                                <span class="font-medium">{{ tournament.teamCount }}</span>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-400 mb-6">
+                            {{ tournament.startDate|date('M d') }} - {{ tournament.endDate|date('M d') }}
+                        </div>
+                        
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-12 bg-[#12121a] rounded-lg border border-[#D4AF37]/20">
+                <p class="text-gray-400">No tournaments available at the moment.</p>
+                <p class="text-sm text-gray-500 mt-2">Check back soon!</p>
+            </div>
+        {% endif %}
+    </section>
+
+    <!-- Top Teams Section -->
+    <section class="container mx-auto px-4 py-16">
+         <div class="mb-12 text-center">
+        <h2 class="text-4xl font-bold mb-4">Teams</h2>
+        <p class="text-gray-400">The teams in our platform</p>
+    </div>
+
+    {% if top_teams is defined and top_teams|length > 0 %}
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 justify-items-center">
+            {% for team in top_teams|slice(0, 4) %}
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition-all w-full max-w-md">
+                    <h3 class="text-lg font-bold mb-4">{{ team.teamName }}</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Owner</span>
+                            <span class="font-medium">{{ team.user ? team.user.username : 'N/A' }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Members</span>
+                            <span class="font-medium">{{ team.teamPlayers|length }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Created</span>
+                            <span class="font-medium">{{ team.creationDate ? team.creationDate|date('Y-m-d') : 'N/A' }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-12 bg-[#12121a] rounded-lg border border-[#D4AF37]/20">
+            <p class="text-gray-400">No teams yet.</p>
+        </div>
+    {% endif %}
+    </section>
+
+    <!-- Store & Courier Section -->
+    <section class="py-20 border-t border-[#D4AF37]/20">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">🏪 Shop & Checkout</h2>
+                <p class="text-gray-400">Browse our exclusive gear and manage your orders</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Store Items -->
+                <div class="lg:col-span-2">
+                    <h3 class="text-2xl font-bold mb-6 text-[#D4AF37]">Featured Products</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Product 1 -->
+                        <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition">
+                            <div class="bg-gradient-to-br from-[#D4AF37]/20 to-[#B8941F]/20 h-40 rounded flex items-center justify-center mb-4">
+                                <svg class="w-12 h-12 text-[#D4AF37]/50" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-0.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l0.03-.12 0.9-1.63h7.45c0.75 0 1.41-.41 1.75-1.03l3.58-6.49c0.08-.16.12-.33.12-.5 0-.55-.45-1-1-1H5.21l-0.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s0.89 2 1.99 2 2-0.9 2-2-0.9-2-2-2z"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2">CarthageGG Jersey</h4>
+                            <p class="text-gray-400 text-sm mb-3">Official team jersey</p>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-xl font-bold text-[#D4AF37]">$49.99</span>
+                                <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">In Stock</span>
+                            </div>
+                            <button onclick="addStoreItem(this, 'CarthageGG Jersey', 49.99)" class="w-full px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold text-sm">Add to Selection</button>
+                        </div>
+
+                        <!-- Product 2 -->
+                        <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition">
+                            <div class="bg-gradient-to-br from-[#D4AF37]/20 to-[#B8941F]/20 h-40 rounded flex items-center justify-center mb-4">
+                                <svg class="w-12 h-12 text-[#D4AF37]/50" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2">Mechanical Keyboard</h4>
+                            <p class="text-gray-400 text-sm mb-3">RGB gaming keyboard</p>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-xl font-bold text-[#D4AF37]">$129.99</span>
+                                <span class="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded">Low Stock</span>
+                            </div>
+                            <button onclick="addStoreItem(this, 'Mechanical Keyboard', 129.99)" class="w-full px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold text-sm">Add to Selection</button>
+                        </div>
+
+                        <!-- Product 3 -->
+                        <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition">
+                            <div class="bg-gradient-to-br from-[#D4AF37]/20 to-[#B8941F]/20 h-40 rounded flex items-center justify-center mb-4">
+                                <svg class="w-12 h-12 text-[#D4AF37]/50" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-13c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2">Team Cap</h4>
+                            <p class="text-gray-400 text-sm mb-3">Official cap</p>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-xl font-bold text-[#D4AF37]">$29.99</span>
+                                <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">In Stock</span>
+                            </div>
+                            <button onclick="addStoreItem(this, 'Team Cap', 29.99)" class="w-full px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold text-sm">Add to Selection</button>
+                        </div>
+
+                        <!-- Product 4 -->
+                        <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition">
+                            <div class="bg-gradient-to-br from-[#D4AF37]/20 to-[#B8941F]/20 h-40 rounded flex items-center justify-center mb-4">
+                                <svg class="w-12 h-12 text-[#D4AF37]/50" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2">Branded Hoodie</h4>
+                            <p class="text-gray-400 text-sm mb-3">Premium hoodie</p>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-xl font-bold text-[#D4AF37]">$74.99</span>
+                                <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">In Stock</span>
+                            </div>
+                            <button onclick="addStoreItem(this, 'Branded Hoodie', 74.99)" class="w-full px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold text-sm">Add to Selection</button>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center">
+                        <a href="store.html" class="text-[#D4AF37] hover:underline font-bold">View All Products →</a>
+                    </div>
+                </div>
+
+                <!-- Selected Items & Courier -->
+                <div class="lg:col-span-1">
+                    <!-- Selected Items -->
+                    <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 mb-6 sticky top-24">
+                        <h3 class="text-xl font-bold text-[#D4AF37] mb-4">📦 Your Selection</h3>
+                        <div id="selectedItems" class="space-y-3 mb-4 max-h-48 overflow-y-auto">
+                            <p class="text-gray-400 text-sm italic">No items selected yet</p>
+                        </div>
+                        <div id="selectedTotal" class="text-lg font-bold text-[#D4AF37] mb-4 pb-4 border-b border-[#D4AF37]/20">
+                            Total: $0.00
+                        </div>
+                        <button onclick="clearSelection()" class="w-full px-4 py-2 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition font-bold text-sm mb-3">Clear Selection</button>
+                        <a href="store-cart.html" class="w-full block text-center px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">View Cart →</a>
+                    </div>
+
+                    <!-- Courier Options -->
+                    <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6">
+                        <h3 class="text-xl font-bold text-[#D4AF37] mb-4">🚚 Shipping Options</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-start gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                                <input type="radio" name="shipping" value="standard" checked class="mt-1 w-4 h-4 accent-[#D4AF37]">
+                                <div>
+                                    <p class="font-bold text-sm">Standard Shipping</p>
+                                    <p class="text-gray-400 text-xs">5-7 business days</p>
+                                    <p class="text-[#D4AF37] text-sm">$9.99</p>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                                <input type="radio" name="shipping" value="express" class="mt-1 w-4 h-4 accent-[#D4AF37]">
+                                <div>
+                                    <p class="font-bold text-sm">Express Shipping</p>
+                                    <p class="text-gray-400 text-xs">2-3 business days</p>
+                                    <p class="text-[#D4AF37] text-sm">$24.99</p>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                                <input type="radio" name="shipping" value="overnight" class="mt-1 w-4 h-4 accent-[#D4AF37]">
+                                <div>
+                                    <p class="font-bold text-sm">Overnight Shipping</p>
+                                    <p class="text-gray-400 text-xs">Next day delivery</p>
+                                    <p class="text-[#D4AF37] text-sm">$49.99</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="mt-6 pt-6 border-t border-[#D4AF37]/20">
+                            <p class="text-sm text-gray-400 mb-3">Shipping to:</p>
+                            <select class="w-full px-3 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] text-sm focus:border-[#D4AF37]">
+                                <option>Tunisia</option>
+                                <option>Algeria</option>
+                                <option>Morocco</option>
+                                <option>Egypt</option>
+                                <option>International</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upcoming Matches -->
+     <section class="container mx-auto px-4 py-16 bg-[#12121a]/50 border-y border-[#D4AF37]/20">
+        <div class="mb-12 text-center">
+            <h2 class="text-4xl font-bold mb-4">Upcoming Matches</h2>
+            <p class="text-gray-400">Don't miss these exciting matchups</p>
+        </div>
+
+        {% if upcoming_matches is defined and upcoming_matches|length > 0 %}
+            <div class="space-y-4 max-w-3xl mx-auto">
+                {% for match in upcoming_matches|slice(0, 3) %}
+                    <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition-all">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-4">
+                                    <span class="font-bold">{{ match.teamA ? match.teamA.teamName : 'TBD' }}</span>
+                                    <span class="text-gray-400">vs</span>
+                                    <span class="font-bold">{{ match.teamB ? match.teamB.teamName : 'TBD' }}</span>
+                                </div>
+                                <p class="text-sm text-gray-400 mt-2">
+                                    {{ match.tournament ? match.tournament.tournamentName : 'Tournament TBD' }}
+                                    • {{ match.matchDate ? match.matchDate|date('M d, H:i') : 'TBD' }}
+                                </p>
+                            </div>
+                            <a href="{{ path('match_show', {id: match.matchId}) }}" 
+                               class="px-6 py-2 rounded-md bg-[#D4AF37]/10 text-[#D4AF37] hover:bg-[#D4AF37]/20 transition-colors text-sm font-medium">
+                                Watch
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            {% if recent_matches is defined and recent_matches|length > 0 %}
+                <div class="mb-6">
+                    <h3 class="text-2xl font-bold">Recent Matches</h3>
+                    <p class="text-gray-400">Latest results from past games</p>
+                </div>
+                <div class="space-y-4 max-w-3xl mx-auto">
+                    {% for match in recent_matches|slice(0, 3) %}
+                        <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition-all">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-6">
+                                        <div>
+                                            <span class="font-bold">{{ match.teamA ? match.teamA.teamName : 'TBD' }}</span>
+                                            <span class="text-2xl font-bold text-[#D4AF37] ml-2">{{ match.scoreTeamA ?? '-' }}</span>
+                                        </div>
+                                        <span class="text-gray-400">vs</span>
+                                        <div>
+                                            <span class="font-bold">{{ match.teamB ? match.teamB.teamName : 'TBD' }}</span>
+                                            <span class="text-2xl font-bold text-[#D4AF37] ml-2">{{ match.scoreTeamB ?? '-' }}</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-400 mt-2">
+                                        {{ match.tournament ? match.tournament.tournamentName : 'Tournament' }}
+                                        • {{ match.matchDate ? match.matchDate|date('M d, Y H:i') : 'Date TBD' }}
+                                    </p>
+                                </div>
+                                <a href="{{ path('match_show', {id: match.matchId}) }}" 
+                                   class="px-6 py-2 rounded-md border-2 border-gray-500 text-gray-400 hover:bg-[#1e1e2e] transition-colors text-sm font-medium">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12 bg-[#12121a] rounded-lg border border-[#D4AF37]/20">
+                    <p class="text-gray-400">No matches available at the moment.</p>
+                    <p class="text-sm text-gray-500 mt-2">Check back soon!</p>
+                </div>
+            {% endif %}
+        {% endif %}
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#D4AF37]/20 bg-[#0a0a0f] mt-16">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-[#D4AF37] mb-4">CarthageGG</h3>
+                    <p class="text-gray-400 text-sm">Tunisia's premier esports platform</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Platform</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="tournaments.html" class="hover:text-[#D4AF37] transition-colors">Tournaments</a></li>
+                        <li><a href="teams.html" class="hover:text-[#D4AF37] transition-colors">Teams</a></li>
+                        <li><a href="matches.html" class="hover:text-[#D4AF37] transition-colors">Matches</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Compete</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="leaderboard.html" class="hover:text-[#D4AF37] transition-colors">Leaderboard</a></li>
+                        <li><a href="register.html" class="hover:text-[#D4AF37] transition-colors">Register</a></li>
+                        <li><a href="support.html" class="hover:text-[#D4AF37] transition-colors">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Follow</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37] transition-colors">Twitter</a>
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37] transition-colors">Discord</a>
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37] transition-colors">YouTube</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-[#D4AF37]/20 pt-8 text-center text-gray-400 text-sm">
+                <p>&copy; 2026 CarthageGG. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ asset('main.js') }}"></script>
+</body>
+</html>
+  

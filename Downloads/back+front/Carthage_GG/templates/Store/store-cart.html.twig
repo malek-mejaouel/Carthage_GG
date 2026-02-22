@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart | CarthageGG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('styles/styles.css') }}">
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    <!-- Navigation -->
+    <nav class="bg-[#12121a] border-b border-[#D4AF37]/20 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <img src="{{ asset('images/zz.png') }}" alt="CarthageGG Logo" class="w-14 h-14 rounded-lg shadow-lg object-cover">
+                <span class="font-bold text-[#D4AF37]">CarthageGG</span>
+            </div>
+            <div class="flex gap-8 items-center">
+                <a href="{{ path('app_index') }}" class="hover:text-[#D4AF37] transition">Home</a>
+                <a href="{{ path('app_store') }}" class="hover:text-[#D4AF37] transition">Store</a>
+                <a href="{{ path('app_dashboard') }}" class="hover:text-[#D4AF37] transition">Dashboard</a>
+                <a href="{{ path('app_store_cart') }}" class="text-[#D4AF37] font-bold">🛒 Cart</a>
+                <a href="{{ path('app_login') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg hover:bg-[#B8941F] transition">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-12 max-w-7xl">
+        <!-- Header -->
+        <div class="mb-12">
+            <h1 class="text-4xl font-bold text-[#D4AF37] mb-2">Shopping Cart</h1>
+            <p class="text-gray-400">Review and manage your selected items</p>
+        </div>
+        {% for type, messages in app.flashes %}
+            {% for msg in messages %}
+                <div class="mb-4 px-4 py-2 rounded {{ type == 'success' ? 'bg-green-600/20 text-green-300 border border-green-600/40' : 'bg-red-600/20 text-red-300 border border-red-600/40' }}">
+                    {{ msg }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Cart Items -->
+            <div class="lg:col-span-2">
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] overflow-hidden">
+                    <div class="bg-[#1a1a24] border-b border-[#D4AF37]/20 px-6 py-4">
+                        <h3 class="font-bold text-lg">Cart Items ({{ cart_items|length }})</h3>
+                    </div>
+
+                    <div class="divide-y divide-[#D4AF37]/20">
+                        {% for item in cart_items %}
+                            <div class="p-6 hover:bg-[#1a1a24] transition">
+                                <div class="flex gap-6">
+                                    <div class="w-24 h-24 bg-gradient-to-br from-[#D4AF37]/20 to-[#B8941F]/20 rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                        {% if item.product.image %}
+                                            {% set src = item.product.image %}
+                                            {% if src starts with 'http' %}
+                                                {% set imgUrl = src %}
+                                            {% elseif src starts with '/uploads/' or src starts with 'uploads/' %}
+                                                {% set imgUrl = asset(src) %}
+                                            {% else %}
+                                                {% set imgUrl = asset('uploads/products/' ~ src) %}
+                                            {% endif %}
+                                            <img src="{{ imgUrl }}" alt="{{ item.product.name }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
+                                        {% else %}
+                                            <svg class="w-12 h-12 text-[#D4AF37]/50" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                            </svg>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-lg mb-2">{{ item.product.name }}</h4>
+                                        <p class="text-gray-400 text-sm mb-4">{{ item.product.category ? item.product.category.name : 'Uncategorized' }}</p>
+                                        <div class="flex items-center gap-4">
+                                            <div class="flex items-center gap-2 bg-[#0a0a0f] rounded p-2">
+                                                <span class="w-8 text-center">{{ item.quantity }}</span>
+                                            </div>
+                                            <span class="font-bold text-[#D4AF37]">${{ item.total|round(2) }}</span>
+                                        </div>
+                                    </div>
+                                    <a href="{{ path('app_store_cart_remove', {id: item.product.id}) }}" class="text-red-400 hover:text-red-500 transition self-start">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="p-6 text-center text-gray-400">Your cart is empty.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Continue Shopping -->
+                <div class="mt-6">
+                    <a href="{{ path('app_store') }}" class="text-[#D4AF37] hover:underline">← Continue Shopping</a>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="lg:col-span-1">
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 sticky top-24">
+                    <h3 class="text-xl font-bold text-[#D4AF37] mb-6">Order Summary</h3>
+
+                    <div class="space-y-4 mb-6 pb-6 border-b border-[#D4AF37]/20">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Subtotal</span>
+                            <span class="font-bold">${{ subtotal|round(2) }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Shipping</span>
+                            <span class="font-bold">${{ shipping|round(2) }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Tax</span>
+                            <span class="font-bold">${{ tax|round(2) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between text-xl mb-6">
+                        <span class="font-bold">Total</span>
+                        <span class="font-bold text-[#D4AF37]">${{ total|round(2) }}</span>
+                    </div>
+
+                    <!-- Email for Receipt -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold mb-2">Email for Receipt</label>
+                        <form action="{{ path('app_store_cart_email') }}" method="post" class="flex gap-2">
+                            <input name="email" type="email" value="{{ checkout_email ?? (app.user ? app.user.email : '') }}" placeholder="you@example.com" class="flex-1 px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37]" />
+                            <button class="px-4 py-2 bg-[#D4AF37]/20 text-[#D4AF37] rounded hover:bg-[#D4AF37]/30 transition font-bold">Save</button>
+                        </form>
+                        <p class="text-xs text-gray-500 mt-2">Used to send Stripe receipt.</p>
+                    </div>
+
+                    <!-- Promo Code -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold mb-2">Promo Code</label>
+                        <div class="flex gap-2">
+                            <input type="text" placeholder="Enter code" class="flex-1 px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37]">
+                            <button onclick="showNotification('Code applied', 'success')" class="px-4 py-2 bg-[#D4AF37]/20 text-[#D4AF37] rounded hover:bg-[#D4AF37]/30 transition font-bold">Apply</button>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Method -->
+                    <div class="mb-6 pb-6 border-b border-[#D4AF37]/20">
+                        <label class="block text-sm font-bold mb-3">Shipping Method</label>
+                        <form action="{{ path('app_store_cart_shipping') }}" method="post" id="shipping-form">
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-[#1a1a24] rounded">
+                                    <input type="radio" name="shipping" value="standard" class="w-4 h-4" {% if shipping_method == 'standard' %}checked{% endif %} onchange="document.getElementById('shipping-form').submit()">
+                                    <div>
+                                        <p class="text-sm font-bold">Standard (5-7 days)</p>
+                                        <p class="text-xs text-gray-400">$9.99</p>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-[#1a1a24] rounded">
+                                    <input type="radio" name="shipping" value="express" class="w-4 h-4" {% if shipping_method == 'express' %}checked{% endif %} onchange="document.getElementById('shipping-form').submit()">
+                                    <div>
+                                        <p class="text-sm font-bold">Express (2-3 days)</p>
+                                        <p class="text-xs text-gray-400">$24.99</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+
+                    {% if cart_items|length > 0 %}
+                        <form action="{{ path('app_store_checkout') }}" method="post" class="mb-3">
+                            <button type="submit" class="w-full px-6 py-3 bg-[#D4AF37] text-[#0a0a0f] rounded-lg hover:bg-[#B8941F] transition font-bold text-lg">Proceed to Checkout</button>
+                        </form>
+                    {% else %}
+                        <button class="w-full px-6 py-3 bg-gray-600 text-white rounded-lg font-bold text-lg mb-3 opacity-60 cursor-not-allowed">Proceed to Checkout</button>
+                    {% endif %}
+                    <button onclick="showNotification('Cart saved', 'info')" class="w-full px-6 py-3 bg-[#12121a] border border-[#D4AF37]/20 rounded-lg hover:border-[#D4AF37] transition font-bold">Save for Later</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recently Viewed -->
+        <div class="mt-12">
+            <h3 class="text-2xl font-bold text-[#D4AF37] mb-6">Recently Viewed</h3>
+            <div class="grid md:grid-cols-4 gap-4">
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-4">
+                    <div class="bg-gradient-to-br from-[#D4AF37]/20 to-[#B8941F]/20 h-32 rounded flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-[#D4AF37]/50" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <h4 class="font-bold mb-2">Gaming Mouse Pad</h4>
+                    <p class="text-[#D4AF37] font-bold">$24.99</p>
+                </div>
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-4">
+                    <div class="bg-gradient-to-br from-[#D4AF37]/20 to-[#B8941F]/20 h-32 rounded flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-[#D4AF37]/50" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                    </div>
+                    <h4 class="font-bold mb-2">Team Cap</h4>
+                    <p class="text-[#D4AF37] font-bold">$29.99</p>
+                </div>
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-4">
+                    <div class="bg-gradient-to-br from-[#D4AF37]/20 to-[#B8941F]/20 h-32 rounded flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-[#D4AF37]/50" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-13c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z"/>
+                        </svg>
+                    </div>
+                    <h4 class="font-bold mb-2">Energy Drink (Case)</h4>
+                    <p class="text-[#D4AF37] font-bold">$39.99</p>
+                </div>
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-4">
+                    <div class="bg-gradient-to-br from-[#D4AF37]/20 to-[#B8941F]/20 h-32 rounded flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-[#D4AF37]/50" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <h4 class="font-bold mb-2">Branded Hoodie</h4>
+                    <p class="text-[#D4AF37] font-bold">$74.99</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ asset('main.js') }}"></script>
+    <script>
+        function updateQty(itemId, change) {
+            showNotification('Quantity updated', 'info');
+        }
+
+        function removeItem(itemId) {
+            // Item removal logic
+        }
+
+        function handleCheckout() {
+            showNotification('Proceeding to payment...', 'success');
+        }
+    </script>
+</body>
+</html>
+

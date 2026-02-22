@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+{% block title %}Admin • Edit Stream{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-[#0a0a0f] text-[#e4e4e7]">
+  <div class="container mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold text-[#D4AF37] mb-6">Edit Stream</h1>
+    <div class="bg-[#12121a] border border-[#D4AF37]/20 rounded-lg p-6">
+      <form method="post" action="{{ path('app_admin_streams_update', { id: stream.streamId }) }}" enctype="multipart/form-data" class="flex flex-col gap-4">
+        <div>
+          <label class="block text-sm text-gray-300 mb-1">Title</label>
+          <input name="stream[title]" type="text" value="{{ stream.title }}" class="w-full px-3 py-2 bg-[#0f0f16] border border-[#D4AF37]/20 rounded text-[#e4e4e7]" required />
+        </div>
+        <div>
+          <label class="block text-sm text-gray-300 mb-1">URL</label>
+          <input name="stream[url]" type="text" value="{% if stream.platform == 'twitch' and stream.channelName %}https://www.twitch.tv/{{ stream.channelName }}{% elseif stream.platform == 'youtube' and stream.youtubeVideoId %}https://www.youtube.com/watch?v={{ stream.youtubeVideoId }}{% endif %}" class="w-full px-3 py-2 bg-[#0f0f16] border border-[#D4AF37]/20 rounded text-[#e4e4e7]" required />
+        </div>
+        <div class="flex items-end justify-end">
+          <button class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F]">Save Changes</button>
+        </div>
+      </form>
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm text-gray-300 mb-1">Current Thumbnail</label>
+          <div class="w-full h-40 bg-[#0f0f16] border border-[#D4AF37]/20 rounded flex items-center justify-center overflow-hidden">
+            {% if stream.thumbnail %}
+              {% set thumb = stream.thumbnail %}
+              {% if thumb|slice(0,4) == 'http' %}
+                {% set src = thumb %}
+              {% elseif thumb|slice(0,1) == '/' %}
+                {% set src = asset(thumb|slice(1)) %}
+              {% else %}
+                {% set src = asset('uploads/streams/' ~ thumb) %}
+              {% endif %}
+              <img src="{{ src }}" alt="{{ stream.title }}" class="w-full h-full object-cover">
+            {% else %}
+              <span class="text-gray-500 text-sm">No thumbnail</span>
+            {% endif %}
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm text-gray-300 mb-1">Upload New Thumbnail</label>
+          <input name="stream[thumbnail]" type="file" accept="image/*" class="w-full px-3 py-2 bg-[#0f0f16] border border-[#D4AF37]/20 rounded text-[#e4e4e7]">
+        </div>
+      </div>
+      <div class="mt-4">
+        <a href="{{ path('app_admin_dash_streams') }}" class="text-[#D4AF37] hover:underline">Back to streams</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

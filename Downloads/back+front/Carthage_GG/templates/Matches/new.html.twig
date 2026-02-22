@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Match - CarthageGG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('styles/styles.css') }}" />
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-[#0a0a0f]/95 backdrop-blur-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex h-16 items-center justify-between">
+                <a href="{{ path('app_index') }}" class="flex items-center space-x-2">
+                    <img src="{{ asset('images/zz.png') }}" alt="CarthageGG Logo" class="h-14 w-14 rounded-lg shadow-lg object-cover">
+                    <span class="text-2xl font-bold text-[#D4AF37]">Carthage</span>
+                    <span class="text-2xl font-bold text-white">GG</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="{{ path('tournament_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Tournaments</a>
+                    <a href="{{ path('team_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Teams</a>
+                    <a href="{{ path('match_index') }}" class="px-4 py-2 rounded-md bg-[#D4AF37]/10 text-[#D4AF37]">Matches</a>
+                    <a href="{{ path('match_player_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">MatchPlayers</a>
+                    <a href="{{ path('team_player_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">TeamPlayers</a>
+                    <a href="{{ path('game_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Games</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ path('app_login') }}" class="text-gray-300 hover:text-white px-4 py-2 text-sm font-medium">Login</a>
+                    <a href="{{ path('app_dashboard') }}" class="px-4 py-2 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] text-sm font-medium">Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="container mx-auto px-4 py-12">
+        <div class="flex items-center space-x-4 mb-8">
+            <a href="{{ path('match_index') }}" class="text-gray-400 hover:text-white">← Back to Matches</a>
+        </div>
+        <h1 class="text-4xl font-bold mb-4">Create Match</h1>
+        <p class="text-gray-400">Set up a new esports match</p>
+    </div>
+
+    <!-- Form Container -->
+    <div class="container mx-auto px-4 pb-12">
+        <div class="max-w-2xl mx-auto border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-8">
+            {% if form_errors(form) %}
+                <div class="mb-6 p-4 rounded-lg bg-red-600/10 border border-red-600 text-red-600">
+                    {{ form_errors(form) }}
+                </div>
+            {% endif %}
+
+            {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+                {% for child in form %}
+                    {% if child.vars.name != 'csrf_token' and child.vars.name != '_token' %}
+                        <div class="form-group">
+                            {{ form_label(child, null, {'label_attr': {'class': 'block text-sm font-medium mb-2'}}) }}
+                            {{ form_widget(child, {'attr': {'class': 'w-full px-4 py-2 rounded-lg bg-[#0a0a0f] border border-[#D4AF37]/20 text-white focus:border-[#D4AF37] focus:outline-none'}}) }}
+                            {% if form_errors(child) %}
+                                <div class="text-red-600 text-xs mt-1">{{ form_errors(child) }}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                <div class="flex gap-4 pt-6">
+                    <button type="submit" class="flex-1 px-6 py-2 rounded-lg bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] font-medium hover:opacity-90">Create Match</button>
+                    <a href="{{ path('match_index') }}" class="flex-1 px-6 py-2 rounded-lg border border-gray-400 text-gray-300 hover:bg-[#1e1e2e] font-medium text-center">Cancel</a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</body>
+</html>

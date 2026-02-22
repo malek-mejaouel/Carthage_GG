@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Management | CarthageGG Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('styles/styles.css') }}">
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    <!-- Navigation -->
+    <nav class="bg-[#12121a] border-b border-[#D4AF37]/20 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <img src="{{ asset('images/zz.png') }}" alt="CarthageGG Logo" class="w-14 h-14 rounded-lg shadow-lg object-cover">
+                <span class="font-bold text-[#D4AF37]">CarthageGG</span>
+            </div>
+            <div class="flex gap-8 items-center">
+                <a href="{{ path('app_index') }}" class="hover:text-[#D4AF37] transition">Home</a>
+                <a href="{{ path('app_dashboard') }}" class="hover:text-[#D4AF37] transition">Dashboard</a>
+                <a href="{{ path('app_admin') }}" class="hover:text-[#D4AF37] transition">Admin</a>
+                <a href="{{ path('app_login') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg hover:bg-[#B8941F] transition">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-12 max-w-7xl">
+        <!-- Header -->
+        <div class="mb-12">
+            <a href="{{ path('app_admin') }}" class="text-[#D4AF37] hover:underline mb-4 inline-block">← Back to Admin Panel</a>
+            <h1 class="text-4xl font-bold text-[#D4AF37] mb-2">Store Management</h1>
+            <p class="text-gray-400">Manage products, inventory, and store settings</p>
+        </div>
+
+        <!-- Store Tabs -->
+        <div class="mb-8 border-b border-[#D4AF37]/20">
+            <div class="flex gap-8">
+                <button onclick="switchTab('products')" class="tab-button px-4 py-3 border-b-2 border-[#D4AF37] text-[#D4AF37] font-bold">📦 Products</button>
+                <button onclick="switchTab('inventory')" class="tab-button px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-[#D4AF37]">📊 Inventory</button>
+                <button onclick="switchTab('settings')" class="tab-button px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-[#D4AF37]">⚙️ Settings</button>
+            </div>
+        </div>
+
+        <!-- Products Tab -->
+        <div id="products" class="tab-content">
+            <div class="mb-8 flex gap-4 justify-between items-center">
+                <div class="flex-1">
+                    <input type="text" placeholder="Search products..." class="w-full px-4 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded-lg text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                </div>
+                <button onclick="showNotification('Add product feature coming soon', 'info')" class="px-6 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg hover:bg-[#B8941F] transition font-bold">+ Add Product</button>
+            </div>
+
+            <!-- Products Table -->
+            <div class="border border-[#D4AF37]/20 rounded-lg overflow-hidden bg-[#12121a]">
+                <table class="w-full">
+                    <thead class="bg-[#1a1a24] border-b border-[#D4AF37]/20">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-[#D4AF37] font-bold">Product</th>
+                            <th class="px-6 py-4 text-left text-[#D4AF37] font-bold">SKU</th>
+                            <th class="px-6 py-4 text-left text-[#D4AF37] font-bold">Category</th>
+                            <th class="px-6 py-4 text-left text-[#D4AF37] font-bold">Price</th>
+                            <th class="px-6 py-4 text-left text-[#D4AF37] font-bold">Stock</th>
+                            <th class="px-6 py-4 text-left text-[#D4AF37] font-bold">Status</th>
+                            <th class="px-6 py-4 text-left text-[#D4AF37] font-bold">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D4AF37]/20">
+                        <tr class="hover:bg-[#1a1a24] transition">
+                            <td class="px-6 py-4 font-bold">CarthageGG Jersey</td>
+                            <td class="px-6 py-4 text-gray-400">SKU-001</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm">Apparel</span></td>
+                            <td class="px-6 py-4 font-bold text-[#D4AF37]">$49.99</td>
+                            <td class="px-6 py-4">245</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">Active</span></td>
+                            <td class="px-6 py-4">
+                                <div class="flex gap-2">
+                                    <button onclick="showNotification('Edit product feature', 'info')" class="text-[#D4AF37] hover:underline text-sm">Edit</button>
+                                    <button onclick="showNotification('Delete product', 'info')" class="text-red-400 hover:underline text-sm">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-[#1a1a24] transition">
+                            <td class="px-6 py-4 font-bold">Gaming Mouse Pad</td>
+                            <td class="px-6 py-4 text-gray-400">SKU-002</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm">Accessories</span></td>
+                            <td class="px-6 py-4 font-bold text-[#D4AF37]">$24.99</td>
+                            <td class="px-6 py-4">512</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">Active</span></td>
+                            <td class="px-6 py-4">
+                                <div class="flex gap-2">
+                                    <button onclick="showNotification('Edit product feature', 'info')" class="text-[#D4AF37] hover:underline text-sm">Edit</button>
+                                    <button onclick="showNotification('Delete product', 'info')" class="text-red-400 hover:underline text-sm">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-[#1a1a24] transition">
+                            <td class="px-6 py-4 font-bold">Mechanical Keyboard</td>
+                            <td class="px-6 py-4 text-gray-400">SKU-003</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">Gaming Gear</span></td>
+                            <td class="px-6 py-4 font-bold text-[#D4AF37]">$129.99</td>
+                            <td class="px-6 py-4">32</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-sm">Low Stock</span></td>
+                            <td class="px-6 py-4">
+                                <div class="flex gap-2">
+                                    <button onclick="showNotification('Edit product feature', 'info')" class="text-[#D4AF37] hover:underline text-sm">Edit</button>
+                                    <button onclick="showNotification('Delete product', 'info')" class="text-red-400 hover:underline text-sm">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-[#1a1a24] transition">
+                            <td class="px-6 py-4 font-bold">Team Cap</td>
+                            <td class="px-6 py-4 text-gray-400">SKU-004</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm">Apparel</span></td>
+                            <td class="px-6 py-4 font-bold text-[#D4AF37]">$29.99</td>
+                            <td class="px-6 py-4">189</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">Active</span></td>
+                            <td class="px-6 py-4">
+                                <div class="flex gap-2">
+                                    <button onclick="showNotification('Edit product feature', 'info')" class="text-[#D4AF37] hover:underline text-sm">Edit</button>
+                                    <button onclick="showNotification('Delete product', 'info')" class="text-red-400 hover:underline text-sm">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-[#1a1a24] transition">
+                            <td class="px-6 py-4 font-bold">Energy Drink (Case)</td>
+                            <td class="px-6 py-4 text-gray-400">SKU-005</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-pink-500/20 text-pink-400 rounded-full text-sm">Collectibles</span></td>
+                            <td class="px-6 py-4 font-bold text-[#D4AF37]">$39.99</td>
+                            <td class="px-6 py-4">0</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-sm">Out of Stock</span></td>
+                            <td class="px-6 py-4">
+                                <div class="flex gap-2">
+                                    <button onclick="showNotification('Edit product feature', 'info')" class="text-[#D4AF37] hover:underline text-sm">Edit</button>
+                                    <button onclick="showNotification('Delete product', 'info')" class="text-red-400 hover:underline text-sm">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Stats -->
+            <div class="mt-8 grid md:grid-cols-4 gap-4">
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 text-center">
+                    <div class="text-3xl font-bold text-[#D4AF37] mb-2">8</div>
+                    <p class="text-gray-400">Total Products</p>
+                </div>
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 text-center">
+                    <div class="text-3xl font-bold text-green-400 mb-2">5</div>
+                    <p class="text-gray-400">Active Products</p>
+                </div>
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 text-center">
+                    <div class="text-3xl font-bold text-yellow-400 mb-2">1</div>
+                    <p class="text-gray-400">Low Stock</p>
+                </div>
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 text-center">
+                    <div class="text-3xl font-bold text-red-400 mb-2">1</div>
+                    <p class="text-gray-400">Out of Stock</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Tab -->
+        <div id="inventory" class="tab-content hidden">
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <!-- Inventory Stats -->
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6">
+                    <h3 class="text-xl font-bold text-[#D4AF37] mb-6">Inventory Overview</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-[#0a0a0f] rounded">
+                            <span>Total SKUs</span>
+                            <span class="font-bold text-[#D4AF37]">8</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-[#0a0a0f] rounded">
+                            <span>Total Units in Stock</span>
+                            <span class="font-bold text-[#D4AF37]">1,278</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-[#0a0a0f] rounded">
+                            <span>Inventory Value</span>
+                            <span class="font-bold text-green-400">$89,234.22</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-[#0a0a0f] rounded">
+                            <span>Reorder Needed</span>
+                            <span class="font-bold text-red-400">2 items</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock Adjustment -->
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6">
+                    <h3 class="text-xl font-bold text-[#D4AF37] mb-6">Adjust Stock</h3>
+                    <form onsubmit="handleStockAdjust(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold mb-2">Select Product</label>
+                            <select class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7]">
+                                <option>CarthageGG Jersey</option>
+                                <option>Gaming Mouse Pad</option>
+                                <option>Mechanical Keyboard</option>
+                                <option>Team Cap</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold mb-2">Adjust Quantity</label>
+                            <input type="number" placeholder="Enter quantity (+ or -)" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold mb-2">Reason</label>
+                            <select class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7]">
+                                <option>Restock</option>
+                                <option>Damage</option>
+                                <option>Lost</option>
+                                <option>Inventory Correction</option>
+                                <option>Return</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">Update Stock</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Stock Levels -->
+            <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6">
+                <h3 class="text-xl font-bold text-[#D4AF37] mb-6">Stock Levels by Product</h3>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span>CarthageGG Jersey</span>
+                            <span class="text-sm text-gray-400">245 / 500</span>
+                        </div>
+                        <div class="w-full bg-[#0a0a0f] rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 49%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span>Gaming Mouse Pad</span>
+                            <span class="text-sm text-gray-400">512 / 600</span>
+                        </div>
+                        <div class="w-full bg-[#0a0a0f] rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span>Mechanical Keyboard</span>
+                            <span class="text-sm text-gray-400">32 / 200</span>
+                        </div>
+                        <div class="w-full bg-[#0a0a0f] rounded-full h-2">
+                            <div class="bg-yellow-500 h-2 rounded-full" style="width: 16%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span>Team Cap</span>
+                            <span class="text-sm text-gray-400">189 / 400</span>
+                        </div>
+                        <div class="w-full bg-[#0a0a0f] rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 47%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span>Energy Drink (Case)</span>
+                            <span class="text-sm text-gray-400">0 / 300</span>
+                        </div>
+                        <div class="w-full bg-[#0a0a0f] rounded-full h-2">
+                            <div class="bg-red-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content hidden">
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl">
+                <!-- Store Settings -->
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6">
+                    <h3 class="text-xl font-bold text-[#D4AF37] mb-6">Store Settings</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold mb-2">Store Name</label>
+                            <input type="text" value="CarthageGG Store" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold mb-2">Support Email</label>
+                            <input type="email" value="store@carthageg.com" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold mb-2">Shipping Cost</label>
+                            <input type="number" value="9.99" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold mb-2">Free Shipping Threshold</label>
+                            <input type="number" value="100" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7]">
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" checked class="w-5 h-5">
+                            <label class="text-sm">Enable store</label>
+                        </div>
+                        <button onclick="showNotification('Settings saved', 'success')" class="w-full px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">Save Settings</button>
+                    </div>
+                </div>
+
+                <!-- Shipping Settings -->
+                <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6">
+                    <h3 class="text-xl font-bold text-[#D4AF37] mb-6">Shipping Providers</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-[#0a0a0f] rounded border border-[#D4AF37]/20">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold">Standard Shipping</span>
+                                <input type="checkbox" checked class="w-5 h-5">
+                            </div>
+                            <p class="text-sm text-gray-400">5-7 business days</p>
+                        </div>
+                        <div class="p-4 bg-[#0a0a0f] rounded border border-[#D4AF37]/20">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold">Express Shipping</span>
+                                <input type="checkbox" checked class="w-5 h-5">
+                            </div>
+                            <p class="text-sm text-gray-400">2-3 business days</p>
+                        </div>
+                        <div class="p-4 bg-[#0a0a0f] rounded border border-[#D4AF37]/20">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold">Overnight Shipping</span>
+                                <input type="checkbox" class="w-5 h-5">
+                            </div>
+                            <p class="text-sm text-gray-400">Next day delivery</p>
+                        </div>
+                        <button onclick="showNotification('Shipping updated', 'success')" class="w-full px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">Update Shipping</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ asset('main.js') }}"></script>
+    <script>
+        function handleStockAdjust(event) {
+            event.preventDefault();
+            showNotification('Stock adjusted successfully', 'success');
+        }
+    </script>
+</body>
+</html>
+

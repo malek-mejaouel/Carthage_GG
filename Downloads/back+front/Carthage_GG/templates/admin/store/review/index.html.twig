@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+{% block title %}Reviews | Store Admin{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-[#D4AF37]">Reviews</h1>
+        <a href="{{ path('admin_reviews_new') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F]">New Review</a>
+    </div>
+    <div class="overflow-x-auto border border-[#D4AF37]/20 rounded-lg">
+        <table class="min-w-full bg-[#12121a]">
+            <thead>
+                <tr class="text-left text-gray-400">
+                    <th class="p-3">ID</th>
+                    <th class="p-3">Product</th>
+                    <th class="p-3">User</th>
+                    <th class="p-3">Rating</th>
+                    <th class="p-3">Comment</th>
+                    <th class="p-3">Created</th>
+                    <th class="p-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-[#D4AF37]/20">
+                {% for r in reviews %}
+                    <tr class="text-sm">
+                        <td class="p-3">{{ r.id }}</td>
+                        <td class="p-3 font-semibold">{{ r.product.name }}</td>
+                        <td class="p-3 text-gray-400">{{ r.user.email }}</td>
+                        <td class="p-3">{{ r.rating }}</td>
+                        <td class="p-3 text-gray-400">{{ r.comment|default('')|slice(0,120) }}</td>
+                        <td class="p-3 text-gray-400">{{ r.createdAt|date('Y-m-d H:i') }}</td>
+                        <td class="p-3">
+                            <a href="{{ path('admin_reviews_edit', {id: r.id}) }}" class="text-[#D4AF37] hover:underline">Edit</a>
+                            <form action="{{ path('admin_reviews_delete', {id: r.id}) }}" method="post" class="inline ml-2" onsubmit="return confirm('Delete this review?')">
+                                <button class="text-red-400 hover:underline">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="7" class="p-6 text-center text-gray-400">No reviews</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

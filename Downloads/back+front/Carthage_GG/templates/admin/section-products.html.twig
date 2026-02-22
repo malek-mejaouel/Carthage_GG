@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products | CarthageGG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ asset('styles/admin.css') }}">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    {% include 'admin/_sidebar.html.twig' %}
+    <div class="lg:ml-64 flex flex-col min-h-screen">
+    <main class="flex-1 p-6">
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-white">Products</h1>
+            <a href="{{ path('app_admin_dashboard') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg font-bold hover:bg-[#B8941F] transition">Back to Dashboard</a>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="lg:col-span-2 bg-[#12121a] rounded-xl border border-[#D4AF37]/10 p-6">
+                <h3 class="text-lg font-bold text-white mb-4">Inventory Status</h3>
+                <div class="relative h-80">
+                    <canvas id="inventoryChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 p-6">
+                <h3 class="text-lg font-bold text-white mb-4">Category Share</h3>
+                <div class="relative h-64">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 overflow-hidden">
+            <div class="p-6 border-b border-[#D4AF37]/10 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white">Product List</h3>
+                <div class="flex gap-2">
+                    {% if app.request.query.get('featured') %}
+                        <a href="{{ path('app_admin_dash_products') }}"
+                           class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+                                  bg-gradient-to-r from-[#1f1f29] to-[#12121a] border border-[#D4AF37]/40 text-[#e4e4e7]
+                                  hover:border-[#D4AF37]/70 hover:from-[#262633] hover:to-[#171722] transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#D4AF37]" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z"/>
+                            </svg>
+                            Show All
+                        </a>
+                    {% else %}
+                        <a href="{{ path('app_admin_dash_products', {'featured': 1}) }}"
+                           class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+                                  bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f]
+                                  shadow-lg shadow-[#D4AF37]/20 hover:from-[#c9a430] hover:to-[#a9851b] transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg>
+                            Featured Only
+                        </a>
+                    {% endif %}
+                    <a href="{{ path('app_admin_products_export_pdf') }}" target="_blank" class="px-4 py-2 bg-[#D4AF37]/10 text-[#D4AF37] rounded-lg text-sm font-medium hover:bg-[#D4AF37]/20 transition">Export PDF</a>
+                    <a href="{{ path('admin_categories_new') }}" class="px-4 py-2 bg-[#3B82F6] text-white rounded-lg text-sm font-bold hover:bg-[#2563EB] transition inline-block">Add Category</a>
+                    <a href="{{ path('admin_products_new') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg text-sm font-bold hover:bg-[#B8941F] transition inline-block">Add</a>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-gray-400">
+                    <thead class="bg-[#1a1a24] text-[#D4AF37] uppercase font-bold text-xs">
+                        <tr>
+                            <th class="px-6 py-4">SKU</th>
+                            <th class="px-6 py-4">Name</th>
+                            <th class="px-6 py-4">Category</th>
+                            <th class="px-6 py-4">Stock</th>
+                            <th class="px-6 py-4">Price</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D4AF37]/10">
+                        {% for product in products %}
+                        <tr class="table-row-hover transition">
+                            <td class="px-6 py-4 font-medium text-white">{{ product.sku ?? 'N/A' }}</td>
+                            <td class="px-6 py-4">
+                                {{ product.name }}
+                                {% if product.isFeatured %}
+                                    <span class="ml-2 px-2 py-1 bg-[#D4AF37]/20 text-[#D4AF37] rounded text-xs">Featured</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4">{{ product.category ? product.category.name : 'Uncategorized' }}</td>
+                            <td class="px-6 py-4">{{ product.stock }}</td>
+                            <td class="px-6 py-4">
+                                {% if product.discount > 0 %}
+                                    <span class="text-gray-500 line-through">${{ product.price }}</span>
+                                    <span class="ml-2 text-green-400 font-semibold">${{ product.finalPrice|number_format(2) }}</span>
+                                {% else %}
+                                    ${{ product.price }}
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4">
+                                {% if product.status == 'active' %}
+                                    <span class="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-xs">Active</span>
+                                {% else %}
+                                    <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs">{{ product.status|capitalize }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ path('admin_products_edit', {'id': product.id}) }}" class="px-3 py-1 bg-[#3B82F6] text-white rounded-md text-xs font-semibold hover:bg-[#2563EB] transition">Edit</a>
+                                    <form action="{{ path('admin_products_delete', {'id': product.id}) }}" method="post" onsubmit="return confirm('Delete this product?');" class="inline">
+                                        <button type="submit" class="px-3 py-1 bg-red-600 text-white rounded-md text-xs font-semibold hover:bg-red-700 transition">Remove</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">No products found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </main>
+    </div>
+    <script>
+        const invLabels = {{ inventory_labels|json_encode|raw }};
+        const invData = {{ inventory_data|json_encode|raw }};
+        const catLabels = {{ category_labels|json_encode|raw }};
+        const catData = {{ category_data|json_encode|raw }};
+        const catColors = {{ category_colors|json_encode|raw }};
+        const inventoryCtx = document.getElementById('inventoryChart');
+        new Chart(inventoryCtx, {
+            type: 'bar',
+            data: {
+                labels: invLabels,
+                datasets: [{ label: 'Units in Stock', data: invData, backgroundColor: '#D4AF37' }]
+            },
+            options: {
+                scales: {
+                    x: { ticks: { color: '#9CA3AF' } },
+                    y: { ticks: { color: '#9CA3AF' }, beginAtZero: true }
+                },
+                plugins: {
+                    legend: { labels: { color: '#e4e4e7' } }
+                }
+            }
+        });
+        const categoryCtx = document.getElementById('categoryChart');
+        new Chart(categoryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: catLabels,
+                datasets: [{ data: catData, backgroundColor: catColors }]
+            },
+            options: { plugins: { legend: { labels: { color: '#e4e4e7' } } } }
+        });
+    </script>
+</script>
+<script src="{{ asset('js/admin-dashboard.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comments | CarthageGG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ asset('styles/admin.css') }}">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    {% include 'admin/_sidebar.html.twig' %}
+    <div class="lg:ml-64 flex flex-col min-h-screen">
+    <main class="flex-1 p-6">
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-white">Comments</h1>
+            <a href="{{ path('app_admin_dashboard') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg font-bold hover:bg-[#B8941F] transition">Back to Dashboard</a>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="lg:col-span-2 bg-[#12121a] rounded-xl border border-[#D4AF37]/10 p-6">
+                <h3 class="text-lg font-bold text-white mb-4">Comment Activity</h3>
+                <div class="relative h-80">
+                    <canvas id="commentsChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 p-6">
+                <h3 class="text-lg font-bold text-white mb-4">Sentiment</h3>
+                <div class="relative h-64">
+                    <canvas id="sentimentChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 overflow-hidden">
+            <div class="p-6 border-b border-[#D4AF37]/10 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white">Comments Management</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-gray-400">
+                    <thead class="bg-[#1a1a24] text-[#D4AF37] uppercase font-bold text-xs">
+                        <tr>
+                            <th class="px-6 py-4">Content</th>
+                            <th class="px-6 py-4">Date</th>
+                            <th class="px-6 py-4">News</th>
+                            <th class="px-6 py-4">Author</th>
+                            <th class="px-6 py-4 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D4AF37]/10">
+                        {% for comment in comments %}
+                            <tr class="table-row-hover transition">
+                                <td class="px-6 py-4 max-w-md truncate text-white">{{ comment.contenu }}</td>
+                                <td class="px-6 py-4">{{ comment.dateCommentaire ? comment.dateCommentaire|date('Y-m-d H:i') : 'N/A' }}</td>
+                                <td class="px-6 py-4">{{ comment.news ? comment.news.titre : 'N/A' }}</td>
+                                <td class="px-6 py-4">{{ comment.user ? comment.user.username : 'N/A' }}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <button class="text-blue-400 hover:text-blue-300 mr-3" onclick="editComment({{ comment.commentaireId }}, '{{ comment.contenu|e('js') }}')">Edit</button>
+                                    <form method="post" action="{{ path('api_comments_delete', {id: comment.commentaireId}) }}" class="inline" onsubmit="return confirm('Delete this comment?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_comment' ~ comment.commentaireId) }}">
+                                        <button type="submit" class="text-red-400 hover:text-red-300">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center opacity-60 py-6">No comments found</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </main>
+    </div>
+    <script>
+        const commentsCtx = document.getElementById('commentsChart');
+        new Chart(commentsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{ label: 'Comments', data: [42, 55, 38, 47, 60, 75, 70], backgroundColor: '#D4AF37' }]
+            },
+            options: { scales: { x: { ticks: { color: '#9CA3AF' } }, y: { ticks: { color: '#9CA3AF' } } } }
+        });
+        const sentimentCtx = document.getElementById('sentimentChart');
+        new Chart(sentimentCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Positive', 'Neutral', 'Negative'],
+                datasets: [{ data: [65, 20, 15], backgroundColor: ['#10B981', '#9CA3AF', '#EF4444'] }]
+            },
+            options: { plugins: { legend: { labels: { color: '#e4e4e7' } } } }
+        });
+        async function editComment(id, currentText) {
+            const updated = prompt('Edit comment content:', currentText);
+            if (updated === null) return;
+            const res = await fetch(`/api/comments/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contenu: updated })
+            });
+            if (res.ok) {
+                location.reload();
+            } else {
+                alert('Failed to update comment');
+            }
+        }
+    </script>
+</script>
+<script src="{{ asset('js/admin-dashboard.js') }}"></script>
+</body>
+</html>

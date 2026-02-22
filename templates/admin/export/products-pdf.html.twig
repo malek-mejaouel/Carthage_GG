@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Export</title>
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --bg: #ffffff;
+            --text: #111827;
+            --muted: #6B7280;
+            --border: #E5E7EB;
+        }
+        body { font-family: Inter, Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+        .wrap { padding: 24px; }
+        .header { display:flex; align-items:center; justify-content: space-between; border-bottom: 2px solid var(--gold); padding-bottom: 12px; margin-bottom: 16px; }
+        .brand { display:flex; align-items:center; gap:12px; }
+        .brand img { width:56px; height:56px; border-radius: 8px; object-fit: cover; }
+        .brand .title { font-weight:700; color: var(--gold); }
+        .meta { text-align:right; font-size:12px; color: var(--muted); }
+        .table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .table th { text-align:left; padding:8px; background: #F9FAFB; color: var(--text); border-bottom:1px solid var(--border); }
+        .table td { padding:8px; border-bottom:1px solid var(--border); color:#111827; }
+        .table tr:nth-child(even) td { background: #FAFAFA; }
+        .footer { margin-top: 12px; font-size: 11px; color: var(--muted); display:flex; justify-content: space-between; }
+        @media print {
+            .no-print { display: none !important; }
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+        .badge { display:inline-block; padding:2px 6px; border-radius:999px; font-size:10px; }
+        .badge-green { color:#065f46; background:#d1fae5; }
+        .badge-red { color:#7f1d1d; background:#fee2e2; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="header">
+            <div class="brand">
+                <img src="{{ asset('images/zz.png') }}" alt="CarthageGG">
+                <div>
+                    <div class="title">CarthageGG</div>
+                    <div style="font-size:12px; color:var(--muted)">Products Export</div>
+                </div>
+            </div>
+            <div class="meta">
+                <div>Generated: {{ generated_at }}</div>
+                <div>Items: {{ products|length }}</div>
+            </div>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Discount</th>
+                    <th>Final</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                <tr>
+                    <td>{{ p.sku ?? 'N/A' }}</td>
+                    <td>{{ p.name }}</td>
+                    <td>{{ p.category ? p.category.name : 'Uncategorized' }}</td>
+                    <td>${{ (p.price + 0)|number_format(2) }}</td>
+                    <td>{{ (p.discount + 0)|number_format(0) }}%</td>
+                    <td>${{ p.getFinalPrice()|number_format(2) }}</td>
+                    <td>{{ p.stock }}</td>
+                    <td>
+                        {% if p.status == 'active' %}
+                            <span class="badge badge-green">Active</span>
+                        {% else %}
+                            <span class="badge badge-red">{{ p.status|capitalize }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" style="text-align:center; color:var(--muted)">No products</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="footer">
+            <div>© {{ "now"|date("Y") }} CarthageGG</div>
+            <div class="no-print">
+                <button onclick="window.print()" style="padding:6px 10px; border:1px solid var(--gold); color:var(--gold); background:white; border-radius:6px; font-weight:600;">Print / Save PDF</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        setTimeout(() => { try { window.print(); } catch(e) {} }, 300);
+    </script>
+</body>
+</html>

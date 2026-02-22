@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Game - CarthageGG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom form styling to match CarthageGG theme */
+        input, select, textarea {
+            background-color: #0a0a0f;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            color: #e4e4e7;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #D4AF37;
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+        }
+        
+        label {
+            color: #D4AF37;
+            font-weight: 500;
+        }
+        
+        .form-checkbox {
+            accent-color: #D4AF37;
+        }
+    </style>
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7] min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-[#0a0a0f]/95 backdrop-blur-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex h-16 items-center justify-between">
+                <a href="{{ path('app_index') }}" class="flex items-center space-x-2">
+                    <img src="{{ asset('images/zz.png') }}" alt="CarthageGG Logo" class="h-14 w-14 rounded-lg shadow-lg object-cover">
+                    <span class="text-2xl font-bold text-[#D4AF37]">Carthage</span>
+                    <span class="text-2xl font-bold text-white">GG</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="{{ path('tournament_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Tournaments</a>
+                    <a href="{{ path('team_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Teams</a>
+                    <a href="{{ path('match_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Matches</a>
+                    <a href="{{ path('match_player_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">MatchPlayer</a>
+                    <a href="{{ path('team_player_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">TeamPlayer</a>
+                    <a href="{{ path('game_index') }}" class="px-4 py-2 rounded-md bg-[#D4AF37]/20 text-[#D4AF37] hover:bg-[#D4AF37]/30">Game</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ path('app_login') }}" class="text-gray-300 hover:text-white px-4 py-2 text-sm font-medium">Login</a>
+                    <a href="{{ path('app_dashboard') }}" class="px-4 py-2 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] text-sm font-medium">Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header Section -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-4xl font-bold text-[#D4AF37] mb-2">Create New Game</h1>
+                    <p class="text-gray-400">Add a new game to the CarthageGG platform</p>
+                </div>
+                <a href="{{ path('game_index') }}" class="inline-flex items-center px-6 py-3 rounded-md border-2 border-[#D4AF37] text-[#D4AF37] font-medium hover:bg-[#D4AF37]/10 transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Back to List
+                </a>
+            </div>
+        </div>
+
+        <!-- Form Container -->
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-[#12121a] border border-[#D4AF37]/20 rounded-lg p-6 mb-8">
+                {{ form_start(form, { 'attr': { 'class': 'space-y-6' } }) }}
+                
+                <!-- Form Fields Styled -->
+                <div class="space-y-4">
+                    {% for child in form %}
+                        {% if child.vars.name != '_token' %}
+                            <div class="space-y-2">
+                                {{ form_label(child, null, { 'label_attr': { 'class': 'block text-sm font-medium text-[#D4AF37]' } }) }}
+                                
+                                {% if child.vars.block_prefixes[1] == 'textarea' %}
+                                    {{ form_widget(child, { 'attr': { 
+                                        'class': 'w-full px-4 py-3 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded-md focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] focus:outline-none text-[#e4e4e7]',
+                                        'rows': '4'
+                                    } }) }}
+                                {% elseif child.vars.block_prefixes[1] == 'checkbox' %}
+                                    <div class="flex items-center">
+                                        {{ form_widget(child, { 'attr': { 
+                                            'class': 'w-5 h-5 rounded border-[#D4AF37]/20 bg-[#0a0a0f] text-[#D4AF37] focus:ring-[#D4AF37] focus:ring-1'
+                                        } }) }}
+                                        <span class="ml-2 text-gray-300">{{ child.vars.label }}</span>
+                                    </div>
+                                {% elseif child.vars.block_prefixes[1] == 'choice' %}
+                                    {{ form_widget(child, { 'attr': { 
+                                        'class': 'w-full px-4 py-3 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded-md focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] focus:outline-none text-[#e4e4e7]'
+                                    } }) }}
+                                {% else %}
+                                    {{ form_widget(child, { 'attr': { 
+                                        'class': 'w-full px-4 py-3 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded-md focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] focus:outline-none text-[#e4e4e7]'
+                                    } }) }}
+                                {% endif %}
+                                
+                                {{ form_errors(child, { 'attr': { 'class': 'text-red-400 text-sm mt-1' } }) }}
+                                {% if child.vars.help is defined %}
+                                    <p class="text-gray-400 text-sm">{{ child.vars.help }}</p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Form Actions -->
+                <div class="pt-6 border-t border-[#D4AF37]/20 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+                    <div class="text-sm text-gray-400">
+                        <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        All fields are required unless marked optional
+                    </div>
+                    <div class="flex space-x-3">
+                        <a href="{{ path('game_index') }}" class="px-6 py-3 rounded-md border-2 border-[#D4AF37] text-[#D4AF37] font-medium hover:bg-[#D4AF37]/10 transition-colors">
+                            Cancel
+                        </a>
+                        <button type="submit" class="inline-flex items-center px-6 py-3 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] font-medium hover:opacity-90 transition-opacity">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Create Game
+                        </button>
+                    </div>
+                </div>
+                
+                {{ form_end(form) }}
+            </div>
+
+            <!-- Help Section -->
+            <div class="bg-[#12121a] border border-[#D4AF37]/20 rounded-lg p-6">
+                <h3 class="text-lg font-bold text-[#D4AF37] mb-4">💡 Game Information Tips</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-medium text-gray-300 mb-2">Game Name</h4>
+                        <p class="text-sm text-gray-400">Use the official game title (e.g., "Counter-Strike 2" not "CS2").</p>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-300 mb-2">Genre</h4>
+                        <p class="text-sm text-gray-400">Choose from popular genres: FPS, MOBA, Battle Royale, RTS, etc.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-300 mb-2">Description</h4>
+                        <p class="text-sm text-gray-400">Brief overview of the game and its competitive aspects.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-300 mb-2">Release Year</h4>
+                        <p class="text-sm text-gray-400">Original release year helps categorize games by era.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Popular Games Reference -->
+            <div class="mt-8">
+                <h3 class="text-xl font-bold text-[#D4AF37] mb-4">🎮 Popular Games on CarthageGG</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-4 text-center">
+                        <div class="text-lg font-bold text-[#D4AF37]">CS:GO</div>
+                        <div class="text-sm text-gray-400">FPS</div>
+                    </div>
+                    <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-4 text-center">
+                        <div class="text-lg font-bold text-[#D4AF37]">League of Legends</div>
+                        <div class="text-sm text-gray-400">MOBA</div>
+                    </div>
+                    <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-4 text-center">
+                        <div class="text-lg font-bold text-[#D4AF37]">VALORANT</div>
+                        <div class="text-sm text-gray-400">FPS</div>
+                    </div>
+                    <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-4 text-center">
+                        <div class="text-lg font-bold text-[#D4AF37]">Dota 2</div>
+                        <div class="text-sm text-gray-400">MOBA</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#D4AF37]/20 bg-[#0a0a0f] mt-16">
+        <div class="container mx-auto px-4 py-8">
+            <div class="text-center text-gray-400 text-sm">
+                <p>&copy; 2026 CarthageGG. All rights reserved.</p>
+                <p class="mt-2">Tunisia's Premier Esports Platform</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Add focus styles to form elements
+        document.addEventListener('DOMContentLoaded', function() {
+            const formInputs = document.querySelectorAll('input, select, textarea');
+            formInputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('ring-1', 'ring-[#D4AF37]');
+                });
+                input.addEventListener('blur', function() {
+                    this.parentElement.classList.remove('ring-1', 'ring-[#D4AF37]');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

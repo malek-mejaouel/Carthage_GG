@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard | CarthageGG{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12 max-w-7xl">
+    <h1 class="text-4xl font-bold text-[#D4AF37] mb-8">User Dashboard</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Profile Card -->
+        <div class="bg-[#12121a] border border-[#D4AF37]/20 rounded-lg p-6 hover:border-[#D4AF37]/50 transition">
+            <h2 class="text-xl font-bold text-white mb-4">My Profile</h2>
+            <p class="text-gray-400 mb-4">View and edit your personal information.</p>
+            {% if app.user %}
+                <a href="{{ path('app_profile_edit', {'id': app.user.id}) }}" class="text-[#D4AF37] hover:underline">Edit Profile →</a>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="text-[#D4AF37] hover:underline">Login to view profile →</a>
+            {% endif %}
+        </div>
+
+        <!-- Orders Card -->
+        <div class="bg-[#12121a] border border-[#D4AF37]/20 rounded-lg p-6 hover:border-[#D4AF37]/50 transition">
+            <h2 class="text-xl font-bold text-white mb-4">My Orders</h2>
+            <p class="text-gray-400 mb-4">Track your recent purchases and order history.</p>
+            <a href="#" class="text-gray-500 cursor-not-allowed">Coming Soon</a>
+        </div>
+
+        <!-- Admin Access (Conditional) -->
+        {% if is_granted('ROLE_ADMIN') %}
+        <div class="bg-[#12121a] border border-[#D4AF37]/20 rounded-lg p-6 hover:border-[#D4AF37]/50 transition">
+            <h2 class="text-xl font-bold text-white mb-4">Admin Panel</h2>
+            <p class="text-gray-400 mb-4">Access the administrative dashboard.</p>
+            <a href="{{ path('app_admin_dashboard') }}" class="text-[#D4AF37] hover:underline block mb-2">Go to Admin Dashboard →</a>
+        </div>
+
+        <div class="bg-[#12121a] border border-[#D4AF37]/20 rounded-lg p-6 hover:border-[#D4AF37]/50 transition">
+            <h2 class="text-xl font-bold text-white mb-4">Store Dashboard</h2>
+            <p class="text-gray-400 mb-4">Manage products and inventory.</p>
+            <div class="flex flex-col gap-2">
+                <a href="{{ path('admin_products_index') }}" class="text-[#D4AF37] hover:underline">Manage Products →</a>
+                <a href="{{ path('admin_products_new') }}" class="text-[#D4AF37] hover:underline">Add New Product →</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

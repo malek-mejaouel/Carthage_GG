@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Matches - CarthageGG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('styles/styles.css') }}" />
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7] min-h-screen">
+
+    {# Navigation Bar #}
+    <nav class="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-[#0a0a0f]/95 backdrop-blur-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex h-16 items-center justify-between">
+                <a href="{{ path('app_index') }}" class="flex items-center space-x-2">
+                    <img src="{{ asset('images/zz.png') }}" alt="CarthageGG Logo" class="h-14 w-14 rounded-lg shadow-lg object-cover">
+                    <span class="text-2xl font-bold text-[#D4AF37]">Carthage</span>
+                    <span class="text-2xl font-bold text-white">GG</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="{{ path('tournament_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Tournaments</a>
+                    <a href="{{ path('team_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Teams</a>
+                    <a href="{{ path('match_index') }}" class="px-4 py-2 rounded-md bg-[#D4AF37]/10 text-[#D4AF37]">Matches</a>
+                    <a href="{{ path('match_player_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">MatchPlayers</a>
+                    <a href="{{ path('team_player_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">TeamPlayers</a>
+                    <a href="{{ path('game_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Games</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ path('app_login') }}" class="text-gray-300 hover:text-white px-4 py-2 text-sm font-medium">Login</a>
+                    <a href="{{ path('app_dashboard') }}" class="px-4 py-2 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] text-sm font-medium">Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {# Page Header #}
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-4xl font-bold mb-2">Matches</h1>
+                <p class="text-gray-400">Track all esports match results and stats</p>
+            </div>
+            <a href="{{ path('match_new') }}" class="px-6 py-2 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] font-medium hover:opacity-90">+ Create Match</a>
+        </div>
+    </div>
+
+    {# Search and Sort Controls #}
+    <div class="container mx-auto px-4 mb-6">
+        <div class="flex justify-between items-center">
+            <h3 class="text-2xl font-bold">All Matches</h3>
+            <div class="flex space-x-2">
+                <div class="relative">
+                    <input type="text" 
+                           id="matchSearch" 
+                           placeholder="Search matches..." 
+                           class="pl-10 pr-4 py-2 rounded-md bg-[#12121a] border border-[#D4AF37]/30 text-white text-sm w-64 focus:outline-none focus:border-[#D4AF37]">
+                    <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" 
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+                <select id="sortSelect" class="px-4 py-2 rounded-md bg-[#12121a] border border-[#D4AF37]/30 text-white text-sm">
+                    <option value="date_desc">Date (Newest First)</option>
+                    <option value="date_asc">Date (Oldest First)</option>
+                    <option value="score_desc">Score (High to Low)</option>
+                    <option value="score_asc">Score (Low to High)</option>
+                    <option value="team_asc">Team (A-Z)</option>
+                    <option value="team_desc">Team (Z-A)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    {# Matches List #}
+    <div class="container mx-auto px-4 mb-12">
+        {% if matches|length > 0 %}
+            <div id="matchesContainer" class="space-y-4">
+                {% for match in matches %}
+                    <div class="match-card border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition-all hover:scale-[1.02]"
+                         data-team-a="{{ match.teamA ? match.teamA.teamName|lower : '' }}"
+                         data-team-b="{{ match.teamB ? match.teamB.teamName|lower : '' }}"
+                         data-game="{{ match.tournament and match.tournament.game ? match.tournament.game.name|lower : '' }}"
+                         data-tournament="{{ match.tournament ? match.tournament.tournamentName|lower : '' }}"
+                         data-date="{{ match.matchDate ? match.matchDate|date('Y-m-d H:i') : '' }}"
+                         data-score="{{ (match.scoreTeamA|default(0) + match.scoreTeamB|default(0)) }}">
+                        
+                        {# Status Badge #}
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1">
+                                <span class="inline-block px-3 py-1 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] text-xs font-bold">MATCH</span>
+                            </div>
+                            <span class="text-xs text-gray-400">{{ match.matchDate ? match.matchDate|date('Y-m-d H:i') : 'N/A' }}</span>
+                        </div>
+
+                        {# Match Details #}
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center mb-4">
+                            <div class="text-center">
+                                <div class="text-sm text-gray-400 mb-1">{{ match.teamA ? match.teamA.teamName : 'TBD' }}</div>
+                                <div class="text-2xl font-bold text-[#D4AF37]">{{ match.scoreTeamA ?? '-' }}</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xs text-gray-400 font-bold px-3 py-2 bg-[#0a0a0f] rounded">VS</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-sm text-gray-400 mb-1">{{ match.teamB ? match.teamB.teamName : 'TBD' }}</div>
+                                <div class="text-2xl font-bold text-[#D4AF37]">{{ match.scoreTeamB ?? '-' }}</div>
+                            </div>
+                        </div>
+
+                        {# Additional Info – FIXED: Game accessed via tournament #}
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs mb-4">
+                            {% if match.tournament and match.tournament.game %}
+                                <div class="bg-[#1e1e2e] rounded p-2">
+                                    <div class="text-gray-400">Game</div>
+                                    <div class="font-bold">{{ match.tournament.game.name }}</div>
+                                </div>
+                            {% endif %}
+                            {% if match.tournament %}
+                                <div class="bg-[#1e1e2e] rounded p-2">
+                                    <div class="text-gray-400">Tournament</div>
+                                    <div class="font-bold">{{ match.tournament.tournamentName }}</div>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {# Actions #}
+                        <div class="flex gap-2">
+                            <a href="{{ path('match_show', {id: match.matchId}) }}" class="flex-1 px-3 py-2 rounded-md bg-[#D4AF37]/10 text-[#D4AF37] hover:bg-[#D4AF37]/20 text-sm font-medium flex items-center justify-center space-x-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                                <span>View</span>
+                            </a>
+                            <a href="{{ path('match_edit', {id: match.matchId}) }}" class="flex-1 px-3 py-2 rounded-md border border-gray-400 text-gray-300 hover:bg-[#1e1e2e] text-sm font-medium flex items-center justify-center space-x-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                                <span>Edit</span>
+                            </a>
+                            <form method="post" action="{{ path('match_delete', {id: match.matchId}) }}" style="flex: 1" onsubmit="return confirm('Delete this match?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ match.matchId) }}">
+                                <button type="submit" class="w-full px-3 py-2 rounded-md border border-red-600 text-red-600 hover:bg-red-600/10 text-sm font-medium flex items-center justify-center space-x-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                    <span>Delete</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {# No Results Message #}
+            <div id="noResults" class="text-center py-12 hidden">
+                <p class="text-gray-400 mb-4">No matches found matching your search</p>
+                <button id="clearSearch" class="px-6 py-2 rounded-md bg-[#D4AF37]/10 text-[#D4AF37] font-medium hover:bg-[#D4AF37]/20">
+                    Clear Search
+                </button>
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <p class="text-gray-400 mb-4">No matches found</p>
+                <a href="{{ path('match_new') }}" class="px-6 py-2 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] font-medium hover:opacity-90">Create First Match</a>
+            </div>
+        {% endif %}
+    </div>
+
+    {# Pagination #}
+    {% if total is defined and total > perPage %}
+        <div class="container mx-auto px-4 pb-12 text-center text-gray-400">
+            <p>Page {{ page }} of {{ ((total + perPage - 1) // perPage) }} — Total: {{ total }} matches</p>
+        </div>
+    {% endif %}
+
+    {# Search & Sort JavaScript #}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('matchSearch');
+            const sortSelect = document.getElementById('sortSelect');
+            const matchCards = document.querySelectorAll('.match-card');
+            const matchesContainer = document.getElementById('matchesContainer');
+            const noResults = document.getElementById('noResults');
+            const clearSearch = document.getElementById('clearSearch');
+
+            function updateMatches() {
+                const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+                const sortValue = sortSelect ? sortSelect.value : 'date_desc';
+                let cards = Array.from(matchCards);
+
+                if (searchTerm) {
+                    cards = cards.filter(card => {
+                        const teamA = card.getAttribute('data-team-a') || '';
+                        const teamB = card.getAttribute('data-team-b') || '';
+                        const game = card.getAttribute('data-game') || '';
+                        const tournament = card.getAttribute('data-tournament') || '';
+                        return teamA.includes(searchTerm) || teamB.includes(searchTerm) || 
+                               game.includes(searchTerm) || tournament.includes(searchTerm);
+                    });
+                }
+
+                cards.sort((a, b) => {
+                    switch(sortValue) {
+                        case 'date_desc':
+                            return new Date(b.getAttribute('data-date') || 0) - new Date(a.getAttribute('data-date') || 0);
+                        case 'date_asc':
+                            return new Date(a.getAttribute('data-date') || 0) - new Date(b.getAttribute('data-date') || 0);
+                        case 'score_desc':
+                            return (parseInt(b.getAttribute('data-score') || 0)) - (parseInt(a.getAttribute('data-score') || 0));
+                        case 'score_asc':
+                            return (parseInt(a.getAttribute('data-score') || 0)) - (parseInt(b.getAttribute('data-score') || 0));
+                        case 'team_asc':
+                            return (a.getAttribute('data-team-a') || '').localeCompare(b.getAttribute('data-team-a') || '');
+                        case 'team_desc':
+                            return (b.getAttribute('data-team-a') || '').localeCompare(a.getAttribute('data-team-a') || '');
+                        default:
+                            return 0;
+                    }
+                });
+
+                matchCards.forEach(card => card.style.display = 'none');
+                cards.forEach(card => {
+                    card.style.display = 'block';
+                    matchesContainer.appendChild(card);
+                });
+
+                const visibleCount = cards.length;
+                if (visibleCount === 0 && searchTerm) {
+                    noResults.classList.remove('hidden');
+                    matchesContainer.classList.add('hidden');
+                } else {
+                    noResults.classList.add('hidden');
+                    matchesContainer.classList.remove('hidden');
+                }
+            }
+
+            if (searchInput) searchInput.addEventListener('input', updateMatches);
+            if (sortSelect) sortSelect.addEventListener('change', updateMatches);
+            if (clearSearch) {
+                clearSearch.addEventListener('click', function() {
+                    searchInput.value = '';
+                    updateMatches();
+                });
+            }
+            updateMatches();
+        });
+    </script>
+</body>
+</html>

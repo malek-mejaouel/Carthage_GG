@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tournament - CarthageGG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('styles/styles.css') }}" />
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    <!-- Navigation Bar -->
+   
+
+    <!-- Page Header -->
+    <div class="container mx-auto px-4 py-12">
+        <div class="flex items-center space-x-4 mb-8">
+            <a href="{{ path('app_admin_dash_tournament') }}" class="text-gray-400 hover:text-white">← Back to Tournaments</a>
+        </div>
+    </div>
+
+    <!-- Tournament Details -->
+    <div class="container mx-auto px-4 pb-12">
+        <div class="max-w-2xl mx-auto">
+            <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] overflow-hidden">
+                <!-- Gradient Bar -->
+                <div class="h-2 bg-gradient-to-r from-[#D4AF37] to-[#B8941F]"></div>
+
+                <!-- Content -->
+                <div class="p-8">
+                    <h1 class="text-4xl font-bold mb-2">{{ tournament.getTournamentName() }}</h1>
+                    <p class="text-gray-400 mb-6">Tournament ID #{{ tournament.getTournamentId() }}</p>
+
+                    <!-- Details Grid -->
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div class="bg-[#0a0a0f] rounded-lg p-4">
+                            <div class="text-gray-400 text-xs font-semibold mb-1">GAME</div>
+                            <div class="text-lg font-bold">{{ tournament.getGame() ? tournament.getGame().getName() : 'N/A' }}</div>
+                        </div>
+                        <div class="bg-[#0a0a0f] rounded-lg p-4">
+                            <div class="text-gray-400 text-xs font-semibold mb-1">PRIZE POOL</div>
+                            <div class="text-lg font-bold text-[#D4AF37]">${{ tournament.getPrizePool() ? tournament.getPrizePool() : '0' }}</div>
+                        </div>
+                        <div class="bg-[#0a0a0f] rounded-lg p-4">
+                            <div class="text-gray-400 text-xs font-semibold mb-1">START DATE</div>
+                            <div class="text-lg font-bold">{{ tournament.getStartDate() ? tournament.getStartDate()|date('Y-m-d') : 'TBD' }}</div>
+                        </div>
+                        <div class="bg-[#0a0a0f] rounded-lg p-4">
+                            <div class="text-gray-400 text-xs font-semibold mb-1">END DATE</div>
+                            <div class="text-lg font-bold">{{ tournament.getEndDate() ? tournament.getEndDate()|date('Y-m-d') : 'TBD' }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex gap-3">
+                        <a href="{{ path('tournament_edit', {id: tournament.getTournamentId()}) }}" class="flex-1 px-4 py-2 rounded-lg bg-[#D4AF37]/10 text-[#D4AF37] hover:bg-[#D4AF37]/20 font-medium text-center">Edit Tournament</a>
+                        <form method="post" action="{{ path('tournament_delete', {id: tournament.getTournamentId()}) }}" style="flex: 1" onsubmit="return confirm('Delete this tournament? This action cannot be undone.');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ tournament.getTournamentId()) }}">
+                            <button type="submit" class="w-full px-4 py-2 rounded-lg border border-red-600 text-red-600 hover:bg-red-600/10 font-medium">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

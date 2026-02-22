@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News | CarthageGG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('styles/admin.css') }}">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .modal {
+            display: none;
+        }
+        .modal.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    {% include 'admin/_sidebar.html.twig' %}
+    <div class="lg:ml-64 flex flex-col min-h-screen">
+    <main class="flex-1 p-6">
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-white">News</h1>
+            <a href="{{ path('app_admin_dashboard') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg font-bold hover:bg-[#B8941F] transition">Back to Dashboard</a>
+        </div>
+
+        {% if app.flashes %}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="mb-4 px-4 py-3 bg-green-500/10 text-green-500 rounded-lg border border-green-500/20">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+
+        <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 overflow-hidden">
+            <div class="p-6 border-b border-[#D4AF37]/10 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white">News Management</h3>
+                <button onclick="openAddNewsModal()" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg text-sm font-bold hover:bg-[#B8941F] transition">Add News</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-gray-400">
+                    <thead class="bg-[#1a1a24] text-[#D4AF37] uppercase font-bold text-xs">
+                        <tr>
+                            <th class="px-6 py-4">Title</th>
+                            <th class="px-6 py-4">Category</th>
+                            <th class="px-6 py-4">Publication Date</th>
+                            <th class="px-6 py-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D4AF37]/10">
+                        {% if news|length > 0 %}
+                            {% for item in news %}
+                                <tr class="table-row-hover transition">
+                                    <td class="px-6 py-4 font-medium text-white">{{ item.titre }}</td>
+                                    <td class="px-6 py-4">{{ item.categorie ?? 'N/A' }}</td>
+                                    <td class="px-6 py-4">{{ item.datePublication|date('M d, Y') }}</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex gap-2">
+                                            <button onclick="openCommentsModal({{ item.newsId }}, '{{ item.titre|e('html') }}')" class="px-2 py-1 bg-purple-500/10 text-purple-500 rounded text-xs hover:bg-purple-500/20 transition">Comments</button>
+                                            <a href="{{ path('app_admin_news_edit', {'newsId': item.newsId}) }}" class="px-2 py-1 bg-blue-500/10 text-blue-500 rounded text-xs hover:bg-blue-500/20 transition">Edit</a>
+                                            <form action="{{ path('app_admin_news_delete', {'newsId': item.newsId}) }}" method="POST" style="display:inline;">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ item.newsId) }}">
+                                                <button type="submit" class="px-2 py-1 bg-red-500/10 text-red-500 rounded text-xs hover:bg-red-500/20 transition" onclick="return confirm('Are you sure?')">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="px-6 py-8 text-center text-gray-500">No news found. Create your first news!</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </main>
+    </div>
+
+    <!-- Add News Modal -->
+    <div id="addNewsModal" class="modal fixed inset-0 bg-black/50 z-50 items-center justify-center hidden">
+        <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/20 max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+            <div class="p-6 border-b border-[#D4AF37]/10 flex justify-between items-center sticky top-0 bg-[#12121a]">
+                <h2 class="text-xl font-bold text-white">Add News</h2>
+                <button type="button" onclick="closeAddNewsModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <div class="p-6">
+                <div id="newsFormErrors" class="hidden mb-4 p-3 bg-red-500/20 border border-red-500/50 text-red-400 rounded-lg text-sm"></div>
+                <form id="addNewsForm" method="POST" enctype="multipart/form-data" onsubmit="return submitAddNewsForm(event);">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Title</label>
+                        <input type="text" name="news_type[titre]" class="w-full px-3 py-2 bg-[#1a1a24] border border-[#D4AF37]/20 rounded-lg text-white focus:outline-none focus:border-[#D4AF37]">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Category</label>
+                        <select name="news_type[categorie]" class="w-full px-3 py-2 bg-[#1a1a24] border border-[#D4AF37]/20 rounded-lg text-white focus:outline-none focus:border-[#D4AF37]">
+                            <option value="">Select a category</option>
+                            <option value="tournaments">Tournaments</option>
+                            <option value="matches">Matches</option>
+                            <option value="players">Players</option>
+                            <option value="events">Events</option>
+                            <option value="updates">Updates</option>
+                            <option value="announcements">Announcements</option>
+                            <option value="results">Results</option>
+                            <option value="statistics">Statistics</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Content</label>
+                        <textarea name="news_type[contenu]" rows="5" class="w-full px-3 py-2 bg-[#1a1a24] border border-[#D4AF37]/20 rounded-lg text-white focus:outline-none focus:border-[#D4AF37]"></textarea>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Upload Image</label>
+                        <input type="file" name="news_type[image]" accept="image/*" class="w-full px-3 py-2 bg-[#1a1a24] border border-[#D4AF37]/20 rounded-lg text-white focus:outline-none focus:border-[#D4AF37]">
+                    </div>
+                    <div class="flex gap-3 justify-end">
+                        <button type="button" onclick="closeAddNewsModal()" class="px-4 py-2 bg-gray-600/20 text-gray-400 rounded-lg hover:bg-gray-600/30 transition">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg font-bold hover:bg-[#B8941F] transition">Create News</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openAddNewsModal() {
+            document.getElementById('addNewsModal').classList.remove('hidden');
+            document.getElementById('addNewsModal').classList.add('flex');
+        }
+
+        function closeAddNewsModal() {
+            document.getElementById('addNewsModal').classList.add('hidden');
+            document.getElementById('addNewsModal').classList.remove('flex');
+        }
+
+        function submitAddNewsForm(event) {
+            event.preventDefault();
+            const form = document.getElementById('addNewsForm');
+            const formData = new FormData(form);
+            const errorDiv = document.getElementById('newsFormErrors');
+            
+            // Clear previous errors
+            errorDiv.classList.add('hidden');
+            errorDiv.innerHTML = '';
+            
+            // Submit to the actual route
+            fetch('{{ path('app_admin_news_new') }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Response:', data);
+                if (data.success) {
+                    console.log('News created successfully!', data);
+                    closeAddNewsModal();
+                    form.reset();
+                    // Reload page to see new news
+                    window.location.reload();
+                } else {
+                    // Display server-side error messages
+                    let errorMessage = data.message || 'Failed to create news';
+                    if (data.errors && typeof data.errors === 'object') {
+                        errorMessage = Object.values(data.errors).join('; ');
+                    }
+                    errorDiv.textContent = errorMessage;
+                    errorDiv.classList.remove('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                errorDiv.textContent = 'Error creating news: ' + error.message;
+                errorDiv.classList.remove('hidden');
+            });
+            
+            return false;
+        }
+
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('addNewsModal');
+            if (event.target === modal) {
+                closeAddNewsModal();
+            }
+            const commentsModal = document.getElementById('commentsModal');
+            if (event.target === commentsModal) {
+                closeCommentsModal();
+            }
+        });
+
+        // Comments Modal Functions
+        function openCommentsModal(newsId, newsTitle) {
+            document.getElementById('commentsNews').textContent = newsTitle;
+            document.getElementById('commentsModal').classList.remove('hidden');
+            document.getElementById('commentsModal').classList.add('flex');
+            loadCommentsAdmin(newsId);
+        }
+
+        function closeCommentsModal() {
+            document.getElementById('commentsModal').classList.add('hidden');
+            document.getElementById('commentsModal').classList.remove('flex');
+        }
+
+        async function loadCommentsAdmin(newsId) {
+            const container = document.getElementById('adminCommentsContainer');
+            container.innerHTML = '<div class="text-center text-gray-400">Loading comments...</div>';
+
+            try {
+                const response = await fetch(`/api/comments/news/${newsId}`);
+                const comments = await response.json();
+                
+                if (comments.length === 0) {
+                    container.innerHTML = '<div class="text-center text-gray-400 py-6">No comments for this article</div>';
+                    return;
+                }
+
+                container.innerHTML = comments.map(comment => `
+                    <div class="bg-[#1a1a24] rounded-lg border border-[#D4AF37]/10 p-4 mb-4">
+                        <div class="text-gray-300 mb-3">${escapeHtml(comment.contenu)}</div>
+                        ${comment.gif_url ? `<img src="${comment.gif_url}" alt="GIF" class="rounded-lg max-w-xs max-h-32 mb-3">` : ''}
+                        <div class="text-xs text-gray-500 mb-3">
+                            <span>${formatDateAdmin(comment.date_commentaire)}</span> • 
+                            <span>👍 ${comment.upvotes}</span> • 
+                            <span>👎 ${comment.downvotes}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="deleteCommentAdmin(${comment.commentaire_id})" class="text-red-500 hover:text-red-400 text-xs font-medium transition">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error:', error);
+                container.innerHTML = '<div class="text-center text-red-500">Failed to load comments</div>';
+            }
+        }
+
+        async function deleteCommentAdmin(commentId) {
+            if (!confirm('Delete this comment?')) return;
+            
+            try {
+                const response = await fetch(`/api/comments/${commentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (response.ok) {
+                    alert('Comment deleted');
+                    // Reload comments
+                    const modal = document.getElementById('commentsModal');
+                    if (!modal.classList.contains('hidden')) {
+                        const newsId = new URLSearchParams(window.location.search).get('newsId') || 
+                                       modal.getAttribute('data-news-id');
+                        if (newsId) loadCommentsAdmin(newsId);
+                    }
+                } else {
+                    alert('Failed to delete comment');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error deleting comment');
+            }
+        }
+
+        function formatDateAdmin(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+
+    <!-- Comments Modal -->
+    <div id="commentsModal" class="fixed inset-0 bg-black/50 z-50 items-center justify-center hidden flex-col">
+        <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/20 max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+            <div class="p-6 border-b border-[#D4AF37]/10 flex justify-between items-center sticky top-0 bg-[#12121a] rounded-t-xl">
+                <h2 class="text-xl font-bold text-white">Comments for <span id="commentsNews"></span></h2>
+                <button type="button" onclick="closeCommentsModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <div class="p-6" id="adminCommentsContainer">
+                <!-- Comments will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ asset('js/admin-dashboard.js') }}"></script>
+</body>
+</html>

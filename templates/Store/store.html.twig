@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store | CarthageGG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('styles/styles.css') }}">
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    <!-- Navigation -->
+    <nav class="bg-[#12121a] border-b border-[#D4AF37]/20 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <img src="{{ asset('images/zz.png') }}" alt="CarthageGG Logo" class="w-14 h-14 rounded-lg shadow-lg object-cover">
+                <span class="font-bold text-[#D4AF37]">CarthageGG</span>
+            </div>
+            <div class="flex gap-8 items-center">
+                <a href="{{ path('app_index') }}" class="hover:text-[#D4AF37] transition">Home</a>
+                <a href="{{ path('app_store') }}" class="text-[#D4AF37] font-bold">Store</a>
+                <a href="{{ path('app_dashboard') }}" class="hover:text-[#D4AF37] transition">Dashboard</a>
+                <div class="relative" id="cart-wrapper">
+                    <a href="{{ path('app_store_cart') }}" class="relative" id="cart-link">
+                        🛒
+                        <span id="cart-count-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{{ cart_count|default(0) }}</span>
+                    </a>
+                    <div id="cart-popover" class="absolute right-0 mt-2 w-72 bg-[#12121a] border border-[#D4AF37]/30 rounded-lg shadow-xl hidden z-50">
+                        <div class="px-4 py-3 border-b border-[#D4AF37]/20">
+                            <p class="text-sm font-semibold text-[#D4AF37]">Cart</p>
+                        </div>
+                        <div id="cart-popover-content" class="max-h-64 overflow-auto">
+                            <div class="px-4 py-3 text-sm text-gray-400">Loading...</div>
+                        </div>
+                        <div class="px-4 py-3 border-t border-[#D4AF37]/20 flex justify-between text-sm">
+                            <span class="text-gray-400">Total</span>
+                            <span id="cart-popover-total" class="font-bold text-[#D4AF37]">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ path('app_login') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg hover:bg-[#B8941F] transition">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-12 max-w-7xl">
+        <!-- Header -->
+        <div class="mb-12">
+            <h1 class="text-4xl font-bold text-[#D4AF37] mb-2">CarthageGG Store</h1>
+            <p class="text-gray-400">Exclusive gaming gear and merchandise</p>
+        </div>
+
+        <!-- Filters & Search -->
+        <form method="get" class="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="flex-1">
+                <input name="q" value="{{ q }}" type="text" placeholder="Search products..." class="w-full px-4 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded-lg text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+            </div>
+            <div class="flex gap-4 items-center">
+                <select name="category" class="px-4 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded-lg text-[#e4e4e7] focus:border-[#D4AF37]">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if selected_category == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+                <select name="sort" class="px-4 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded-lg text-[#e4e4e7] focus:border-[#D4AF37]">
+                    <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+                    <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="bestsellers" {% if sort == 'bestsellers' %}selected{% endif %}>Best Sellers</option>
+                    <option value="featured" {% if sort == 'featured' %}selected{% endif %}>Featured First</option>
+                </select>
+                {% if app.request.query.get('featured') %}
+                    <a href="{{ path('app_store', {'q': q, 'category': selected_category, 'sort': sort}) }}"
+                       class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+                              bg-gradient-to-r from-[#1f1f29] to-[#12121a] border border-[#D4AF37]/40 text-[#e4e4e7]
+                              hover:border-[#D4AF37]/70 hover:from-[#262633] hover:to-[#171722] transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#D4AF37]" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z"/>
+                        </svg>
+                        Show All
+                    </a>
+                {% else %}
+                    <a href="{{ path('app_store', {'q': q, 'category': selected_category, 'sort': sort, 'featured': 1}) }}"
+                       class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold
+                              bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f]
+                              shadow-lg shadow-[#D4AF37]/20 hover:from-[#c9a430] hover:to-[#a9851b] transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+                        </svg>
+                        Featured Only
+                    </a>
+                {% endif %}
+                <button class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg hover:bg-[#B8941F] transition">Apply</button>
+            </div>
+        </form>
+
+        {% if featured is defined and featured|length > 0 and not app.request.query.get('featured') %}
+        <div class="mb-10">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-white">Featured</h2>
+                <span class="text-sm text-gray-400">{{ featured|length }} items</span>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for p in featured %}
+                    {% set price = p.price + 0 %}
+                    {% set discount = p.discount + 0 %}
+                    {% set final = price - (price * discount / 100) %}
+                    <div class="relative border border-[#D4AF37]/30 rounded-lg bg-[#12121a] overflow-hidden hover:border-[#D4AF37]/50 transition min-h-[360px]">
+                        <span class="absolute top-2 right-2 bg-[#D4AF37]/20 text-[#D4AF37] text-xs font-semibold px-2 py-1 rounded">Featured</span>
+                        <div class="relative h-48">
+                            {% if p.image %}
+                                {% set src = p.image %}
+                                {% if src starts with 'http' %}
+                                    {% set imgUrl = src %}
+                                {% elseif src starts with '/uploads/' or src starts with 'uploads/' %}
+                                    {% set imgUrl = asset(src) %}
+                                {% else %}
+                                    {% set imgUrl = asset('uploads/products/' ~ src) %}
+                                {% endif %}
+                                <img src="{{ imgUrl }}" alt="{{ p.name }}" class="h-48 w-full object-cover">
+                            {% else %}
+                                <div class="bg-gradient-to-br from-[#D4AF37]/10 to-[#B8941F]/10 h-48 w-full"></div>
+                            {% endif %}
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold">{{ p.name }}</h3>
+                            <div class="mt-2 flex items-center gap-2">
+                                {% if discount > 0 %}
+                                    <span class="text-gray-400 line-through">${{ price|number_format(2) }}</span>
+                                {% endif %}
+                                <span class="text-xl font-bold text-[#D4AF37]">${{ final|number_format(2) }}</span>
+                            </div>
+                            <div class="mt-3">
+                                {% if p.stock > 0 %}
+                                    <a href="{{ path('app_store_cart_add', {id: p.id}) }}" class="inline-block px-3 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded text-sm font-bold">Add to Cart</a>
+                                {% else %}
+                                    <span class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded">Out of Stock</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Products Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {% for p in products %}
+                {% set price = p.price + 0 %}
+                {% set discount = p.discount + 0 %}
+                {% set final = price - (price * discount / 100) %}
+                <div class="relative border border-[#D4AF37]/20 rounded-lg bg-[#12121a] overflow-hidden hover:border-[#D4AF37]/50 transition min-h-[420px]">
+                    <div class="relative h-60">
+                        {% if p.discount > 0 %}
+                            <span class="absolute top-2 left-2 bg-green-500/20 text-green-300 text-xs font-semibold px-2 py-1 rounded">
+                                -{{ (p.discount + 0)|number_format(0) }}%
+                            </span>
+                        {% endif %}
+                    {% if p.isFeatured %}
+                        <span class="absolute top-2 right-2 bg-[#D4AF37]/20 text-[#D4AF37] text-xs font-semibold px-2 py-1 rounded">Featured</span>
+                    {% endif %}
+                        {% if p.image %}
+                            {% set src = p.image %}
+                            {% if src starts with 'http' %}
+                                {% set imgUrl = src %}
+                            {% elseif src starts with '/uploads/' or src starts with 'uploads/' %}
+                                {% set imgUrl = asset(src) %}
+                            {% else %}
+                                {% set imgUrl = asset('uploads/products/' ~ src) %}
+                            {% endif %}
+                            <img src="{{ imgUrl }}" alt="{{ p.name }}" class="h-60 w-full object-cover transition-transform duration-300 hover:scale-105" loading="lazy" decoding="async">
+                        {% else %}
+                            <div class="bg-gradient-to-br from-[#D4AF37]/10 to-[#B8941F]/10 h-60 w-full flex items-center justify-center">
+                                <svg class="w-16 h-16 text-[#D4AF37]/50" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-2">{{ p.name }}</h3>
+                        <p class="text-gray-400 text-sm mb-3">{{ p.description|default('')|slice(0,120) }}{% if p.description and p.description|length > 120 %}...{% endif %}</p>
+                        {% set rating = (p.averageRating + 0) %}
+                        {% set full = rating|round(0, 'floor') %}
+                        <div class="mt-1 mb-4 flex items-center gap-1">
+                            {% for i in 1..5 %}
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 {% if i <= full %}text-[#D4AF37]{% else %}text-gray-500{% endif %}" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+                                </svg>
+                            {% endfor %}
+                        </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex items-center gap-2">
+                                {% if discount > 0 %}
+                                    <span class="text-gray-400 line-through">${{ price|number_format(2) }}</span>
+                                {% endif %}
+                                <span class="text-2xl font-bold text-[#D4AF37]">${{ final|number_format(2) }}</span>
+                            </div>
+                            {% if p.stock > 0 %}
+                                <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">In Stock</span>
+                            {% else %}
+                                <span class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded">Out of Stock</span>
+                            {% endif %}
+                        </div>
+                        {% if p.stock > 0 %}
+                            <button data-url="{{ path('app_store_cart_add', {id: p.id}) }}" class="add-to-cart block w-full text-center px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">Add to Cart</button>
+                            <button
+                                class="btn-details mt-2 block w-full text-center px-4 py-2 bg-[#12121a] border border-[#D4AF37]/40 text-[#D4AF37] rounded hover:border-[#D4AF37] transition font-bold"
+                                data-name="{{ p.name }}"
+                                data-description="{{ p.description|default('') }}"
+                                data-price="{{ price|number_format(2) }}"
+                                data-final="{{ final|number_format(2) }}"
+                                data-discount="{{ discount|number_format(0) }}"
+                                data-sku="{{ p.sku ?? 'N/A' }}"
+                                data-category="{{ p.category ? p.category.name : 'Uncategorized' }}"
+                                data-stock="{{ p.stock }}"
+                                data-rating="{{ (p.averageRating + 0)|number_format(1) }}"
+                                data-image="{{ imgUrl|default('') }}"
+                                data-url="{{ path('app_store_cart_add', {id: p.id}) }}"
+                            >More Details</button>
+                        {% else %}
+                            <button class="w-full px-4 py-2 bg-gray-500 text-white rounded cursor-not-allowed font-bold opacity-50">Out of Stock</button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-span-4 text-center py-12 bg-[#12121a] rounded-lg border border-[#D4AF37]/20">
+                    <p class="text-gray-400">No products found.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-center items-center gap-2">
+            {% set params = {'q': q, 'category': selected_category, 'sort': sort} %}
+            {% if app.request.query.get('featured') %}
+                {% set params = params|merge({'featured': 1}) %}
+            {% endif %}
+            {% if has_prev %}
+                <a href="{{ path('app_store', params|merge({'page': page - 1})) }}"
+                   class="px-4 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded hover:border-[#D4AF37] transition">← Prev</a>
+            {% else %}
+                <span class="px-4 py-2 bg-[#0e0e14] border border-[#D4AF37]/10 rounded text-gray-500 cursor-not-allowed">← Prev</span>
+            {% endif %}
+            <span class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded font-bold">{{ page }}</span>
+            {% if has_next %}
+                <a href="{{ path('app_store', params|merge({'page': page + 1})) }}"
+                   class="px-4 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded hover:border-[#D4AF37] transition">Next →</a>
+            {% else %}
+                <span class="px-4 py-2 bg-[#0e0e14] border border-[#D4AF37]/10 rounded text-gray-500 cursor-not-allowed">Next →</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="{{ asset('main.js') }}"></script>
+    <!-- Product Details Modal -->
+    <div id="product-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50">
+        <div class="max-w-3xl mx-auto mt-16 bg-[#12121a] border border-[#D4AF37]/30 rounded-xl shadow-xl overflow-hidden">
+            <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/2 w-full">
+                    <img id="pm-image" src="" alt="" class="w-full h-64 object-cover hidden">
+                    <div id="pm-image-fallback" class="w-full h-64 bg-gradient-to-br from-[#D4AF37]/10 to-[#B8941F]/10 flex items-center justify-center">
+                        <svg class="w-20 h-20 text-[#D4AF37]/50" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="md:w-1/2 w-full p-6">
+                    <div class="flex justify-between items-start">
+                        <h2 id="pm-name" class="text-2xl font-bold text-[#D4AF37]"></h2>
+                        <button id="pm-close" class="text-gray-400 hover:text-white text-xl">×</button>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-400" id="pm-meta"></div>
+                    <div class="mt-3 text-gray-200 text-sm" id="pm-description"></div>
+                    <div class="mt-4 flex items-center gap-3">
+                        <span id="pm-price-strike" class="text-gray-400 line-through hidden"></span>
+                        <span id="pm-discount" class="text-green-400 text-xs hidden"></span>
+                        <span id="pm-final" class="text-2xl font-bold text-[#D4AF37]"></span>
+                    </div>
+                    <div class="mt-4 flex gap-2">
+                        <button id="pm-add" class="flex-1 px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">Add to Cart</button>
+                        <button id="pm-close-2" class="px-4 py-2 bg-[#12121a] border border-[#D4AF37]/40 text-[#D4AF37] rounded hover:border-[#D4AF37] transition font-bold">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const badge = document.getElementById('cart-count-badge');
+        function setBadgeCount(n) {
+            if (!badge) return;
+            badge.textContent = String(n || 0);
+            badge.classList.toggle('opacity-0', (n || 0) === 0);
+        }
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const url = btn.getAttribute('data-url');
+                try {
+                    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                    const data = await res.json();
+                    if (data && data.ok) {
+                        setBadgeCount(data.count || 0);
+                    }
+                } catch (err) {
+                    // ignore
+                }
+            });
+        });
+        const modal = document.getElementById('product-modal');
+        const pmImage = document.getElementById('pm-image');
+        const pmImageFallback = document.getElementById('pm-image-fallback');
+        const pmName = document.getElementById('pm-name');
+        const pmMeta = document.getElementById('pm-meta');
+        const pmDesc = document.getElementById('pm-description');
+        const pmStrike = document.getElementById('pm-price-strike');
+        const pmDiscount = document.getElementById('pm-discount');
+        const pmFinal = document.getElementById('pm-final');
+        const pmAdd = document.getElementById('pm-add');
+        function openModal(data) {
+            pmName.textContent = data.name || '';
+            pmMeta.textContent = `SKU: ${data.sku || 'N/A'} • Category: ${data.category || 'Uncategorized'} • Stock: ${data.stock || 0} • Rating: ${data.rating || '0.0'}`;
+            pmDesc.textContent = data.description || '';
+            pmFinal.textContent = `$${data.final || data.price || '0.00'}`;
+            if (data.discount && Number(data.discount) > 0 && data.price) {
+                pmStrike.textContent = `$${data.price}`;
+                pmStrike.classList.remove('hidden');
+                pmDiscount.textContent = `-${data.discount}%`;
+                pmDiscount.classList.remove('hidden');
+            } else {
+                pmStrike.classList.add('hidden');
+                pmDiscount.classList.add('hidden');
+            }
+            if (data.image) {
+                pmImage.src = data.image;
+                pmImage.classList.remove('hidden');
+                pmImageFallback.classList.add('hidden');
+            } else {
+                pmImage.src = '';
+                pmImage.classList.add('hidden');
+                pmImageFallback.classList.remove('hidden');
+            }
+            pmAdd.dataset.url = data.url || '';
+            modal.classList.remove('hidden');
+        }
+        function closeModal() { modal.classList.add('hidden'); }
+        document.getElementById('pm-close').addEventListener('click', closeModal);
+        document.getElementById('pm-close-2').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+        document.querySelectorAll('.btn-details').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const data = {
+                    name: btn.dataset.name,
+                    description: btn.dataset.description,
+                    price: btn.dataset.price,
+                    final: btn.dataset.final,
+                    discount: btn.dataset.discount,
+                    sku: btn.dataset.sku,
+                    category: btn.dataset.category,
+                    stock: btn.dataset.stock,
+                    rating: btn.dataset.rating,
+                    image: btn.dataset.image,
+                    url: btn.dataset.url,
+                };
+                openModal(data);
+            });
+        });
+        pmAdd.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const url = pmAdd.dataset.url;
+            if (!url) return;
+            try {
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                const data = await res.json();
+                if (data && data.ok) {
+                    setBadgeCount(data.count || 0);
+                }
+            } catch {}
+        });
+    </script>
+</body>
+</html>

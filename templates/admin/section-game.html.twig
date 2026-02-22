@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Analytics | CarthageGG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ asset('styles/admin.css') }}">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    {% include 'admin/_sidebar.html.twig' %}
+    <div class="lg:ml-64 flex flex-col min-h-screen">
+    <main class="flex-1 p-6">
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-white">Game Analytics</h1>
+            <a href="{{ path('app_admin_dashboard') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg font-bold hover:bg-[#B8941F] transition">Back to Dashboard</a>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="lg:col-span-2 bg-[#12121a] rounded-xl border border-[#D4AF37]/10 p-6">
+                <h3 class="text-lg font-bold text-white mb-4">Game Engagement</h3>
+                <div class="relative h-80">
+                    <canvas id="engagementChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 p-6">
+                <h3 class="text-lg font-bold text-white mb-4">Top Modes</h3>
+                <div class="relative h-64">
+                    <canvas id="modesChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 overflow-hidden">
+            <div class="p-6 border-b border-[#D4AF37]/10 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white">Games Management</h3>
+                <div class="flex gap-2">
+                    <a href="{{ path('game_new') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg text-sm font-bold hover:bg-[#B8941F] transition">Add Game</a>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-gray-400">
+                    <thead class="bg-[#1a1a24] text-[#D4AF37] uppercase font-bold text-xs">
+                        <tr>
+                            <th class="px-6 py-4">ID</th>
+                            <th class="px-6 py-4">Name</th>
+                            <th class="px-6 py-4">Genre</th>
+                            <th class="px-6 py-4 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D4AF37]/10">
+                        {% for game in games %}
+                            <tr class="table-row-hover transition">
+                                <td class="px-6 py-4 font-medium text-white">{{ game.gameId }}</td>
+                                <td class="px-6 py-4">{{ game.name }}</td>
+                                <td class="px-6 py-4">{{ game.genre ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <a href="{{ path('game_edit', {id: game.gameId}) }}" class="text-blue-400 hover:text-blue-300 mr-3">Edit</a>
+                                    <form method="post" action="{{ path('game_delete', {id: game.gameId}) }}" class="inline" onsubmit="return confirm('Delete this game?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ game.gameId) }}">
+                                        <button type="submit" class="text-red-400 hover:text-red-300">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center opacity-60 py-6">No games found</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </main>
+    </div>
+    <script>
+        const engagementCtx = document.getElementById('engagementChart');
+        new Chart(engagementCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{ label: 'Avg. Minutes', data: [32, 28, 35, 40, 38, 42, 45], backgroundColor: '#D4AF37' }]
+            },
+            options: { scales: { x: { ticks: { color: '#9CA3AF' } }, y: { ticks: { color: '#9CA3AF' } } } }
+        });
+        const modesCtx = document.getElementById('modesChart');
+        new Chart(modesCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Ranked', 'Casual', 'Custom'],
+                datasets: [{ data: [55, 30, 15], backgroundColor: ['#D4AF37', '#3B82F6', '#10B981'] }]
+            },
+            options: { plugins: { legend: { labels: { color: '#e4e4e7' } } } }
+        });
+    </script>
+</script>
+<script src="{{ asset('js/admin-dashboard.js') }}"></script>
+</body>
+</html>

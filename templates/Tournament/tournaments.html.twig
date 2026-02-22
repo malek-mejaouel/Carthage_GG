@@ -1,0 +1,145 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Tournament - CarthageGG{% endblock %}
+{% block content %}
+    <!-- Page Header -->
+    <div class="container mx-auto px-4 py-12">
+        <h1 class="text-4xl font-bold mb-4">Tournaments</h1>
+        <p class="text-gray-400">Compete in the most prestigious esports tournaments in Tunisia</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="container mx-auto px-4 mb-8">
+        <div class="flex flex-wrap gap-4">
+            <button class="px-4 py-2 rounded-md border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10">All Games</button>
+            <button class="px-4 py-2 rounded-md border border-gray-400 text-gray-300 hover:bg-[#1e1e2e]">CS:GO</button>
+            <button class="px-4 py-2 rounded-md border border-gray-400 text-gray-300 hover:bg-[#1e1e2e]">League of Legends</button>
+            <button class="px-4 py-2 rounded-md border border-gray-400 text-gray-300 hover:bg-[#1e1e2e]">Valorant</button>
+            <button class="px-4 py-2 rounded-md border border-gray-400 text-gray-300 hover:bg-[#1e1e2e]">Dota 2</button>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="container mx-auto px-4">
+        <div class="flex border-b border-[#D4AF37]/20 mb-8">
+            <button onclick="switchTab('all')" class="tab-button active px-6 py-4 font-medium text-[#D4AF37] border-b-2 border-[#D4AF37]">All Tournaments</button>
+            <button onclick="switchTab('live')" class="tab-button px-6 py-4 font-medium text-gray-400 border-b-2 border-transparent hover:border-[#D4AF37]/50">Live</button>
+            <button onclick="switchTab('upcoming')" class="tab-button px-6 py-4 font-medium text-gray-400 border-b-2 border-transparent hover:border-[#D4AF37]/50">Upcoming</button>
+            <button onclick="switchTab('registration')" class="tab-button px-6 py-4 font-medium text-gray-400 border-b-2 border-transparent hover:border-[#D4AF37]/50">Registration</button>
+        </div>
+
+        <!-- Tournament Cards -->
+       <div class="mb-12 text-center">
+            <h2 class="text-4xl font-bold mb-4">Featured Tournaments</h2>
+            <p class="text-gray-400">Showcase of our most prestigious competitions</p>
+        </div>
+
+        {% set items = tournaments is defined ? tournaments : (featured_tournaments is defined ? featured_tournaments : []) %}
+        {% if items|length > 0 %}
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 justify-items-center max-w-6xl mx-auto">
+                {% for tournament in items %}
+                    {% set now = date() %}
+                    {% set start = tournament.startDate %}
+                    {% set end = tournament.endDate %}
+                    {% set status = 'Upcoming' %}
+                    {% set status_class = 'bg-[#D4AF37]/20 text-[#D4AF37]' %}
+                    {% if start is not null and end is not null and start <= now and end >= now %}
+                        {% set status = 'Live' %}
+                        {% set status_class = 'bg-[#DC2626] text-white' %}
+                    {% elseif end is not null and end < now %}
+                        {% set status = 'Completed' %}
+                        {% set status_class = 'bg-gray-600 text-white' %}
+                    {% endif %}
+
+                    <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 hover:border-[#D4AF37]/50 transition-all w-full max-w-md text-center">
+                        <div class="h-2 bg-gradient-to-r from-[#D4AF37] to-[#DC2626] rounded-t-lg mb-4"></div>
+                        <div class="flex items-start justify-between mb-4">
+                            <h3 class="text-xl font-bold">{{ tournament.tournamentName }}</h3>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold {{ status_class }}">{{ status }}</span>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-4">{{ tournament.game ? tournament.game.name : 'N/A' }}</p>
+                        <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                            <div>
+                                <span class="text-gray-400 block">Prize Pool</span>
+                                <span class="font-bold text-[#D4AF37]">${{ tournament.prizePool|default('0')|number_format(0) }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400 block">Teams</span>
+                                <span class="font-medium">{{ tournament.teamCount }}</span>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-400 mb-6">
+                            {% if tournament.startDate is not null and tournament.endDate is not null %}
+                                {{ tournament.startDate|date('M d') }} - {{ tournament.endDate|date('M d') }}
+                            {% elseif tournament.startDate is not null %}
+                                {{ tournament.startDate|date('M d') }}
+                            {% else %}
+                                TBD
+                            {% endif %}
+                        </div>
+                        <div class="mt-2">
+                            <a href="{{ path('app_tournament_view', { id: tournament.tournamentId }) }}" class="inline-block px-4 py-2 rounded-md border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 text-sm">View Details</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-12 bg-[#12121a] rounded-lg border border-[#D4AF37]/20">
+                <p class="text-gray-400">No tournaments available at the moment.</p>
+                <p class="text-sm text-gray-500 mt-2">Check back soon!</p>
+            </div>
+        {% endif %}
+
+    <!-- Footer -->
+    <footer class="border-t border-[#D4AF37]/20 bg-[#0a0a0f] mt-16">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-[#D4AF37] mb-4">CarthageGG</h3>
+                    <p class="text-gray-400 text-sm">Tunisia's premier esports platform</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Platform</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="{{ path('app_tournaments') }}" class="hover:text-[#D4AF37]">Tournaments</a></li>
+                        <li><a href="{{ path('app_teams') }}" class="hover:text-[#D4AF37]">Teams</a></li>
+                        <li><a href="{{ path('app_matches') }}" class="hover:text-[#D4AF37]">Matches</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Compete</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="{{ path('app_leaderboard') }}" class="hover:text-[#D4AF37]">Leaderboard</a></li>
+                        <li><a href="{{ path('app_register') }}" class="hover:text-[#D4AF37]">Register</a></li>
+                        <li><a href="{{ path('app_support') }}" class="hover:text-[#D4AF37]">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Follow</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37]">Twitter</a>
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37]">Discord</a>
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37]">YouTube</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-[#D4AF37]/20 pt-8 text-center text-gray-400 text-sm">
+                <p>&copy; 2026 CarthageGG. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ asset('assets/main.js') }}"></script>
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('border-[#D4AF37]', 'text-[#D4AF37]');
+                btn.classList.add('border-transparent', 'text-gray-400');
+            });
+            event.target.classList.add('border-[#D4AF37]', 'text-[#D4AF37]');
+            event.target.classList.remove('border-transparent', 'text-gray-400');
+        }
+    </script>
+</body>
+</html>
+{% endblock %}

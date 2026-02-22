@@ -1,0 +1,1022 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ news.titre }} - CarthageGG News{% endblock %}
+
+{% block content %}
+<section class="py-12 px-6 bg-gradient-to-b from-[#0a0a0f] to-[#1a1a24]">
+    <div class="container mx-auto max-w-4xl">
+        <!-- Back Button -->
+        <a href="{{ path('app_news_list') }}" class="inline-flex items-center text-[#D4AF37] hover:text-[#B8941F] transition mb-8">
+            ← Back to News
+        </a>
+
+        <!-- Article Header -->
+        <header class="mb-8">
+            <!-- Category -->
+            <div class="mb-4">
+                <span class="inline-block px-4 py-1 bg-[#D4AF37]/10 text-[#D4AF37] rounded-full text-sm font-semibold uppercase">
+                    {{ news.categorie ?? 'General' }}
+                </span>
+            </div>
+
+            <!-- Title -->
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                {{ news.titre }}
+            </h1>
+
+            <!-- Meta Info -->
+            <div class="flex flex-col md:flex-row md:items-center gap-4 text-gray-400 border-b border-[#D4AF37]/10 pb-6">
+                <time datetime="{{ news.datePublication|date('c') }}">
+                    📅 {{ news.datePublication|date('F d, Y') }}
+                </time>
+            </div>
+        </header>
+
+        <!-- Featured Image -->
+        <div class="mb-8 rounded-xl overflow-hidden bg-[#1a1a24] border border-[#D4AF37]/10">
+            {% if news.image and news.image != 'default-news.jpg' %}
+                <img src="{{ asset('uploads/news/' ~ news.image) }}" alt="{{ news.titre }}" class="w-full h-auto">
+            {% else %}
+                <img src="{{ asset('assets/images/zz.png') }}" alt="{{ news.titre }}" class="w-full h-auto opacity-80">
+            {% endif %}
+        </div>
+
+        <!-- Article Content -->
+        <article class="prose prose-invert max-w-none mb-12">
+            <div class="flex items-center justify-between mb-6 flex-wrap gap-2">
+                <div></div>
+                <div class="flex gap-2">
+                    <a 
+                        href="{{ path('app_news_download_pdf', {'id': news.newsId}) }}"
+                        class="px-4 py-2 bg-[#D4AF37]/20 text-[#D4AF37] rounded-lg hover:bg-[#D4AF37]/30 transition font-medium text-sm flex items-center gap-2"
+                        title="Download article as PDF"
+                        download
+                    >
+                        📄 Download PDF
+                    </a>
+                    <button 
+                        type="button"
+                        id="readArticleBtn"
+                        class="px-4 py-2 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 transition font-medium text-sm flex items-center gap-2"
+                        title="Read article aloud"
+                    >
+                        🔊 Read Aloud
+                    </button>
+                </div>
+            </div>
+            <div id="articleContent" class="text-lg text-gray-300 leading-relaxed whitespace-pre-wrap">
+                {{ news.contenu }}
+            </div>
+        </article>
+
+        <!-- Divider -->
+        <hr class="border-[#D4AF37]/10 my-8">
+
+        <!-- Comments Section -->
+        <section id="comments" class="mt-12">
+            <h2 class="text-2xl font-bold text-white mb-8">Comments</h2>
+
+            <!-- Add Comment Form (TOP) -->
+            <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 p-6 mb-12">
+                <h3 class="text-lg font-bold text-white mb-4">Add Your Comment</h3>
+                
+                <form id="addCommentForm" class="space-y-3">
+                    <!-- Comment Textarea with Inline Emoji Buttons -->
+                    <div class="relative">
+                        <textarea 
+                            id="commentContent"
+                            name="contenu" 
+                            rows="4" 
+                            placeholder="Share your thoughts... (emojis supported 😊)"
+                            class="w-full px-4 py-3 bg-[#1a1a24] border border-[#D4AF37]/20 rounded-lg text-white text-base focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] resize-none pr-24"
+                        ></textarea>
+                        
+                        <!-- Emoji & Voice Buttons (Inside textarea area on bottom-right) -->
+                        <div class="absolute bottom-2 right-2 flex gap-1">
+                            <!-- Voice Button -->
+                            <button 
+                                type="button" 
+                                id="voiceInputBtn"
+                                class="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs hover:bg-blue-500/30 transition font-bold"
+                                title="Click to speak"
+                            >
+                                🎤
+                            </button>
+                            
+                            <!-- Emoji Button -->
+                            <button 
+                                type="button" 
+                                id="emojiPickerToggle"
+                                class="px-2 py-1 bg-[#D4AF37]/20 text-[#D4AF37] rounded text-xs hover:bg-[#D4AF37]/30 transition font-bold"
+                                title="Add Emoji"
+                            >
+                                😊
+                            </button>
+                        </div>
+                        
+                        <!-- Recording Indicator -->
+                        <div id="recordingIndicator" class="hidden absolute top-2 right-2 flex items-center gap-2 text-red-500 text-xs">
+                            <span class="animate-pulse">●</span>
+                            <span>Recording...</span>
+                        </div>
+                    </div>
+
+                    <div id="speechStatus" class="text-xs text-gray-500"></div>
+
+                    <!-- Character Counter -->
+                    <div class="text-xs text-gray-500 text-right">
+                        <span id="charCount">0</span> / 5000 characters
+                    </div>
+
+                    <!-- Emoji Picker Grid (Hidden) -->
+                    <div id="emojiPicker" class="hidden bg-[#1a1a24] border border-[#D4AF37]/20 rounded-lg p-3 grid grid-cols-8 sm:grid-cols-10 gap-1 max-h-40 overflow-y-auto">
+                        <!-- Emojis will be populated by JavaScript -->
+                    </div>
+
+                    <!-- GIF Button -->
+                    <div class="flex gap-2">
+                        <button 
+                            type="button" 
+                            id="openGifPickerBtn"
+                            class="px-4 py-2 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 transition font-medium text-sm"
+                        >
+                            🎬 Add GIF
+                        </button>
+                        <span id="gifFileName" class="text-xs text-gray-400 flex items-center"></span>
+                    </div>
+
+                    <!-- Selected GIF Preview -->
+                    <div id="gifPreview" class="hidden">
+                        <img id="gifPreviewImg" src="" alt="GIF Preview" class="max-w-xs max-h-32 rounded-lg">
+                        <button 
+                            type="button" 
+                            onclick="document.getElementById('gifPreview').classList.add('hidden'); document.getElementById('selectedGifUrl').value = ''; document.getElementById('gifFileName').textContent = '';"
+                            class="mt-2 text-xs text-red-500 hover:text-red-400"
+                        >
+                            Remove GIF
+                        </button>
+                    </div>
+
+                    <!-- Hidden GIF URL field -->
+                    <input type="hidden" id="selectedGifUrl" name="gif_url">
+
+                    <!-- Submit Buttons -->
+                    <div class="flex gap-3 pt-2">
+                        <button 
+                            type="submit"
+                            class="flex-1 px-6 py-3 bg-[#D4AF37] text-[#0a0a0f] rounded-lg font-bold hover:bg-[#B8941F] transition"
+                        >
+                            Post Comment
+                        </button>
+                        <button 
+                            type="reset"
+                            onclick="document.getElementById('emojiPicker').classList.add('hidden'); document.getElementById('gifPreview').classList.add('hidden'); document.getElementById('gifFileName').textContent = '';"
+                            class="px-6 py-3 bg-[#D4AF37]/10 text-[#D4AF37] rounded-lg font-medium hover:bg-[#D4AF37]/20 transition"
+                        >
+                            Clear
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Comments Container (BELOW FORM) -->
+            <div id="comments-container" class="space-y-6">
+                <!-- Comments will be loaded here by JavaScript -->
+                <div class="text-center text-gray-400">Loading comments...</div>
+            </div>
+        </section>
+
+        <!-- Navigation -->
+        <div class="flex justify-between items-center mt-12 pt-8 border-t border-[#D4AF37]/10">
+            <a href="{{ path('app_news_list') }}" class="px-6 py-3 bg-[#D4AF37]/10 text-[#D4AF37] rounded-lg hover:bg-[#D4AF37]/20 transition font-medium">
+                ← All News
+            </a>
+
+            <!-- Share Info -->
+            <div class="text-sm text-gray-500">
+                News ID: {{ news.newsId }}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- GIF Picker Modal -->
+<div id="gifPickerModal" class="fixed inset-0 bg-black/50 z-50 items-center justify-center hidden flex-col p-4">
+    <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/20 max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+        <!-- Header -->
+        <div class="p-6 border-b border-[#D4AF37]/10 flex justify-between items-center">
+            <h2 class="text-xl font-bold text-white">Select a GIF</h2>
+            <button type="button" onclick="closeGifPicker()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="p-4 border-b border-[#D4AF37]/10 flex gap-2">
+            <input 
+                type="text" 
+                id="gifSearchInput" 
+                placeholder="Search GIFs..." 
+                class="flex-1 bg-[#1a1a24] text-white px-4 py-2 rounded-lg border border-[#D4AF37]/20 focus:outline-none focus:border-[#D4AF37] transition"
+            >
+            <button 
+                type="button"
+                onclick="searchGifs()"
+                class="bg-[#D4AF37] text-[#12121a] font-semibold px-6 py-2 rounded-lg hover:bg-[#E5C158] transition"
+            >
+                Search
+            </button>
+        </div>
+
+        <!-- GIFs Grid -->
+        <div class="p-6 overflow-y-auto flex-1">
+            <div id="gifGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- GIFs will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Loading indicator -->
+        <div id="gifLoadingIndicator" class="hidden p-6 text-center">
+            <div class="relative w-8 h-8 mx-auto">
+                <div class="absolute inset-0 border-4 border-[#D4AF37]/20 rounded-full"></div>
+                <div class="absolute inset-0 border-4 border-transparent border-t-[#D4AF37] rounded-full animate-spin"></div>
+            </div>
+            <p class="text-gray-400 mt-2">Loading GIFs...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const newsId = {{ news.newsId }};
+    const apiBaseUrl = '{{ path('api_comments_news', {'news_id': '__ID__'}) }}'.replace('__ID__', newsId);
+    const gifSearchUrl = '{{ path('api_gifs_search') }}';
+    const gifTrendingUrl = '{{ path('api_gifs_trending') }}';
+
+    // Common emojis for quick selection
+    const emojis = ['😂', '❤️', '🔥', '👍', '😍', '🎮', '😎', '🤔', '👏', '🎉', '😢', '😡', '🤯', '💯', '🚀', '✨', '👌', '💪', '🎊', '😎', '🔔', '⭐'];
+
+    // Initialize emoji picker
+    function initEmojiPicker() {
+        const picker = document.getElementById('emojiPicker');
+        emojis.forEach(emoji => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = emoji;
+            btn.className = 'text-xl hover:bg-[#D4AF37]/10 p-1 rounded transition';
+            btn.onclick = (e) => {
+                e.preventDefault();
+                const textarea = document.getElementById('commentContent');
+                textarea.focus();
+                textarea.value += emoji;
+                updateCharCount();
+            };
+            picker.appendChild(btn);
+        });
+    }
+
+    // Toggle emoji picker
+    document.getElementById('emojiPickerToggle').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('emojiPicker').classList.toggle('hidden');
+    });
+
+    /**
+     * Display GIFs in the grid
+     * @param {Array} gifs Array of GIF objects from API
+     */
+    function displayGifs(gifs) {
+        const grid = document.getElementById('gifGrid');
+        grid.innerHTML = '';
+
+        if (!gifs || gifs.length === 0) {
+            grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-8">No GIFs found. Try searching for something else!</div>';
+            return;
+        }
+
+        gifs.forEach(gif => {
+            const item = document.createElement('div');
+            item.className = 'cursor-pointer bg-[#1a1a24] rounded-lg overflow-hidden border border-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition';
+            item.onclick = () => selectGif(gif);
+            
+            // Use thumbnail for display if available, fallback to full GIF
+            const displayUrl = gif.thumbnail || gif.url;
+            
+            item.innerHTML = `
+                <img src="${displayUrl}" alt="${gif.name}" class="w-full h-32 object-cover hover:scale-105 transition" loading="lazy">
+                <p class="p-2 text-sm text-gray-300 text-center truncate">${gif.name}</p>
+            `;
+            grid.appendChild(item);
+        });
+    }
+
+    /**
+     * Search for GIFs via API
+     */
+    async function searchGifs() {
+        const query = document.getElementById('gifSearchInput').value.trim();
+        
+        if (!query) {
+            alert('Please enter a search term');
+            return;
+        }
+
+        // Show loading indicator
+        document.getElementById('gifLoadingIndicator').classList.remove('hidden');
+        document.getElementById('gifGrid').classList.add('hidden');
+
+        try {
+            const url = new URL(gifSearchUrl, window.location.origin);
+            url.searchParams.set('q', query);
+            url.searchParams.set('limit', 20);
+
+            const response = await fetch(url.toString());
+            const data = await response.json();
+
+            // Hide loading indicator
+            document.getElementById('gifLoadingIndicator').classList.add('hidden');
+            document.getElementById('gifGrid').classList.remove('hidden');
+
+            if (data.success) {
+                displayGifs(data.gifs);
+            } else {
+                console.error('API Error:', data.error);
+                alert('Error searching for GIFs: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            document.getElementById('gifLoadingIndicator').classList.add('hidden');
+            document.getElementById('gifGrid').classList.remove('hidden');
+            alert('Error searching for GIFs: ' + error.message);
+        }
+    }
+
+    /**
+     * Load trending GIFs when modal opens
+     */
+    async function loadTrendingGifs() {
+        // Show loading indicator
+        document.getElementById('gifLoadingIndicator').classList.remove('hidden');
+        document.getElementById('gifGrid').classList.add('hidden');
+
+        try {
+            const response = await fetch(gifTrendingUrl + '?limit=20');
+            const data = await response.json();
+
+            // Hide loading indicator
+            document.getElementById('gifLoadingIndicator').classList.add('hidden');
+            document.getElementById('gifGrid').classList.remove('hidden');
+
+            if (data.success) {
+                displayGifs(data.gifs);
+            } else {
+                console.log('No trending GIFs available');
+                displayGifs([]);
+            }
+        } catch (error) {
+            console.error('Error loading trending GIFs:', error);
+            document.getElementById('gifLoadingIndicator').classList.add('hidden');
+            document.getElementById('gifGrid').classList.remove('hidden');
+        }
+    }
+
+    // Allow Enter key to search
+    document.getElementById('gifSearchInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchGifs();
+        }
+    });
+
+    // Open GIF picker
+    document.getElementById('openGifPickerBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('gifPickerModal').classList.remove('hidden');
+        document.getElementById('gifPickerModal').classList.add('flex');
+        document.getElementById('gifSearchInput').value = ''; // Clear search field
+        loadTrendingGifs(); // Load trending GIFs on open
+    });
+
+    // Close GIF picker
+    function closeGifPicker() {
+        document.getElementById('gifPickerModal').classList.add('hidden');
+        document.getElementById('gifPickerModal').classList.remove('flex');
+    }
+
+    // Select GIF
+    function selectGif(gif) {
+        document.getElementById('selectedGifUrl').value = gif.url;
+        document.getElementById('gifPreviewImg').src = gif.url;
+        document.getElementById('gifFileName').textContent = `📹 ${gif.name} selected`;
+        document.getElementById('gifPreview').classList.remove('hidden');
+        closeGifPicker();
+    }
+
+    // Character counter
+    function updateCharCount() {
+        const content = document.getElementById('commentContent').value;
+        document.getElementById('charCount').textContent = content.length;
+    }
+
+    document.getElementById('commentContent').addEventListener('input', updateCharCount);
+
+    // Load comments
+    async function loadComments() {
+        try {
+            const response = await fetch(apiBaseUrl);
+            const comments = await response.json();
+            displayComments(comments);
+        } catch (error) {
+            console.error('Error loading comments:', error);
+            document.getElementById('comments-container').innerHTML =
+                '<div class="text-center text-red-500">Failed to load comments</div>';
+        }
+    }
+
+    // Display comments
+    function displayComments(comments) {
+        const container = document.getElementById('comments-container');
+        
+        if (comments.length === 0) {
+            container.innerHTML = '<div class="text-center text-gray-400 py-8">No comments yet. Be the first to comment!</div>';
+            return;
+        }
+
+        container.innerHTML = comments.map(comment => {
+            const voteKey = `comment_vote_${comment.commentaire_id}`;
+            const userVote = localStorage.getItem(voteKey) || 'none'; // 'none', 'upvote', 'downvote'
+            const isAuth = !!comment.user;
+            const avatarUrl = isAuth && comment.user.avatar ? comment.user.avatar : null;
+            const displayName = isAuth ? (comment.user.username || 'User') : 'Anonymous';
+            const profileLink = isAuth && comment.user.profile_url ? comment.user.profile_url : null;
+            
+            return `
+                <div class="bg-[#12121a] rounded-lg border border-[#D4AF37]/10 p-6">
+                    <div class="flex items-center gap-3 mb-3">
+                        ${avatarUrl 
+                            ? `<img src="${avatarUrl}" alt="${displayName}" class="w-8 h-8 rounded-full object-cover border border-[#D4AF37]/50">`
+                            : `<div class="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37]">
+                                   ${displayName.substring(0,1).toUpperCase()}
+                               </div>`
+                        }
+                        ${profileLink 
+                            ? `<a href="${profileLink}" class="text-sm font-semibold hover:text-[#D4AF37]">${displayName}</a>`
+                            : `<span class="text-sm font-semibold">${displayName}</span>`
+                        }
+                        <span class="text-xs text-gray-400 ml-auto">${comment.date_commentaire || ''}</span>
+                    </div>
+                    <!-- Comment Text & GIF -->
+                    <div class="mb-4">
+                        <p id="comment-content-${comment.commentaire_id}" class="text-gray-300 mb-3">${escapeHtml(comment.contenu)}</p>
+                        ${comment.gif_url ? `<img src="${comment.gif_url}" alt="GIF" class="rounded-lg max-w-xs max-h-40 mb-3" onerror="this.style.display='none'">` : ''}
+                    </div>
+
+                    <!-- Timestamp -->
+                    <div class="text-xs text-gray-500 mb-3 pb-3 border-b border-[#D4AF37]/10">
+                        <time>${formatDate(comment.date_commentaire)}</time>
+                    </div>
+
+                    <!-- Vote Buttons -->
+                    <div class="flex gap-3">
+                        <button 
+                            onclick="voteComment(${comment.commentaire_id}, 'upvote')"
+                            class="flex items-center gap-1 px-3 py-2 rounded-lg transition ${userVote === 'upvote' ? 'bg-green-500/20 text-green-400' : 'bg-[#D4AF37]/10 text-gray-400 hover:text-[#D4AF37]'}"
+                        >
+                            👍 <span class="text-sm font-medium">${comment.upvotes}</span>
+                        </button>
+                        <button 
+                            onclick="voteComment(${comment.commentaire_id}, 'downvote')"
+                            class="flex items-center gap-1 px-3 py-2 rounded-lg transition ${userVote === 'downvote' ? 'bg-red-500/20 text-red-400' : 'bg-[#D4AF37]/10 text-gray-400 hover:text-[#D4AF37]'}"
+                        >
+                            👎 <span class="text-sm font-medium">${comment.downvotes}</span>
+                        </button>
+                    </div>
+
+                    <!-- Edit / Delete / Speak Buttons -->
+                    <div class="flex gap-2 mt-3">
+                        <button
+                            onclick="speakComment(${comment.commentaire_id})"
+                            id="speak-btn-${comment.commentaire_id}"
+                            class="px-3 py-2 text-xs bg-purple-500/10 text-purple-400 rounded hover:bg-purple-500/20 transition"
+                            title="Read comment aloud"
+                        >
+                            🔊 Listen
+                        </button>
+                        <button
+                            onclick="editComment(${comment.commentaire_id})"
+                            class="px-3 py-2 text-xs bg-[#D4AF37]/10 text-[#D4AF37] rounded hover:bg-[#D4AF37]/20 transition"
+                        >
+                            ✏️ Edit
+                        </button>
+                        <button
+                            onclick="deleteComment(${comment.commentaire_id})"
+                            class="px-3 py-2 text-xs bg-red-600/10 text-red-400 rounded hover:bg-red-600/20 transition"
+                        >
+                            🗑️ Delete
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Vote on comment
+    async function voteComment(commentId, voteType) {
+        const voteKey = `comment_vote_${commentId}`;
+        const currentVote = localStorage.getItem(voteKey) || 'none';
+        
+        // Map upvote/downvote to up/down for API
+        const apiVoteType = voteType === 'upvote' ? 'up' : 'down';
+        const apiCurrentVote = currentVote === 'upvote' ? 'up' : (currentVote === 'downvote' ? 'down' : null);
+
+        // If user already voted with this type, undo it
+        if (currentVote === voteType) {
+            // Undo vote
+            await sendVote(commentId, null, apiCurrentVote, true);
+            localStorage.removeItem(voteKey);
+        } else if (currentVote === 'none') {
+            // New vote
+            await sendVote(commentId, apiVoteType, null, false);
+            localStorage.setItem(voteKey, voteType);
+        } else {
+            // Change vote (switch from up to down or vice versa)
+            await sendVote(commentId, apiVoteType, apiCurrentVote, false);
+            localStorage.setItem(voteKey, voteType);
+        }
+
+        // Reload comments
+        loadComments();
+    }
+
+    // Send vote to server
+    async function sendVote(commentId, voteType, previousVote = null, undo = false) {
+        try {
+            const payload = {};
+            if (voteType) payload.type = voteType;
+            if (previousVote) payload.previous = previousVote;
+            if (undo) payload.undo = true;
+
+            const response = await fetch(`/api/comments/${commentId}/vote`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                console.error('Vote failed');
+            }
+        } catch (error) {
+            console.error('Error voting:', error);
+        }
+    }
+
+    // Format date
+    function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diff = now - date;
+        const hours = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+        
+        if (hours < 1) return 'Just now';
+        if (hours < 24) return `${hours}h ago`;
+        if (days < 7) return `${days}d ago`;
+        
+        return date.toLocaleDateString();
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // Submit comment form
+    document.getElementById('addCommentForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const contenu = document.getElementById('commentContent').value;
+        const gif_url = document.getElementById('selectedGifUrl').value;
+
+        try {
+            const response = await fetch('{{ path('api_comments_add') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    news_id: newsId,
+                    contenu,
+                    gif_url: gif_url || null
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                document.getElementById('addCommentForm').reset();
+                updateCharCount();
+                document.getElementById('gifPreview').classList.add('hidden');
+                document.getElementById('gifFileName').textContent = '';
+                document.getElementById('emojiPicker').classList.add('hidden');
+                // Clear any previous error message
+                const errorDiv = document.getElementById('commentErrorMessage');
+                if (errorDiv) errorDiv.remove();
+                loadComments();
+            } else {
+                // Display server error message
+                const errorMessage = result.error || 'Failed to post comment';
+                
+                // Remove previous error if exists
+                const existingError = document.getElementById('commentErrorMessage');
+                if (existingError) existingError.remove();
+                
+                // Create and display error message
+                const errorDiv = document.createElement('div');
+                errorDiv.id = 'commentErrorMessage';
+                errorDiv.className = 'mt-3 p-3 bg-red-500/20 border border-red-500/50 text-red-400 rounded-lg text-sm';
+                errorDiv.textContent = errorMessage;
+                document.getElementById('addCommentForm').insertAdjacentElement('afterend', errorDiv);
+            }
+        } catch (error) {
+            console.error('Error posting comment:', error);
+            const errorDiv = document.createElement('div');
+            errorDiv.id = 'commentErrorMessage';
+            errorDiv.className = 'mt-3 p-3 bg-red-500/20 border border-red-500/50 text-red-400 rounded-lg text-sm';
+            errorDiv.textContent = 'Error posting comment';
+            document.getElementById('addCommentForm').insertAdjacentElement('afterend', errorDiv);
+        }
+    });
+
+    // Delete a comment (asks for confirmation)
+    async function deleteComment(commentId) {
+        if (!confirm('Are you sure you want to delete this comment?')) return;
+
+        try {
+            const response = await fetch(`/api/comments/${commentId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                loadComments();
+            } else {
+                const res = await response.json();
+                alert(res.error || 'Failed to delete comment');
+            }
+        } catch (err) {
+            console.error('Error deleting comment:', err);
+            alert('Error deleting comment');
+        }
+    }
+
+    // Edit a comment using a simple prompt, then POST update
+    async function editComment(commentId) {
+        const el = document.getElementById(`comment-content-${commentId}`);
+        const current = el ? el.textContent : '';
+        const updated = prompt('Edit your comment:', current);
+        if (updated === null) return; // cancelled
+
+        try {
+            const response = await fetch(`/api/comments/${commentId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contenu: updated })
+            });
+
+            if (response.ok) {
+                loadComments();
+            } else {
+                const res = await response.json();
+                alert(res.error || 'Failed to update comment');
+            }
+        } catch (err) {
+            console.error('Error editing comment:', err);
+            alert('Error updating comment');
+        }
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('gifPickerModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeGifPicker();
+        }
+    });
+
+    let currentSpeechId = null;
+    let isArticleReading = false;
+    const hasSpeechSynthesis = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+
+    function readArticle() {
+        if (!hasSpeechSynthesis) {
+            return;
+        }
+        const articleText = document.getElementById('articleContent').textContent;
+        const btn = document.getElementById('readArticleBtn');
+        
+        // If already reading article, stop it
+        if (isArticleReading && speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+            btn.innerHTML = '🔊 Read Aloud';
+            isArticleReading = false;
+            currentSpeechId = null;
+            return;
+        }
+        
+        // Stop any other speaking
+        if (speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+            // Reset previous button
+            if (currentSpeechId) {
+                const prevBtn = document.getElementById(`speak-btn-${currentSpeechId}`);
+                if (prevBtn) prevBtn.textContent = '🔊 Listen';
+            }
+        }
+        
+        // Create speech utterance
+        const utterance = new SpeechSynthesisUtterance(articleText);
+        utterance.rate = 1.0; // Normal speed
+        utterance.pitch = 1.0; // Normal pitch
+        utterance.volume = 1.0; // Full volume
+        
+        // Update button when speaking starts
+        utterance.onstart = function() {
+            btn.innerHTML = '⏹️ Stop Reading';
+            isArticleReading = true;
+            currentSpeechId = null;
+        };
+        
+        // Update button when speaking ends
+        utterance.onend = function() {
+            btn.innerHTML = '🔊 Read Aloud';
+            isArticleReading = false;
+        };
+        
+        utterance.onerror = function(event) {
+            if (event.error === 'interrupted' || event.error === 'canceled') {
+                btn.innerHTML = '🔊 Read Aloud';
+                isArticleReading = false;
+                return;
+            }
+            console.error('Speech synthesis error:', event.error);
+            btn.innerHTML = '🔊 Read Aloud';
+            isArticleReading = false;
+            alert('Error: Could not read article. Please try again.');
+        };
+        
+        // Speak the article
+        speechSynthesis.speak(utterance);
+    }
+
+    // Add event listener to read article button
+    document.getElementById('readArticleBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        readArticle();
+    });
+
+    function speakComment(commentId) {
+        if (!hasSpeechSynthesis) {
+            return;
+        }
+        const commentText = document.getElementById(`comment-content-${commentId}`).textContent;
+        const btn = document.getElementById(`speak-btn-${commentId}`);
+        
+        // If already speaking this comment, stop it
+        if (currentSpeechId === commentId && speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+            btn.textContent = '🔊 Listen';
+            currentSpeechId = null;
+            return;
+        }
+        
+        // Stop any other speaking
+        if (speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+            // Reset previous button
+            if (currentSpeechId) {
+                const prevBtn = document.getElementById(`speak-btn-${currentSpeechId}`);
+                if (prevBtn) prevBtn.textContent = '🔊 Listen';
+            }
+        }
+        
+        // Create speech utterance
+        const utterance = new SpeechSynthesisUtterance(commentText);
+        utterance.rate = 1.0; // Normal speed
+        utterance.pitch = 1.0; // Normal pitch
+        utterance.volume = 1.0; // Full volume
+        
+        // Update button when speaking starts
+        utterance.onstart = function() {
+            btn.textContent = '⏹️ Stop';
+            currentSpeechId = commentId;
+        };
+        
+        // Update button when speaking ends
+        utterance.onend = function() {
+            btn.textContent = '🔊 Listen';
+            currentSpeechId = null;
+        };
+        
+        utterance.onerror = function(event) {
+            if (event.error === 'interrupted' || event.error === 'canceled') {
+                btn.textContent = '🔊 Listen';
+                currentSpeechId = null;
+                return;
+            }
+            console.error('Speech synthesis error:', event.error);
+            btn.textContent = '🔊 Listen';
+            currentSpeechId = null;
+            alert('Error: Could not read comment. Please try again.');
+        };
+        
+        // Speak the comment
+        speechSynthesis.speak(utterance);
+    }
+
+    // Voice Recognition Setup
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let isRecording = false;
+    let recognition;
+    let lastAddedTranscript = '';
+    const speechDebugEnabled = new URLSearchParams(window.location.search).get('debugSpeech') === '1';
+    const speechStatusEl = document.getElementById('speechStatus');
+    const voiceBtn = document.getElementById('voiceInputBtn');
+    let networkBlockedUntil = 0;
+    const host = window.location.hostname;
+    const isLocalhost = host === 'localhost' || host === '127.0.0.1' || host === '[::1]';
+    const isSecureContextOk = window.isSecureContext || isLocalhost;
+
+    function setSpeechStatus(message, tone = 'text-gray-500') {
+        if (!speechStatusEl) return;
+        speechStatusEl.textContent = message || '';
+        speechStatusEl.className = `text-xs ${tone}`;
+    }
+
+    function setVoiceBtnDisabled(disabled, title) {
+        if (!voiceBtn) return;
+        voiceBtn.disabled = disabled;
+        voiceBtn.style.opacity = disabled ? '0.5' : '1';
+        if (title) voiceBtn.title = title;
+    }
+
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US'; // Default language
+        
+        function blockNetworkTemporarily(ms) {
+            networkBlockedUntil = Date.now() + ms;
+            updateConnectivityState();
+            window.setTimeout(() => {
+                if (Date.now() >= networkBlockedUntil) {
+                    networkBlockedUntil = 0;
+                    updateConnectivityState();
+                }
+            }, ms);
+        }
+
+        function updateConnectivityState() {
+            if (!isSecureContextOk) {
+                networkBlockedUntil = 0;
+                setVoiceBtnDisabled(true, 'Voice input requires HTTPS (or localhost).');
+                setSpeechStatus('Voice input requires HTTPS (or localhost).', 'text-yellow-400');
+            } else if (!navigator.onLine) {
+                networkBlockedUntil = 0;
+                setVoiceBtnDisabled(true, 'Offline: voice input requires internet');
+                setSpeechStatus('Offline: voice input requires internet.', 'text-yellow-400');
+            } else if (Date.now() < networkBlockedUntil) {
+                const secondsLeft = Math.max(1, Math.ceil((networkBlockedUntil - Date.now()) / 1000));
+                setVoiceBtnDisabled(true, `Voice input temporarily unavailable (network). Retry in ${secondsLeft}s`);
+                setSpeechStatus(`Voice input temporarily unavailable (network). Retry in ${secondsLeft}s`, 'text-yellow-400');
+            } else {
+                setVoiceBtnDisabled(false, 'Click to speak');
+                setSpeechStatus('Voice input ready.', 'text-gray-500');
+            }
+        }
+        updateConnectivityState();
+        window.addEventListener('online', updateConnectivityState);
+        window.addEventListener('offline', updateConnectivityState);
+
+        recognition.onstart = function() {
+            isRecording = true;
+            lastAddedTranscript = '';
+            document.getElementById('recordingIndicator').classList.remove('hidden');
+            setVoiceBtnDisabled(true);
+            setSpeechStatus('Listening…', 'text-red-400');
+        };
+
+        recognition.onresult = function(event) {
+            let transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcriptSegment = event.results[i][0].transcript;
+                transcript += transcriptSegment;
+            }
+            
+            // Only add final results (not interim)
+            if (transcript && transcript !== lastAddedTranscript) {
+                const textarea = document.getElementById('commentContent');
+                const currentText = textarea.value;
+                const lastChar = currentText[currentText.length - 1];
+                
+                // Add space before text if textarea is not empty and doesn't end with space
+                if (currentText && lastChar !== ' ' && lastChar !== '\n') {
+                    textarea.value = currentText + ' ' + transcript;
+                } else {
+                    textarea.value = currentText + transcript;
+                }
+                
+                lastAddedTranscript = transcript;
+                updateCharCount();
+            }
+        };
+
+        recognition.onerror = function(event) {
+            let errorMsg = '';
+            switch (event.error) {
+                case 'no-speech':
+                    if (speechDebugEnabled) console.error('Speech recognition error:', event.error);
+                    errorMsg = 'No speech detected. Please try again.';
+                    alert('Error: ' + errorMsg);
+                    setSpeechStatus(errorMsg, 'text-yellow-400');
+                    break;
+                case 'network':
+                    if (speechDebugEnabled) {
+                        console.error('Speech recognition error:', event.error);
+                        console.info('Speech debug', {
+                            isSecureContext: window.isSecureContext,
+                            protocol: window.location.protocol,
+                            host: window.location.host,
+                            onLine: navigator.onLine,
+                        });
+                    }
+                    blockNetworkTemporarily(15000);
+                    break;
+                case 'permission-denied':
+                    if (speechDebugEnabled) console.error('Speech recognition error:', event.error);
+                    errorMsg = 'Microphone permission denied. Please allow access.';
+                    alert('Error: ' + errorMsg);
+                    setSpeechStatus(errorMsg, 'text-yellow-400');
+                    break;
+                default:
+                    if (speechDebugEnabled) console.error('Speech recognition error:', event.error);
+                    errorMsg = event.error;
+                    alert('Error: ' + errorMsg);
+                    setSpeechStatus('Voice input error: ' + errorMsg, 'text-yellow-400');
+            }
+        };
+
+        recognition.onend = function() {
+            isRecording = false;
+            document.getElementById('recordingIndicator').classList.add('hidden');
+            updateConnectivityState();
+        };
+
+        // Voice button click handler
+        document.getElementById('voiceInputBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                if (!isSecureContextOk) {
+                    alert('Error: Voice input requires HTTPS (or localhost).');
+                    setSpeechStatus('Voice input requires HTTPS (or localhost).', 'text-yellow-400');
+                    return;
+                }
+                if (!navigator.onLine) {
+                    alert('Error: Network unavailable. Please check your connection.');
+                    setSpeechStatus('Offline: voice input requires internet.', 'text-yellow-400');
+                    return;
+                }
+                if (Date.now() < networkBlockedUntil) {
+                    return;
+                }
+                try {
+                    recognition.start();
+                } catch (err) {
+                    console.error('Recognition start error:', err);
+                    alert('Error: Could not start voice input.');
+                    setSpeechStatus('Error: Could not start voice input.', 'text-yellow-400');
+                }
+            }
+        });
+    } else {
+        // Browser doesn't support Web Speech API
+        document.getElementById('voiceInputBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Voice input is not supported in your browser. Please use Chrome, Edge, or Safari.');
+        });
+        document.getElementById('voiceInputBtn').style.opacity = '0.5';
+        document.getElementById('voiceInputBtn').disabled = true;
+    }
+
+    // Initial setup
+    initEmojiPicker();
+    loadComments();
+</script>
+{% endblock %}

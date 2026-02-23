@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ match.tournament ? match.tournament.tournamentName : 'Match' }} - CarthageGG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('assets/styles/styles.css') }}" />
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7] min-h-screen">
+
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-[#0a0a0f]/95 backdrop-blur-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex h-16 items-center justify-between">
+                <a href="{{ path('app_index') }}" class="flex items-center space-x-2">
+                    <img src="{{ asset('assets/images/zz.png') }}" alt="CarthageGG Logo" class="h-14 w-14 rounded-lg shadow-lg object-cover">
+                    <span class="text-2xl font-bold text-[#D4AF37]">Carthage</span>
+                    <span class="text-2xl font-bold text-white">GG</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="{{ path('app_tournaments') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Tournaments</a>
+                    <a href="{{ path('app_teams') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Teams</a>
+                    <a href="{{ path('app_matches') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Matches</a>
+                    <a href="{{ path('app_leaderboard') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Leaderboard</a>
+                    <a href="{{ path('app_support') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Support</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ path('app_login') }}" class="text-gray-300 hover:text-white px-4 py-2 text-sm font-medium">Login</a>
+                    <a href="{{ path('app_admin_dashboard') }}" class="px-4 py-2 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] text-sm font-medium">Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Back button -->
+        <a href="{{ path('app_matches') }}" class="inline-flex items-center text-gray-400 hover:text-white mb-6">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to matches
+        </a>
+
+        <!-- Match details card -->
+        <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-8 mb-6">
+            <div class="flex justify-between items-start mb-6">
+                <h1 class="text-3xl font-bold">{{ match.tournament ? match.tournament.tournamentName : 'Match' }}</h1>
+                <div class="flex items-center gap-2">
+                    {% if isRivalry is defined and isRivalry %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-600/20 text-red-400 border border-red-600/30">
+                            ⚔️ Derby
+                        </span>
+                    {% endif %}
+                    <span class="px-4 py-2 rounded-full text-sm font-medium
+                        {% if match.scoreTeamA is not null and match.scoreTeamB is not null %}
+                            bg-green-600/20 text-green-400
+                        {% else %}
+                            bg-yellow-600/20 text-yellow-400
+                        {% endif %}">
+                        {% if match.scoreTeamA is not null and match.scoreTeamB is not null %}
+                            Completed
+                        {% else %}
+                            Upcoming
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Teams and scores -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
+                <!-- Team A -->
+                <div class="text-center flex-1">
+                    <div class="text-2xl font-bold mb-2">{{ match.teamA ? match.teamA.teamName : 'TBD' }}</div>
+                    <div class="text-5xl font-bold text-[#D4AF37]">{{ match.scoreTeamA ?? '-' }}</div>
+                </div>
+
+                <!-- VS separator -->
+                <div class="text-3xl text-gray-400 font-bold">VS</div>
+
+                <!-- Team B -->
+                <div class="text-center flex-1">
+                    <div class="text-2xl font-bold mb-2">{{ match.teamB ? match.teamB.teamName : 'TBD' }}</div>
+                    <div class="text-5xl font-bold text-[#D4AF37]">{{ match.scoreTeamB ?? '-' }}</div>
+                </div>
+            </div>
+
+            <!-- Additional info -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div class="bg-[#0a0a0f] p-3 rounded">
+                    <div class="text-gray-400">Date</div>
+                    <div class="font-bold">{{ match.matchDate ? match.matchDate|date('M d, Y H:i') : 'TBD' }}</div>
+                </div>
+                <div class="bg-[#0a0a0f] p-3 rounded">
+                    <div class="text-gray-400">Tournament</div>
+                    <div class="font-bold">{{ match.tournament ? match.tournament.tournamentName : 'N/A' }}</div>
+                </div>
+                <div class="bg-[#0a0a0f] p-3 rounded">
+                    <div class="text-gray-400">Game</div>
+                    <div class="font-bold">{{ match.tournament and match.tournament.game ? match.tournament.game.name : 'N/A' }}</div>
+                </div>
+                <div class="bg-[#0a0a0f] p-3 rounded">
+                    <div class="text-gray-400">Match ID</div>
+                    <div class="font-bold">#{{ match.matchId }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Prediction Section -->
+        {% if prediction is defined and prediction %}
+            <div class="mt-6 p-6 bg-[#12121a] rounded-lg border border-[#D4AF37]/20">
+                <h3 class="text-xl font-bold mb-4 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"></path>
+                    </svg>
+                    🔮 AI Prediction
+                </h3>
+                <p class="text-gray-300 mb-4">
+                    Le vainqueur probable est 
+                    <span class="text-[#D4AF37] font-bold">{{ prediction.winner.teamName }}</span> 
+                    avec <span class="text-[#D4AF37] font-bold">{{ prediction.probability }}%</span> de chances.
+                </p>
+                <div class="grid grid-cols-2 gap-4 text-sm text-gray-400">
+                    <div>
+                        <p class="font-bold">{{ match.teamA ? match.teamA.teamName : 'Team A' }} stats</p>
+                        <ul class="list-disc list-inside">
+                            <li>Victoires: {{ prediction.stats.teamA.wins }}</li>
+                            <li>Défaites: {{ prediction.stats.teamA.losses }}</li>
+                            <li>Matchs nuls: {{ prediction.stats.teamA.draws }}</li>
+                            <li>Taux de victoire: {{ prediction.stats.teamA.win_rate }}%</li>
+                            <li>Moyenne de points: {{ prediction.stats.teamA.avg_score }}</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <p class="font-bold">{{ match.teamB ? match.teamB.teamName : 'Team B' }} stats</p>
+                        <ul class="list-disc list-inside">
+                            <li>Victoires: {{ prediction.stats.teamB.wins }}</li>
+                            <li>Défaites: {{ prediction.stats.teamB.losses }}</li>
+                            <li>Matchs nuls: {{ prediction.stats.teamB.draws }}</li>
+                            <li>Taux de victoire: {{ prediction.stats.teamB.win_rate }}%</li>
+                            <li>Moyenne de points: {{ prediction.stats.teamB.avg_score }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div class="flex gap-4 mt-8">
+            <a href="{{ path('app_matches') }}" class="px-6 py-3 rounded-md border border-gray-400 text-gray-300 hover:bg-[#1e1e2e] transition">
+                ← Back to matches
+            </a>
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('match_edit', {id: match.matchId}) }}" class="px-6 py-3 rounded-md bg-[#D4AF37]/10 text-[#D4AF37] hover:bg-[#D4AF37]/20 transition">
+                    Edit match
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#D4AF37]/20 bg-[#0a0a0f] mt-16">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-[#D4AF37] mb-4">CarthageGG</h3>
+                    <p class="text-gray-400 text-sm">Tunisia's premier esports platform</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Platform</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="{{ path('app_tournaments') }}" class="hover:text-[#D4AF37]">Tournaments</a></li>
+                        <li><a href="{{ path('app_teams') }}" class="hover:text-[#D4AF37]">Teams</a></li>
+                        <li><a href="{{ path('app_matches') }}" class="hover:text-[#D4AF37]">Matches</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Compete</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="{{ path('app_leaderboard') }}" class="hover:text-[#D4AF37]">Leaderboard</a></li>
+                        <li><a href="{{ path('app_register') }}" class="hover:text-[#D4AF37]">Register</a></li>
+                        <li><a href="{{ path('app_support') }}" class="hover:text-[#D4AF37]">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Follow</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37]">Twitter</a>
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37]">Discord</a>
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37]">YouTube</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-[#D4AF37]/20 pt-8 text-center text-gray-400 text-sm">
+                <p>&copy; 2026 CarthageGG. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ asset('assets/main.js') }}"></script>
+</body>
+</html>

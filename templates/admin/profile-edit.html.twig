@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile | CarthageGG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('assets/styles/styles.css') }}">
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    <!-- Navigation -->
+    <nav class="bg-[#12121a] border-b border-[#D4AF37]/20 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <img src="{{ asset('assets/images/zz.png') }}" alt="CarthageGG Logo" class="w-14 h-14 rounded-lg shadow-lg object-cover">
+                <span class=\"font-bold text-[#D4AF37]\">CarthageGG</span>
+            </div>
+            <div class="flex gap-8 items-center">
+                <a href="{{ path('app_index') }}" class="hover:text-[#D4AF37] transition">Home</a>
+                {% if 'ROLE_ADMIN' in user.roles %}
+                    <a href="{{ path('app_admin_dashboard') }}" class="hover:text-[#D4AF37] transition">Dashboard</a>
+                {% endif %}
+                <h3 class="hover:text-[#D4AF37] transition">{{ app.user.roles[0]|replace({'ROLE_': ''})|lower|capitalize }}</h3>
+                <a href="{{ path('app_login') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg hover:bg-[#B8941F] transition">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-12 max-w-4xl">
+        <!-- Header -->
+        <div class="mb-12">
+            <h1 class="text-4xl font-bold text-[#D4AF37] mb-2">Edit User Profile</h1>
+            <p class="text-gray-400">Manage user account and permissions</p>
+        </div>
+        {% if app.flashes %}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="mb-6 px-4 py-3 rounded-lg border {% if label == 'success' %}bg-green-500/10 text-green-500 border-green-500/20{% else %}bg-red-500/10 text-red-500 border-red-500/20{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+
+        <!-- Profile Tabs -->
+        <div class="mb-8 border-b border-[#D4AF37]/20">
+            <div class="flex gap-8">
+                <button onclick="switchTab('basicInfo')" class="tab-button px-4 py-3 border-b-2 border-[#D4AF37] text-[#D4AF37] font-bold">📋 Basic Info</button>
+                <button onclick="switchTab('permissions')" class="tab-button px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-[#D4AF37]">🔐 Permissions</button>
+                <button onclick="switchTab('activity')" class="tab-button px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-[#D4AF37]">📊 Activity</button>
+            </div>
+        </div>
+
+        <!-- Basic Info Tab -->
+        <div id="basicInfo" class="tab-content">
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Profile Picture -->
+                <div class="md:col-span-1">
+                    <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 text-center">
+                        <form method="post" action="{{ path('app_profile_edit', {'id': user.id}) }}" enctype="multipart/form-data" id="avatarForm">
+                            <input type="hidden" name="_token" value="{{ csrf_token('profile_edit_' ~ user.id) }}">
+                            <div class="w-24 h-24 bg-gradient-to-br from-[#D4AF37] to-[#B8941F] rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                                {% if user.avatar %}
+                                    <img src="{{ asset(user.avatar) }}" alt="Avatar" class="w-full h-full object-cover rounded-full">
+                                {% else %}
+                                    <svg class="w-12 h-12 text-[#0a0a0f]" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                {% endif %}
+                            </div>
+                            <h3 class="font-bold mb-2">{{ user.firstName ? (user.firstName ~ ' ' ~ (user.lastName ?: '')) : (user.username ?: user.email) }}</h3>
+                            <p class="text-gray-400 text-sm mb-4">
+                                {% set role = user.roles|first %}
+                                {{ role|default('User')|replace({'ROLE_':'', '_':' '}) }}
+                            </p>
+                            <input type="file" name="avatar" id="avatarInput" accept="image/*" class="hidden" onchange="document.getElementById('avatarForm').submit();">
+                            <label for="avatarInput" class="w-full px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition text-sm font-bold cursor-pointer inline-block">Change Avatar</label>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- User Info Form -->
+                <div class="md:col-span-2">
+                    <form method="post" action="{{ path('app_profile_edit', {'id': user.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('profile_edit_' ~ user.id) }}">
+                        <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6 space-y-6">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-bold mb-2">First Name</label>
+                                    <input type="text" name="firstName" value="{{ user.firstName ?? '' }}" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold mb-2">Last Name</label>
+                                    <input type="text" name="lastName" value="{{ user.lastName ?? '' }}" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Username</label>
+                                <input type="text" name="username" value="{{ user.username ?? '' }}" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Email Address</label>
+                                <input type="email" name="email" value="{{ user.email ?? '' }}" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Bio</label>
+                                <textarea name="bio" rows="4" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none"></textarea>
+                            </div>
+
+                            <div class="flex gap-4 pt-4">
+                                <button type="submit" class="flex-1 px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">Save Changes</button>
+                                <button type="button" onclick="showNotification('Changes discarded', 'info')" class="flex-1 px-4 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded hover:border-[#D4AF37] transition font-bold">Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Settings -->
+            <div class="mt-8 border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6">
+                <h3 class="text-xl font-bold text-[#D4AF37] mb-6">Account Settings</h3>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="font-bold mb-4">Change Password</h4>
+                        <form method="post" action="{{ path('app_profile_change_password', {'id': user.id}) }}" class="space-y-4">
+                            <input type="hidden" name="_token" value="{{ csrf_token('change_password_' ~ user.id) }}">
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Current Password</label>
+                                <input type="password" name="current_password" placeholder="••••••••" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">New Password</label>
+                                <input type="password" name="new_password" placeholder="••••••••" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Confirm Password</label>
+                                <input type="password" name="confirm_password" placeholder="••••••••" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                            </div>
+                            <button type="submit" class="w-full px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">Update Password</button>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold mb-4">Account Status</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-3 bg-[#0a0a0f] rounded border border-[#D4AF37]/20">
+                                <div>
+                                    <p class="font-bold">Account Status</p>
+                                    <p class="text-gray-400 text-sm">{{ user.isActive ? 'Currently Active' : 'Currently Inactive' }}</p>
+                                </div>
+                                <span class="px-3 py-1 {{ user.isActive ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400' }} rounded-full text-sm">{{ user.isActive ? 'Active' : 'Inactive' }}</span>
+                            </div>
+
+                            <div class="flex justify-between items-center p-3 bg-[#0a0a0f] rounded border border-[#D4AF37]/20">
+                                <div>
+                                    <p class="font-bold">Email Verified</p>
+                                    <p class="text-gray-400 text-sm">{{ user.createdAt ? user.createdAt|date('M d, Y') : '-' }}</p>
+                                </div>
+                                <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">✓</span>
+                            </div>
+
+                            <div class="flex justify-between items-center p-3 bg-[#0a0a0f] rounded border border-[#D4AF37]/20">
+                                <div>
+                                    <p class="font-bold">Last Login</p>
+                                    <p class="text-gray-400 text-sm">{{ user.lastLoginAt ? user.lastLoginAt|date('M d, Y - h:i A') : 'Never' }}</p>
+                                </div>
+                                {% if user.lastLoginAt %}
+                                    <span class="text-[#D4AF37] font-bold">{{ user.lastLoginAt|date('M d') }}</span>
+                                {% else %}
+                                    <span class="text-gray-400 font-bold">-</span>
+                                {% endif %}
+                            </div>
+
+                            <button onclick="showNotification('Account suspended', 'info')" class="w-full px-4 py-2 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition font-bold">Suspend Account</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if app.user and app.user.id == user.id %}
+            <div class="mt-8 border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-[#D4AF37] mb-2">Face Authentication</h3>
+                        {% set faceAuth = user.faceAuthentication %}
+                        <p class="text-gray-400 text-sm mb-2">
+                            {% if faceAuth and faceAuth.enabled %}
+                                Face registered on {{ faceAuth.registeredAt|date('M d, Y - H:i') }}
+                            {% else %}
+                                No face data registered for this account.
+                            {% endif %}
+                        </p>
+                        <p id="face-status-message" class="text-sm"></p>
+                    </div>
+                    <div class="flex flex-col items-end gap-2">
+                        <button id="open-face-modal" type="button" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">
+                            {% if faceAuth and faceAuth.enabled %}
+                                Re-register Face
+                            {% else %}
+                                Register Face
+                            {% endif %}
+                        </button>
+                        <span class="text-xs text-gray-500">Used for passwordless login.</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% set canVerify = app.user and (app.user.id == user.id or ('ROLE_ADMIN' in app.user.roles) or ('ROLE_VERIFIER' in app.user.roles)) %}
+            <div class="mt-8 border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-[#D4AF37] mb-2">Verify Role</h3>
+                        <p class="text-gray-400 text-sm mb-4">Upload certification image to verify your role.</p>
+                        <div id="verifyStatus" class="flex items-center gap-2 mb-4">
+                            {% if user.isVerified %}
+                                <span id="verifyPill" class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">Verified</span>
+                                <span id="verifyMeta" class="text-sm text-gray-400">{{ user.verifiedRoleBadge ?: 'Role' }} • {{ user.verificationDate ? user.verificationDate|date('M d, Y H:i') : '' }}</span>
+                            {% else %}
+                                <span id="verifyPill" class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-sm">Pending</span>
+                                <span id="verifyMeta" class="text-sm text-gray-400 hidden"></span>
+                            {% endif %}
+                        </div>
+                        {% if canVerify %}
+                            <form id="verifyRoleForm" method="post" action="{{ path('verify_role') }}" enctype="multipart/form-data" class="space-y-4">
+                                <input type="hidden" name="_token" value="{{ csrf_token('verify_role_' ~ user.id) }}">
+                                <input type="hidden" name="id" value="{{ user.id }}">
+                                <div>
+                                    <label class="block text-sm font-bold mb-2">Certification Image (PNG/JPG, max 5MB)</label>
+                                    <input id="verificationImage" type="file" name="verification_image" accept="image/png,image/jpeg" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold mb-2">Role Name</label>
+                                    {% set currentRole = user.roles|first|default('ROLE_USER') %}
+                                    <select id="roleName" name="role_name" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37]">
+                                        <option value="PLAYER" {{ currentRole in ['ROLE_USER'] ? 'selected' : '' }}>PLAYER</option>
+                                        <option value="VIEWER" {{ currentRole == 'ROLE_MODERATOR' ? 'selected' : '' }}>VIEWER</option>
+                                        <option value="COACH">COACH</option>
+                                        <option value="ORGANISER" {{ currentRole == 'ROLE_ADMIN' ? 'selected' : '' }}>ORGANISER</option>
+                                    </select>
+                                </div>
+                                <button id="verifyButton" type="submit" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">Verify</button>
+                            </form>
+                        {% else %}
+                            <div class="text-sm text-red-400">You don’t have permission to verify this user. Ask an admin to perform verification.</div>
+                        {% endif %}
+                        <div class="mt-2 text-xs text-gray-500">Uses logo and signature reference files: assets/images/validation/</div>
+                        <div id="verifyTrace" class="mt-3 hidden">
+                            <div class="text-sm font-bold text-[#D4AF37] mb-1">Verification Trace</div>
+                            <pre class="text-xs bg-[#0a0a0f] border border-[#D4AF37]/20 rounded p-3 overflow-auto max-h-64"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Permissions Tab -->
+        <div id="permissions" class="tab-content hidden">
+            <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] p-6">
+                <form method="post" action="{{ path('app_profile_edit', {'id': user.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('profile_edit_' ~ user.id) }}">
+                    <div class="mb-8">
+                        <h3 class="text-xl font-bold text-[#D4AF37] mb-6">User Role & Permissions</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mb-8">
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Current Role</label>
+                                <select name="role" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                                    {% set currentRole = user.roles|first|default('ROLE_USER') %}
+                                    <option value="ROLE_ADMIN" {{ currentRole == 'ROLE_ADMIN' ? 'selected' : '' }}>Admin</option>
+                                    <option value="ROLE_MODERATOR" {{ currentRole == 'ROLE_MODERATOR' ? 'selected' : '' }}>Moderator</option>
+                                    <option value="ROLE_USER" {{ currentRole == 'ROLE_USER' ? 'selected' : '' }}>Player</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Status</label>
+                                <select name="status" class="w-full px-4 py-2 bg-[#0a0a0f] border border-[#D4AF37]/20 rounded text-[#e4e4e7] focus:border-[#D4AF37] focus:outline-none">
+                                    <option value="active" {{ user.isActive ? 'selected' : '' }}>Active</option>
+                                    <option value="inactive" {{ not user.isActive ? 'selected' : '' }}>Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                <!-- Permissions Grid -->
+                <h4 class="font-bold text-[#D4AF37] mb-4">Specific Permissions</h4>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" checked class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">Manage Users</p>
+                                <p class="text-gray-400 text-sm">Add, edit, and remove user accounts</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" checked class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">Edit Tournaments</p>
+                                <p class="text-gray-400 text-sm">Create and modify tournament settings</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" checked class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">View Analytics</p>
+                                <p class="text-gray-400 text-sm">Access platform statistics and reports</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" checked class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">System Settings</p>
+                                <p class="text-gray-400 text-sm">Modify platform configuration</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" checked class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">Moderate Content</p>
+                                <p class="text-gray-400 text-sm">Remove or flag inappropriate content</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">View User Logs</p>
+                                <p class="text-gray-400 text-sm">Access detailed user activity logs</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" checked class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">Manage Payouts</p>
+                                <p class="text-gray-400 text-sm">Process prize distributions</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 cursor-pointer p-3 hover:bg-[#1a1a24] rounded transition">
+                            <input type="checkbox" class="w-5 h-5 accent-[#D4AF37]">
+                            <div>
+                                <p class="font-bold">Export Data</p>
+                                <p class="text-gray-400 text-sm">Download platform data exports</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                    <div class="mt-8 flex gap-4">
+                        <button type="submit" class="flex-1 px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">Save Permissions</button>
+                        <button type="button" onclick="window.location.reload()" class="flex-1 px-4 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded hover:border-[#D4AF37] transition font-bold">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Activity Tab -->
+        <div id="activity" class="tab-content hidden">
+            <div class="border border-[#D4AF37]/20 rounded-lg bg-[#12121a] overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-[#1a1a24] border-b border-[#D4AF37]/20">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-[#D4AF37] font-bold">Date & Time</th>
+                            <th class="px-6 py-4 text-left text-[#D4AF37] font-bold">Action</th>
+                            <th class="px-6 py-4 text-left text-[#D4AF37] font-bold">IP Address</th>
+                            <th class="px-6 py-4 text-left text-[#D4AF37] font-bold">Device</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#D4AF37]/20">
+                        <tr class="hover:bg-[#1a1a24] transition">
+                            <td class="px-6 py-4">Feb 3, 2026 - 10:35 AM</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded text-sm">Login</span></td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">192.168.1.1</td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">Windows - Chrome</td>
+                        </tr>
+                        <tr class="hover:bg-[#1a1a24] transition">
+                            <td class="px-6 py-4">Feb 2, 2026 - 3:22 PM</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-green-500/20 text-green-400 rounded text-sm">Profile Updated</span></td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">192.168.1.1</td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">Windows - Chrome</td>
+                        </tr>
+                        <tr class="hover:bg-[#1a1a24] transition">
+                            <td class="px-6 py-4">Feb 1, 2026 - 8:15 PM</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded text-sm">User Suspended</span></td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">192.168.1.2</td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">Windows - Firefox</td>
+                        </tr>
+                        <tr class="hover:bg-[#1a1a24] transition">
+                            <td class="px-6 py-4">Jan 30, 2026 - 2:45 PM</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded text-sm">Password Changed</span></td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">192.168.1.1</td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">Windows - Chrome</td>
+                        </tr>
+                        <tr class="hover:bg-[#1a1a24] transition">
+                            <td class="px-6 py-4">Jan 25, 2026 - 11:20 AM</td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded text-sm">Login</span></td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">192.168.1.3</td>
+                            <td class="px-6 py-4 text-gray-400 text-sm">Mac OS - Safari</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% if app.user and app.user.id == user.id %}
+    <div id="face-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden">
+        <div class="bg-[#12121a] border border-[#D4AF37]/30 rounded-lg p-6 w-full max-w-lg">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-[#D4AF37]">Register Face</h3>
+                <button id="close-face-modal" type="button" class="text-gray-400 hover:text-[#D4AF37]">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <div class="relative bg-black rounded-lg overflow-hidden h-64 flex items-center justify-center">
+                    <video id="face-video" autoplay playsinline class="w-full h-full object-cover"></video>
+                    <canvas id="face-canvas" class="hidden"></canvas>
+                    <img id="face-preview" alt="Face preview" class="hidden w-full h-full object-cover">
+                    <div id="face-loading" class="hidden absolute inset-0 flex items-center justify-center bg-black/60">
+                        <div class="h-10 w-10 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button id="capture-face" type="button" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F] transition font-bold">Capture</button>
+                    <button id="confirm-face" type="button" class="px-4 py-2 bg-transparent border border-[#D4AF37]/40 text-[#D4AF37] rounded hover:bg-[#1a1a24] transition font-bold">Save</button>
+                </div>
+                <p class="text-xs text-gray-400">Ensure your face is well lit and clearly visible.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <script src="{{ asset('assets/main.js') }}"></script>
+    <script>
+        function switchTab(id) {
+            var contents = document.querySelectorAll('.tab-content');
+            contents.forEach(function (el) {
+                el.classList.add('hidden');
+            });
+            var buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(function (btn) {
+                btn.classList.remove('border-[#D4AF37]', 'text-[#D4AF37]');
+                btn.classList.add('border-transparent', 'text-gray-400');
+            });
+            var active = document.getElementById(id);
+            if (active) {
+                active.classList.remove('hidden');
+            }
+            var button = Array.prototype.find.call(buttons, function (b) {
+                return b.getAttribute('onclick') === "switchTab('" + id + "')";
+            });
+            if (button) {
+                button.classList.add('border-[#D4AF37]', 'text-[#D4AF37]');
+                button.classList.remove('border-transparent', 'text-gray-400');
+            }
+        }
+
+        function showNotification(message, type) {
+            var colorClasses = type === 'info'
+                ? 'bg-blue-500/20 text-blue-400 border-blue-500/20'
+                : type === 'error'
+                    ? 'bg-red-500/20 text-red-400 border-red-500/20'
+                    : 'bg-green-500/20 text-green-400 border-green-500/20';
+            var container = document.createElement('div');
+            container.className = 'fixed top-4 right-4 z-50';
+            var alert = document.createElement('div');
+            alert.className = 'px-4 py-3 rounded-lg border ' + colorClasses;
+            alert.textContent = message;
+            container.appendChild(alert);
+            document.body.appendChild(container);
+            setTimeout(function () {
+                container.remove();
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var verifyForm = document.getElementById('verifyRoleForm');
+            if (verifyForm) {
+                var verifyButton = document.getElementById('verifyButton');
+                verifyForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    if (verifyButton) {
+                        verifyButton.disabled = true;
+                        var oldText = verifyButton.textContent;
+                        verifyButton.textContent = 'Verifying...';
+                    }
+                    var verifyPill = document.getElementById('verifyPill');
+                    var verifyMeta = document.getElementById('verifyMeta');
+                    var fd = new FormData(verifyForm);
+                    try {
+                        var res = await fetch(verifyForm.action, {
+                            method: 'POST',
+                            body: fd,
+                            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                        });
+                        var data = null;
+                        try { data = await res.json(); } catch (_) {}
+                        if (data && data.success) {
+                            if (verifyPill) {
+                                verifyPill.textContent = 'Verified';
+                                verifyPill.className = 'px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm';
+                            }
+                            if (verifyMeta) {
+                                verifyMeta.className = 'text-sm text-gray-400';
+                                verifyMeta.textContent = (data.badge || '') + (data.timestamp ? (' • ' + data.timestamp) : '');
+                            }
+                            var vt = document.getElementById('verifyTrace');
+                            if (vt) {
+                                vt.classList.add('hidden');
+                                var pre = vt.querySelector('pre');
+                                if (pre) { pre.textContent = ''; }
+                            }
+                        } else {
+                            var msg = (data && data.message) ? data.message : 'Verification failed';
+                            showNotification(msg, 'error');
+                            var vt = document.getElementById('verifyTrace');
+                            if (vt) {
+                                var pre = vt.querySelector('pre');
+                                if (pre) {
+                                    pre.textContent = (data && data.trace) ? JSON.stringify(data.trace, null, 2) : '';
+                                }
+                                vt.classList.toggle('hidden', !(data && data.trace));
+                            }
+                        }
+                    } catch (err) {
+                        showNotification('Processing error', 'error');
+                    } finally {
+                        if (verifyButton) {
+                            verifyButton.disabled = false;
+                            verifyButton.textContent = oldText;
+                        }
+                    }
+                });
+            }
+            var openButton = document.getElementById('open-face-modal');
+            var modal = document.getElementById('face-modal');
+            if (!openButton || !modal) {
+                return;
+            }
+
+            var closeButton = document.getElementById('close-face-modal');
+            var video = document.getElementById('face-video');
+            var canvas = document.getElementById('face-canvas');
+            var preview = document.getElementById('face-preview');
+            var captureButton = document.getElementById('capture-face');
+            var confirmButton = document.getElementById('confirm-face');
+            var loading = document.getElementById('face-loading');
+            var statusMessage = document.getElementById('face-status-message');
+            var stream = null;
+            var capturedImage = null;
+
+            function openModal() {
+                modal.classList.remove('hidden');
+                capturedImage = null;
+                preview.classList.add('hidden');
+                video.classList.remove('hidden');
+                loading.classList.add('hidden');
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    if (statusMessage) {
+                        statusMessage.textContent = 'Camera not supported in this browser.';
+                        statusMessage.className = 'text-sm text-red-400';
+                    }
+                    return;
+                }
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function (mediaStream) {
+                        stream = mediaStream;
+                        video.srcObject = mediaStream;
+                    })
+                    .catch(function () {
+                        if (statusMessage) {
+                            statusMessage.textContent = 'Unable to access camera.';
+                            statusMessage.className = 'text-sm text-red-400';
+                        }
+                    });
+            }
+
+            function closeModal() {
+                modal.classList.add('hidden');
+                if (stream) {
+                    stream.getTracks().forEach(function (track) {
+                        track.stop();
+                    });
+                    stream = null;
+                }
+            }
+
+            function captureFrame() {
+                if (!video || video.readyState < 2) {
+                    return;
+                }
+                var width = video.videoWidth;
+                var height = video.videoHeight;
+                if (!width || !height) {
+                    return;
+                }
+                canvas.width = width;
+                canvas.height = height;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, width, height);
+                capturedImage = canvas.toDataURL('image/jpeg', 0.9);
+                preview.src = capturedImage;
+                preview.classList.remove('hidden');
+                video.classList.add('hidden');
+            }
+
+            function submitFace() {
+                if (!capturedImage) {
+                    if (statusMessage) {
+                        statusMessage.textContent = 'Capture an image before saving.';
+                        statusMessage.className = 'text-sm text-yellow-400';
+                    }
+                    return;
+                }
+                loading.classList.remove('hidden');
+                fetch('{{ path('profile_face_register') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ image: capturedImage })
+                })
+                    .then(function (response) {
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        loading.classList.add('hidden');
+                        if (data && data.success) {
+                            if (statusMessage) {
+                                statusMessage.textContent = 'Face registered successfully.';
+                                statusMessage.className = 'text-sm text-green-400';
+                            }
+                            closeModal();
+                            window.location.reload();
+                        } else {
+                            if (statusMessage) {
+                                statusMessage.textContent = data && data.message ? data.message : 'Unable to register face.';
+                                statusMessage.className = 'text-sm text-red-400';
+                            }
+                        }
+                    })
+                    .catch(function () {
+                        loading.classList.add('hidden');
+                        if (statusMessage) {
+                            statusMessage.textContent = 'Error communicating with server.';
+                            statusMessage.className = 'text-sm text-red-400';
+                        }
+                    });
+            }
+
+            openButton.addEventListener('click', openModal);
+            closeButton.addEventListener('click', closeModal);
+            captureButton.addEventListener('click', captureFrame);
+            confirmButton.addEventListener('click', submitFace);
+            modal.addEventListener('click', function (event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

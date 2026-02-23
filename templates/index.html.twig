@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tournaments - CarthageGG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('assets/styles/styles.css') }}" />
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-[#0a0a0f]/95 backdrop-blur-sm">
+        <div class="w-full px-4">
+            <div class="flex h-16 items-center justify-between">
+                <a href="{{ path('app_index') }}" class="flex items-center space-x-2 flex-shrink-0">
+                    <img src="{{ asset('assets/images/zz.png') }}" alt="CarthageGG Logo" class="h-14 w-14 rounded-lg shadow-lg object-cover">
+                    <span class="text-2xl font-bold text-[#D4AF37]">Carthage</span>
+                    <span class="text-2xl font-bold text-white">GG</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-1 flex-1 justify-center ml-8">
+                    <a href="{{ path('app_tournaments') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Tournaments</a>
+                    <a href="{{ path('app_teams') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Teams</a>
+                    <a href="{{ path('app_matches') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Matches</a>
+                     <a href="{{ path('app_store') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Store</a>
+                    <a href="{{ path('app_games') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Games</a>
+                    <a href="{{ path('app_news') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">News</a>
+                    <a href="{{ path('app_streams_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Streams</a>
+                </div>
+              <div class="flex items-center space-x-3">
+                     {% if app.user %}
+                    <a href="{{ path('app_profile_edit', {'id': app.user.id}) }}" class="text-[#e4e4e7] hover:text-[#D4AF37] transition font-bold flex items-center gap-2">
+                        {% if app.user.avatar %}
+                            <img src="{{ asset(app.user.avatar) }}" alt="Avatar" class="w-8 h-8 rounded-full object-cover border border-[#D4AF37]/50">
+                        {% else %}
+                            <div class="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37]">
+                                {{ app.user.firstName ? app.user.firstName|first|upper : app.user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                        {{ app.user.firstName ? app.user.firstName : app.user.username }}
+                    </a>
+                {% endif %}
+                {% if app.user is defined and app.user %}
+                    <a href="{{ path('app_logout') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg hover:bg-[#B8941F] transition">Logout</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg hover:bg-[#B8941F] transition">Login</a>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden border-b border-[#D4AF37]/20 bg-gradient-to-b from-[#0a0a0f] via-[#12121a] to-[#0a0a0f]">
+        <div class="container relative mx-auto px-4 py-24">
+            <div class="mx-auto max-w-4xl text-center">
+                <div class="mb-6 inline-block px-4 py-2 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/30">
+                    Tunisia's Premier Esports Platform
+                </div>
+                <h1 class="mb-6 text-5xl md:text-6xl font-bold">
+                    <span class="bg-gradient-to-r from-[#D4AF37] via-[#F4D03F] to-[#D4AF37] bg-clip-text text-transparent">
+                        Compete. Conquer. Claim Glory.
+                    </span>
+                </h1>
+                <p class="mb-8 text-xl text-gray-400">
+                    Join the ultimate competitive gaming platform inspired by the legendary legacy of Carthage
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="register.html" class="inline-flex items-center px-6 py-3 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] font-medium hover:opacity-90 transition-opacity">
+                        <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        Start Competing
+                    </a>
+                    <a href="tournaments.html" class="inline-flex items-center px-6 py-3 rounded-md border-2 border-[#D4AF37] text-[#D4AF37] font-medium hover:bg-[#D4AF37]/10 transition-colors">
+                        Browse Tournaments
+                    </a>
+                </div>
+
+                <!-- Stats -->
+                <div class="mt-16 grid grid-cols-2 gap-8 md:grid-cols-4">
+                    <div>
+                        <div class="text-3xl font-bold text-[#D4AF37]">2,500+</div>
+                        <div class="text-sm text-gray-400">Active Players</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-[#D4AF37]">150+</div>
+                        <div class="text-sm text-gray-400">Tournaments</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-[#D4AF37]">$500K+</div>
+                        <div class="text-sm text-gray-400">Prize Pool</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-[#D4AF37]">80+</div>
+                        <div class="text-sm text-gray-400">Teams</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#D4AF37]/20 bg-[#0a0a0f] mt-16">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-[#D4AF37] mb-4">CarthageGG</h3>
+                    <p class="text-gray-400 text-sm">Tunisia's premier esports platform</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Platform</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="tournaments.html" class="hover:text-[#D4AF37] transition-colors">Tournaments</a></li>
+                        <li><a href="teams.html" class="hover:text-[#D4AF37] transition-colors">Teams</a></li>
+                        <li><a href="matches.html" class="hover:text-[#D4AF37] transition-colors">Matches</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Compete</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="leaderboard.html" class="hover:text-[#D4AF37] transition-colors">Leaderboard</a></li>
+                        <li><a href="register.html" class="hover:text-[#D4AF37] transition-colors">Register</a></li>
+                        <li><a href="support.html" class="hover:text-[#D4AF37] transition-colors">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Follow</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37] transition-colors">Twitter</a>
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37] transition-colors">Discord</a>
+                        <a href="#" class="text-gray-400 hover:text-[#D4AF37] transition-colors">YouTube</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-[#D4AF37]/20 pt-8 text-center text-gray-400 text-sm">
+                <p>&copy; 2026 CarthageGG. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
+  

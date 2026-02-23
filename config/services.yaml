@@ -1,0 +1,65 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    face_recognition.api_base_url: '%env(FACE_API_BASE_URL)%'
+    role_verification_threshold: 0.32
+    role_verification_require_both: false
+    role_verification_corr_threshold: 0.78
+    role_verification_pre_crop: true
+    role_verification_hist_threshold: 0.6
+    role_verification_edge_threshold: 0.65
+    role_verification_name_similarity_threshold: 0.5
+    role_verification_skip_name_check_if_no_ocr: false
+    role_verification_strict_names: false
+    role_verification_require_role_match: true
+    role_verification_ocr_provider: 'optiic'
+    role_verification_ocr_endpoint: 'https://api.optiic.dev/process'
+    role_verification_ocr_api_key: '%env(resolve:ROLE_VERIF_OCR_API_KEY)%'
+    recaptcha_secret_key: '%env(RECAPTCHA_SECRET_KEY)%'
+    recaptcha_site_key: '%env(RECAPTCHA_SITE_KEY)%'
+    stripe.secret_key: '%env(STRIPE_SECRET_KEY)%'
+    stripe.success_url: '%env(STRIPE_SUCCESS_URL)%'
+    stripe.cancel_url: '%env(STRIPE_CANCEL_URL)%'
+    n8n.receipt_webhook_url: '%env(N8N_RECEIPT_WEBHOOK_URL)%'
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    App\Service\FaceRecognitionService:
+        arguments:
+            $faceRecognitionApiBaseUrl: '%face_recognition.api_base_url%'
+
+    App\Service\FinalEnhancedPDFGeneratorService:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    App\Controller\CommentaireController:
+        arguments:
+            $recaptchaSecretKey: '%recaptcha_secret_key%'
+
+    App\Controller\NewsController:
+        arguments:
+            $recaptchaSiteKey: '%recaptcha_site_key%'
+    App\Service\StreamStatusService:
+        arguments:
+            $twitchClientId: '%env(TWITCH_CLIENT_ID)%'
+            $twitchAccessToken: '%env(TWITCH_ACCESS_TOKEN)%'
+            $youtubeApiKey: '%env(YOUTUBE_API_KEY)%'
+
+  
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones

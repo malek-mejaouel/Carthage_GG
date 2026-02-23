@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ stream.title }} • Stream{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-[#0a0a0f] text-[#e4e4e7]">
+  <div class="container mx-auto px-4 pt-6 max-w-7xl">
+    <a href="{{ path('app_streams_index') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M12.707 14.707a1 1 0 01-1.414 0L6.586 10l4.707-4.707a1 1 0 011.414 1.414L9.414 10l3.293 3.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+      </svg>
+      Back to Streams
+    </a>
+  </div>
+
+  <div class="container mx-auto px-4 py-12 max-w-7xl">
+    <div class="bg-[#12121a] border border-[#D4AF37]/20 rounded-2xl overflow-hidden shadow-lg">
+      <div class="p-6 flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl md:text-4xl font-extrabold">{{ stream.title }}</h1>
+          <p class="text-base text-gray-400 mt-1">{{ stream.platform|capitalize }} • {{ stream.isLive ? 'LIVE' : 'OFFLINE' }}</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-base text-[#D4AF37]">{{ stream.viewerCount }} viewers</span>
+          {% if stream.platform == 'twitch' and stream.channelName %}
+            <a href="https://www.twitch.tv/{{ stream.channelName }}" target="_blank" class="px-4 py-2 rounded-md bg-[#D4AF37]/10 text-[#D4AF37]">Open</a>
+          {% elseif stream.platform == 'youtube' and stream.youtubeVideoId %}
+            <a href="https://www.youtube.com/watch?v={{ stream.youtubeVideoId }}" target="_blank" class="px-4 py-2 rounded-md bg-[#D4AF37]/10 text-[#D4AF37]">Open</a>
+          {% endif %}
+          <button id="toggleChat" class="px-4 py-2 rounded-md bg-[#D4AF37] text-[#0a0a0f]">Toggle Chat</button>
+        </div>
+      </div>
+      <div class="bg-[#0f0f16]">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-0">
+          <div id="playerPane" class="col-span-1 lg:col-span-9">
+            {% if stream.platform == 'twitch' and stream.channelName %}
+              {% set parents = twitch_parents|join('&parent=') %}
+              <iframe
+                src="https://player.twitch.tv/?channel={{ stream.channelName }}&muted=false&parent={{ parents }}"
+                height="720" width="100%" frameborder="0" scrolling="no" allowfullscreen="true">
+              </iframe>
+            {% elseif stream.platform == 'youtube' and stream.youtubeVideoId %}
+              <iframe
+                width="100%" height="720"
+                src="https://www.youtube.com/embed/{{ stream.youtubeVideoId }}?modestbranding=1&color=white"
+                title="YouTube video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+              </iframe>
+            {% else %}
+              <div class="p-6 text-gray-400">No embed available for this stream.</div>
+            {% endif %}
+          </div>
+          <div class="lg:col-span-3 border-l border-[#D4AF37]/10 hidden lg:block" id="chatPane">
+            {% if stream.platform == 'twitch' and stream.channelName %}
+              {% set parents = twitch_parents|join('&parent=') %}
+              <iframe
+                src="https://www.twitch.tv/embed/{{ stream.channelName }}/chat?parent={{ parents }}"
+                width="100%" height="720" frameborder="0" scrolling="no">
+              </iframe>
+            {% elseif stream.platform == 'youtube' and stream.youtubeVideoId %}
+              <iframe
+                src="https://www.youtube.com/live_chat?v={{ stream.youtubeVideoId }}&embed_domain={{ host }}"
+                width="100%" height="720" frameborder="0">
+              </iframe>
+            {% else %}
+              <div class="h-[720px] flex items-center justify-center text-gray-500">No chat available</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% if stream.description %}
+        <div class="p-6 text-gray-300 border-t border-[#D4AF37]/20 text-lg leading-relaxed">
+          {{ stream.description }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var btn = document.getElementById('toggleChat');
+    var pane = document.getElementById('chatPane');
+    var player = document.getElementById('playerPane');
+    if (btn && pane && player) {
+      btn.addEventListener('click', function() {
+        var isHiddenLg = pane.classList.contains('lg:hidden');
+        if (isHiddenLg) {
+          pane.classList.remove('lg:hidden');
+          pane.classList.add('lg:block');
+          player.classList.remove('lg:col-span-12');
+          player.classList.add('lg:col-span-9');
+        } else {
+          pane.classList.remove('lg:block');
+          pane.classList.add('lg:hidden');
+          player.classList.remove('lg:col-span-9');
+          player.classList.add('lg:col-span-12');
+        }
+      });
+    }
+  });
+  </script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+{% block title %}Streams{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-[#0a0a0f] text-[#e4e4e7]">
+  
+
+  <div class="container mx-auto px-4 py-12 max-w-5xl">
+    <h1 class="text-4xl md:text-5xl font-extrabold text-[#D4AF37] mb-8">Available Streams</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      {% for s in live %}
+        <div class="group bg-[#12121a] border border-[#D4AF37]/20 rounded-2xl overflow-hidden hover:border-[#D4AF37]/40 shadow-lg">
+          <div class="h-60 md:h-64 bg-[#0f0f16] relative">
+            {% if s.thumbnail %}
+              {% set thumb = s.thumbnail %}
+              {% if thumb|slice(0,4) == 'http' %}
+                {% set src = thumb %}
+              {% elseif thumb|slice(0,1) == '/' %}
+                {% set src = asset(thumb|slice(1)) %}
+              {% else %}
+                {% set src = asset('uploads/streams/' ~ thumb) %}
+              {% endif %}
+              <img src="{{ src }}" alt="{{ s.title }}" class="w-full h-full object-cover group-hover:scale-[1.02] transition" />
+            {% else %}
+              <div class="w-full h-full flex items-center justify-center text-gray-500">No thumbnail</div>
+            {% endif %}
+            <span class="absolute top-3 left-3 px-3 py-1.5 text-sm rounded-full bg-[#DC2626] text-white shadow">LIVE</span>
+          </div>
+          <div class="p-5">
+            <p class="font-semibold text-base md:text-lg">{{ s.title }}</p>
+            <p class="text-sm text-gray-400 mt-1">{{ s.platform|capitalize }} • {{ s.viewerCount }} watching</p>
+            <div class="mt-4 flex gap-3">
+              <a href="{{ path('app_streams_show', { id: s.streamId }) }}" class="px-3.5 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-md hover:bg-[#B8941F]">Join</a>
+              {% if s.platform == 'twitch' and s.channelName %}
+                <a href="https://www.twitch.tv/{{ s.channelName }}" target="_blank" class="px-3.5 py-2 bg-[#D4AF37]/10 text-[#D4AF37] rounded-md">Open</a>
+              {% elseif s.platform == 'youtube' and s.youtubeVideoId %}
+                <a href="https://www.youtube.com/watch?v={{ s.youtubeVideoId }}" target="_blank" class="px-3.5 py-2 bg-[#D4AF37]/10 text-[#D4AF37] rounded-md">Open</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <p class="text-gray-400">No streams are live.</p>
+      {% endfor %}
+    </div>
+
+    <h2 class="text-3xl font-bold text-[#D4AF37] mt-12 mb-6">All Streams</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      {% for s in streams %}
+        <div class="group bg-[#12121a] border border-[#D4AF37]/20 rounded-2xl overflow-hidden hover:border-[#D4AF37]/40 shadow">
+          <div class="h-56 md:h-60 bg-[#0f0f16] relative">
+            {% if s.thumbnail %}
+              {% set thumb = s.thumbnail %}
+              {% if thumb|slice(0,4) == 'http' %}
+                {% set src = thumb %}
+              {% elseif thumb|slice(0,1) == '/' %}
+                {% set src = asset(thumb|slice(1)) %}
+              {% else %}
+                {% set src = asset('uploads/streams/' ~ thumb) %}
+              {% endif %}
+              <img src="{{ src }}" alt="{{ s.title }}" class="w-full h-full object-cover group-hover:scale-[1.02] transition" />
+            {% else %}
+              <div class="w-full h-full flex items-center justify-center text-gray-500">No thumbnail</div>
+            {% endif %}
+            {% if s.isLive %}
+              <span class="absolute top-3 left-3 px-3 py-1.5 text-sm rounded-full bg-[#DC2626] text-white shadow">LIVE</span>
+            {% endif %}
+          </div>
+          <div class="p-5">
+            <p class="font-semibold text-base md:text-lg">{{ s.title }}</p>
+            <p class="text-sm text-gray-400 mt-1">{{ s.platform|capitalize }} • {{ s.isLive ? 'LIVE' : 'OFFLINE' }}</p>
+            <div class="mt-4">
+              {% if s.isLive %}
+                <a href="{{ path('app_streams_show', { id: s.streamId }) }}" class="px-3.5 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-md hover:bg-[#B8941F]">Join</a>
+              {% else %}
+                <a href="{{ path('app_streams_show', { id: s.streamId }) }}" class="px-3.5 py-2 bg-[#D4AF37]/10 text-[#D4AF37] rounded-md">View</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <p class="text-gray-400">No streams yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

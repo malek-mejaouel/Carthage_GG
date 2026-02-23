@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+{% block title %}Products | Store Admin{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-[#D4AF37]">Products</h1>
+        <div class="flex items-center gap-2">
+            <a href="{{ path('app_admin_dash_products') }}" class="px-4 py-2 border border-[#D4AF37]/40 text-[#D4AF37] rounded hover:bg-[#D4AF37]/10">Products Dashboard</a>
+            <a href="{{ path('admin_products_new') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded hover:bg-[#B8941F]">New Product</a>
+        </div>
+    </div>
+    <div class="overflow-x-auto border border-[#D4AF37]/20 rounded-lg">
+        <table class="min-w-full bg-[#12121a]">
+            <thead>
+                <tr class="text-left text-gray-400">
+                    <th class="p-3">ID</th>
+                    <th class="p-3">Name</th>
+                    <th class="p-3">Category</th>
+                    <th class="p-3">Price</th>
+                    <th class="p-3">Stock</th>
+                    <th class="p-3">Status</th>
+                    <th class="p-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-[#D4AF37]/20">
+                {% for p in products %}
+                    <tr class="text-sm">
+                        <td class="p-3">{{ p.id }}</td>
+                        <td class="p-3 font-semibold">
+                            {{ p.name }}
+                            {% if p.isFeatured %}
+                                <span class="ml-2 px-2 py-0.5 text-xs bg-[#D4AF37]/20 text-[#D4AF37] rounded">Featured</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-3 text-gray-400">{{ p.category ? p.category.name : '—' }}</td>
+                        <td class="p-3">
+                            {% if p.discount > 0 %}
+                                <span class="text-gray-500 line-through">${{ (p.price + 0)|number_format(2) }}</span>
+                                <span class="ml-2 text-green-400 font-semibold">${{ p.finalPrice|number_format(2) }}</span>
+                            {% else %}
+                                <span class="text-[#D4AF37]">${{ (p.price + 0)|number_format(2) }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-3">{{ p.stock }}</td>
+                        <td class="p-3">{{ p.status }}</td>
+                        <td class="p-3">
+                            <a href="{{ path('admin_products_edit', {id: p.id}) }}" class="text-[#D4AF37] hover:underline">Edit</a>
+                            <form action="{{ path('admin_products_delete', {id: p.id}) }}" method="post" class="inline ml-2" onsubmit="return confirm('Delete this product?')">
+                                <button class="text-red-400 hover:underline">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="7" class="p-6 text-center text-gray-400">No products</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

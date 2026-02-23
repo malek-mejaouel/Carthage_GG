@@ -10,7 +10,7 @@
 </head>
 <body class="bg-[#0a0a0f] text-[#e4e4e7] font-sans min-h-screen">
     <!-- Top navigation copied from index layout (logo left, News center, Dashboard right) -->
-   <nav class="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-[#0a0a0f]/95 backdrop-blur-sm">
+  <nav class="sticky top-0 z-50 border-b border-[#D4AF37]/20 bg-[#0a0a0f]/95 backdrop-blur-sm">
         <div class="w-full px-4">
             <div class="flex h-16 items-center justify-between">
                 <a href="{{ path('app_index') }}" class="flex items-center space-x-2 flex-shrink-0">
@@ -22,8 +22,10 @@
                     <a href="{{ path('app_tournaments') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Tournaments</a>
                     <a href="{{ path('app_teams') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Teams</a>
                     <a href="{{ path('app_matches') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Matches</a>
+                     <a href="{{ path('app_store') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Store</a>
                     <a href="{{ path('app_games') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Games</a>
                     <a href="{{ path('app_news') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">News</a>
+                    <a href="{{ path('app_streams_index') }}" class="px-4 py-2 rounded-md text-gray-300 hover:bg-[#1e1e2e]">Streams</a>
                 </div>
               <div class="flex items-center space-x-3">
                      {% if app.user %}

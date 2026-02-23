@@ -20,7 +20,7 @@ final class TournamentController extends AbstractController
     ) {
     }
 
-    #[Route('', name: 'tournament_index', methods: ['GET'])]
+    #[Route('/list', name: 'tournament_index', methods: ['GET'])]
     public function index(Request $request): Response
     {
         $page = $request->query->getInt('page', 1);

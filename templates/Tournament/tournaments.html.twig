@@ -78,7 +78,7 @@
                             {% endif %}
                         </div>
                         <div class="mt-2">
-                            <a href="{{ path('app_tournament_view', { id: tournament.tournamentId }) }}" class="inline-block px-4 py-2 rounded-md border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 text-sm">View Details</a>
+                            <a href="{{ path('tournament_show', { id: tournament.tournamentId }) }}" class="inline-block px-4 py-2 rounded-md border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 text-sm">View Details</a>
                         </div>
                     </div>
                 {% endfor %}

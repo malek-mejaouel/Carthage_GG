@@ -14,7 +14,7 @@
     <!-- Page Header -->
     <div class="container mx-auto px-4 py-12">
         <div class="flex items-center space-x-4 mb-8">
-            <a href="{{ path('app_admin_dash_tournament') }}" class="text-gray-400 hover:text-white">← Back to Tournaments</a>
+            <a href="{{ path('app_tournaments') }}" class="text-gray-400 hover:text-white">← Back to Tournaments</a>
         </div>
     </div>
 
@@ -50,7 +50,7 @@
                         </div>
                     </div>
 
-                    <!-- Actions -->
+                    {% if is_granted('ROLE_ADMIN') %}
                     <div class="flex gap-3">
                         <a href="{{ path('tournament_edit', {id: tournament.getTournamentId()}) }}" class="flex-1 px-4 py-2 rounded-lg bg-[#D4AF37]/10 text-[#D4AF37] hover:bg-[#D4AF37]/20 font-medium text-center">Edit Tournament</a>
                         <form method="post" action="{{ path('tournament_delete', {id: tournament.getTournamentId()}) }}" style="flex: 1" onsubmit="return confirm('Delete this tournament? This action cannot be undone.');">
@@ -58,6 +58,7 @@
                             <button type="submit" class="w-full px-4 py-2 rounded-lg border border-red-600 text-red-600 hover:bg-red-600/10 font-medium">Delete</button>
                         </form>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

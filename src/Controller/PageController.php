@@ -66,14 +66,22 @@ class PageController extends AbstractController
     }
 
     #[Route('/tournaments', name: 'app_tournaments')]
-    public function tournaments(TournamentRepository $tournamentRepository): Response
+    public function tournaments(Request $request, TournamentRepository $tournamentRepository): Response
     {
+        $page = $request->query->getInt('page', 1);
+        $perPage = 9;
+        $tournaments = $tournamentRepository->findTournamentsPaginated($page, $perPage);
+        $total = $tournamentRepository->getTotalCount();
         $featuredTournaments = $tournamentRepository->findOngoingTournaments();
         if (count($featuredTournaments) === 0) {
             $featuredTournaments = $tournamentRepository->findUpcomingTournaments(6);
         }
         return $this->render('Tournament/tournaments.html.twig', [
+            'tournaments' => $tournaments,
             'featured_tournaments' => $featuredTournaments,
+            'total' => $total,
+            'page' => $page,
+            'perPage' => $perPage,
         ]);
     }
 

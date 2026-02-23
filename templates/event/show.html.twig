@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Event - CarthageGG{% endblock %}
+
+{% block content %}
+  <div class="mb-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">{{ event.title }}</h1>
+    <div>
+      <a href="{{ path('event_index') }}" class="px-3 py-2 ml-2 border rounded">Back</a>
+    </div>
+  </div>
+
+  <div class="space-y-4 max-w-2xl">
+    <div>
+      <strong>Start:</strong> {{ event.startAt ? event.startAt|date('Y-m-d H:i') : '' }}
+    </div>
+    <div>
+      <strong>End:</strong> {{ event.endAt ? event.endAt|date('Y-m-d H:i') : '' }}
+    </div>
+    <div>
+      <strong>Location:</strong> {{ event.location ? event.location.name : '—' }}
+    </div>
+    <div>
+      <strong>Address:</strong> {{ event.location and event.location.address ? event.location.address : '—' }}
+    </div>
+    <div>
+      <strong>Capacity:</strong> {{ event.location and event.location.capacity ? event.location.capacity : '—' }}
+    </div>
+    <div>
+      <strong>Reserved seats:</strong> {{ event.getReservedSeats() }} / {{ event.maxSeats }}
+    </div>
+
+    <div>
+      <div id="map" style="height:360px;" class="rounded border border-[#D4AF37]/20 mt-3"></div>
+    </div>
+  </div>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    (function(){
+      const defaultPos = [36.8065, 10.1815];
+      const map = L.map('map').setView(defaultPos, 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      {% if event.location and event.location.latitude and event.location.longitude %}
+        const lat = {{ event.location.latitude }};
+        const lng = {{ event.location.longitude }};
+        const marker = L.marker([lat, lng]).addTo(map);
+        map.setView([lat, lng], 14);
+        {% if event.location.address %}
+          marker.bindPopup(`{{ event.location.address | e('js') }}`);
+        {% endif %}
+      {% elseif event.location and event.location.address %}
+        // fallback: try to geocode client-side via photon
+        (async function(){
+          try {
+            const q = encodeURIComponent(`{{ event.location.address | e('js') }}`);
+            const res = await fetch('https://photon.komoot.io/api/?q=' + q + '&limit=1');
+            const obj = await res.json();
+            if (obj.features && obj.features.length) {
+              const p = obj.features[0];
+              const [lng, lat] = p.geometry.coordinates;
+              const marker = L.marker([lat, lng]).addTo(map);
+              map.setView([lat, lng], 14);
+              marker.bindPopup(`{{ event.location.address | e('js') }}`);
+            }
+          } catch (err) { console.warn(err); }
+        })();
+      {% endif %}
+    })();
+  </script>
+
+{% endblock %}

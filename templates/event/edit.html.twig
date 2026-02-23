@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Event - CarthageGG{% endblock %}
+
+{% block content %}
+  <h1 class="text-2xl font-bold mb-4">Edit Event</h1>
+  {% for label, messages in app.flashes %}
+    {% for msg in messages %}
+      <div class="text-red-400 mb-2">{{ msg }}</div>
+    {% endfor %}
+  {% endfor %}
+
+  <form method="post" action="{{ path('event_edit', {'id': event.id}) }}" class="space-y-4 max-w-lg">
+    <div>
+      <label class="block mb-1">Title</label>
+      <input class="w-full px-3 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded" type="text" name="title" value="{{ event.title }}">
+    </div>
+    <div>
+      <label class="block mb-1">Start (Y-m-d H:i)</label>
+      <input class="w-full px-3 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded" type="text" name="date" value="{{ event.startAt ? event.startAt|date('Y-m-d H:i') : '' }}">
+    </div>
+    <div>
+      <label class="block mb-1">End (Y-m-d H:i)</label>
+      <input class="w-full px-3 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded" type="text" name="end_at" value="{{ event.endAt ? event.endAt|date('Y-m-d H:i') : '' }}">
+    </div>
+    <div>
+      <label class="block mb-1">Location</label>
+      <select name="location" class="w-full px-3 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded">
+        <option value="">-- select (or pick on map) --</option>
+        {% for l in locations %}
+          <option value="{{ l.id }}" {% if event.location and event.location.id == l.id %}selected{% endif %}>{{ l.name }}</option>
+        {% endfor %}
+      </select>
+
+      <div class="mt-3">
+        <div class="block mb-1">Or pick a location on the map</div>
+        <!-- Leaflet + Photon (no API key required) -->
+        <input id="map-search" class="w-full px-3 py-2 mb-2 bg-[#12121a] border border-[#D4AF37]/20 rounded" placeholder="Search a place">
+        <div id="map" style="height:300px;" class="rounded border border-[#D4AF37]/20"></div>
+
+        <input type="hidden" name="location_latitude" id="location_latitude" value="{{ (event.location is defined and event.location) ? event.location.latitude : '' }}">
+        <input type="hidden" name="location_longitude" id="location_longitude" value="{{ (event.location is defined and event.location) ? event.location.longitude : '' }}">
+        <input type="hidden" name="location_address" id="location_address" value="{{ (event.location is defined and event.location) ? event.location.address : '' }}">
+        <input type="hidden" name="location_place_id" id="location_place_id" value="{{ (event.location is defined and event.location) ? event.location.placeId : '' }}">
+
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+        <script>
+          (function(){
+            const map = L.map('map').setView([36.8065, 10.1815], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              maxZoom: 19,
+              attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            let marker = null;
+            const latInput = document.getElementById('location_latitude');
+            const lngInput = document.getElementById('location_longitude');
+            const addrInput = document.getElementById('location_address');
+            const placeIdInput = document.getElementById('location_place_id');
+
+            // if event has lat/lng, center map and place marker
+            if (latInput.value && lngInput.value) {
+              const lat = parseFloat(latInput.value);
+              const lng = parseFloat(lngInput.value);
+              marker = L.marker([lat,lng]).addTo(map);
+              map.setView([lat,lng], 15);
+            }
+
+            map.on('click', async function(e){
+              const lat = e.latlng.lat;
+              const lng = e.latlng.lng;
+              if (!marker) marker = L.marker([lat,lng]).addTo(map);
+              else marker.setLatLng([lat,lng]);
+              latInput.value = lat;
+              lngInput.value = lng;
+              try {
+                const resp = await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+lat+'&lon='+lng, {headers:{'Accept':'application/json'}});
+                if (resp.ok) {
+                  const data = await resp.json();
+                  addrInput.value = data.display_name || '';
+                  if (data.osm_type && data.osm_id) placeIdInput.value = data.osm_type+':'+data.osm_id;
+                }
+              } catch (err) { console.warn(err); }
+            });
+
+            const searchInput = document.getElementById('map-search');
+            let debounce = null;
+            searchInput.addEventListener('input', function(){
+              clearTimeout(debounce);
+              debounce = setTimeout(async function(){
+                const q = searchInput.value.trim(); if (!q) return;
+                try {
+                  const res = await fetch('https://photon.komoot.io/api/?q='+encodeURIComponent(q)+'&limit=5');
+                  const obj = await res.json();
+                  if (obj.features && obj.features.length) {
+                    const p = obj.features[0];
+                    const [lng, lat] = p.geometry.coordinates;
+                    map.setView([lat,lng], 15);
+                    if (!marker) marker = L.marker([lat,lng]).addTo(map);
+                    else marker.setLatLng([lat,lng]);
+                    latInput.value = lat; lngInput.value = lng;
+                    addrInput.value = p.properties.label || p.properties.name || q;
+                    if (p.properties.osm_id) placeIdInput.value = (p.properties.osm_type?p.properties.osm_type:'osm')+':'+p.properties.osm_id;
+                  }
+                } catch (err) { console.warn(err); }
+              }, 300);
+            });
+          })();
+        </script>
+      </div>
+    </div>
+    <div>
+      <button class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded">Save</button>
+    </div>
+  </form>
+{% endblock %}

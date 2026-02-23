@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Location - CarthageGG{% endblock %}
+
+{% block content %}
+  <div class="mb-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">{{ location.name }}</h1>
+    <div>
+      <a href="{{ path('location_index') }}" class="px-3 py-2 ml-2 border rounded">Back</a>
+    </div>
+  </div>
+
+  <div class="space-y-4 max-w-2xl">
+    <div>
+      <strong>Address:</strong> {{ location.address ?: '—' }}
+    </div>
+    <div>
+      <strong>Capacity:</strong> {{ location.capacity ?: '—' }}
+    </div>
+    <div>
+      <strong>Coordinates:</strong>
+      {% if location.latitude and location.longitude %}
+        {{ location.latitude }}, {{ location.longitude }}
+      {% else %}
+        —
+      {% endif %}
+    </div>
+    <div>
+      <a href="{{ path('location_book', {'id': location.id}) }}" class="px-3 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded">Book</a>
+    </div>
+  </div>
+{% endblock %}

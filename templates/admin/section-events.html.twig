@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events | CarthageGG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ asset('assets/styles/admin.css') }}">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#0a0a0f] text-[#e4e4e7]">
+    {% include 'admin/_sidebar.html.twig' %}
+    <div class="lg:ml-64 flex flex-col min-h-screen">
+        <main class="flex-1 p-6">
+            <div class="container mx-auto px-6 py-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-2xl font-bold text-white">Events</h1>
+                    <a href="{{ path('app_admin_dashboard') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg font-bold hover:bg-[#B8941F] transition">Back to Dashboard</a>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="lg:col-span-2 bg-[#12121a] rounded-xl border border-[#D4AF37]/10 p-6">
+                        <h3 class="text-lg font-bold text-white mb-4">Timeline</h3>
+                        <div class="relative h-80">
+                            <canvas id="eventsTimeline"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 p-6">
+                        <h3 class="text-lg font-bold text-white mb-4">Capacity vs Seats</h3>
+                        <div class="relative h-64">
+                            <canvas id="capacityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-[#12121a] rounded-xl border border-[#D4AF37]/10 overflow-hidden">
+                    <div class="p-6 border-b border-[#D4AF37]/10 flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-white">All Events</h3>
+                        <div class="flex gap-2">
+                            <a href="{{ path('event_new') }}" class="px-4 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded-lg text-sm font-bold hover:bg-[#B8941F] transition">Add Event</a>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-gray-400">
+                            <thead class="bg-[#1a1a24] text-[#D4AF37] uppercase font-bold text-xs">
+                                <tr>
+                                    <th class="px-6 py-4">Title</th>
+                                    <th class="px-6 py-4">Start</th>
+                                    <th class="px-6 py-4">Location</th>
+                                    <th class="px-6 py-4">Seats Left</th>
+                                    <th class="px-6 py-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#D4AF37]/10">
+                                {% for e in events %}
+                                <tr class="table-row-hover transition">
+                                    <td class="px-6 py-4 font-medium text-white">{{ e.title }}</td>
+                                    <td class="px-6 py-4">{{ e.startAt ? e.startAt|date('Y-m-d H:i') : '' }}</td>
+                                    <td class="px-6 py-4">{{ e.location ? e.location.name : '' }}</td>
+                                    <td class="px-6 py-4">{{ e.availableSeats }}</td>
+                                    <td class="px-6 py-4">
+                                        <a href="{{ path('event_show', {'id': e.id}) }}" class="px-3 py-1 border border-[#D4AF37] text-[#D4AF37] rounded text-xs mr-2">View</a>
+                                        <a href="{{ path('event_edit', {'id': e.id}) }}" class="px-3 py-1 border border-[#D4AF37] text-[#D4AF37] rounded text-xs mr-2">Edit</a>
+                                        <a href="{{ path('event_delete', {'id': e.id}) }}" onclick="return confirm('Delete?')" class="px-3 py-1 border border-red-500 text-red-500 rounded text-xs">Delete</a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td class="px-6 py-4" colspan="5">No events</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        const tlCtx = document.getElementById('eventsTimeline');
+        new Chart(tlCtx, {
+            type: 'line',
+            data: {
+                labels: [{% for e in events %}'{{ e.startAt ? e.startAt|date('m/d') : '' }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                datasets: [{ label: 'Events', data: [{% for e in events %}{{ loop.index }}{% if not loop.last %}, {% endif %}{% endfor %}], borderColor: '#D4AF37', backgroundColor: 'rgba(212,175,55,0.1)' }]
+            },
+            options: { scales: { x: { ticks: { color: '#9CA3AF' } }, y: { ticks: { color: '#9CA3AF' } } } }
+        });
+        const capCtx = document.getElementById('capacityChart');
+        new Chart(capCtx, {
+            type: 'bar',
+            data: {
+                labels: [{% for e in events %}'{{ e.title|slice(0,10) }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                datasets: [
+                    { label: 'Max Seats', data: [{% for e in events %}{{ e.maxSeats }}{% if not loop.last %}, {% endif %}{% endfor %}], backgroundColor: 'rgba(180,148,31,0.6)' },
+                    { label: 'Available', data: [{% for e in events %}{{ e.availableSeats }}{% if not loop.last %}, {% endif %}{% endfor %}], backgroundColor: 'rgba(212,175,55,0.6)' }
+                ]
+            },
+            options: { plugins: { legend: { labels: { color: '#e4e4e7' } } }, scales: { x: { ticks: { color: '#9CA3AF' } }, y: { ticks: { color: '#9CA3AF' } } } }
+        });
+    </script>
+    <script src="{{ asset('assets/js/admin-dashboard.js') }}"></script>
+</body>
+</html>

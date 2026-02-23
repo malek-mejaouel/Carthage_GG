@@ -97,7 +97,112 @@
             </div>
         </div>
     </section>
+    <section class="container mx-auto px-4 py-12">
+        <div class="mb-6">
+            <h2 class="text-4xl font-bold mb-2">Events</h2>
+            <p class="text-gray-400">Discover upcoming events and meetups.</p>
+        </div>
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {% for e in events %}
+                <div class="border border-[#D4AF37]/10 rounded-lg bg-[#12121a] p-4 flex flex-col">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-lg font-bold">{{ e.title }}</h3>
+                        {% if e.startAt %}
+                            <span class="px-2 py-1 bg-[#0b0b10] rounded text-xs">{{ e.startAt|date('M d, Y H:i') }}</span>
+                        {% endif %}
+                    </div>
+                    {% if e.description %}
+                        <p class="text-sm text-gray-400 mt-2">{{ e.description|length > 140 ? e.description|slice(0,140) ~ '…' : e.description }}</p>
+                    {% endif %}
+                    <div class="mt-3 text-sm text-gray-300 flex flex-wrap gap-2 items-center">
+                        {% if e.location %}
+                            <div class="px-2 py-1 bg-[#0b0b10] rounded">Location: {{ e.location.name }}</div>
+                        {% endif %}
+                        <div class="px-2 py-1 bg-[#0b0b10] rounded">Seats left: {{ e.availableSeats }}</div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{{ path('event_show', {'id': e.id}) }}" class="px-3 py-2 rounded bg-transparent border border-[#2a2a34] text-sm hover:bg-[#1a1a24]">View</a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-span-full text-gray-400">No events</div>
+            {% endfor %}
+        </div>
+    </section>
+     <section class="container mx-auto px-4 py-12">
+        <div class="mb-6">
+            <h2 class="text-4xl font-bold mb-2">Locations</h2>
+            <p class="text-gray-400">Find a venue near you — search, filter and book.</p>
+        </div>
 
+        <!-- Search & Filters -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <div class="flex-1">
+                <input id="locationSearch" type="search" placeholder="Search locations or address..." class="w-full px-4 py-3 rounded bg-[#0b0b10] border border-[#2a2a34] text-gray-200 focus:outline-none" />
+            </div>
+            <div class="flex items-center gap-3">
+                <label class="text-sm text-gray-400">City:</label>
+                <select id="cityFilter" class="px-3 py-2 bg-[#0a0a0f] border border-[#2a2a34] rounded text-gray-200">
+                    <option value="all">All</option>
+                    <option value="Tunis">Tunis</option>
+                    <option value="Sousse">Sousse</option>
+                    <option value="Sfax">Sfax</option>
+                    <option value="Nabeul">Nabeul</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Locations Grid -->
+        <div id="locationsGrid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {# Example static cards — replace with dynamic `locations` variable if available #}
+            {% set sample_locations = [
+                {"id":1, "name":"Arena Tunis", "city":"Tunis", "addr":"Avenue Habib Bourguiba, Tunis", "lat":36.8065, "lng":10.1815, "featured":true, "status":"Open", "capacity":40, "pcs":20, "price":6, "amenities":["WiFi","Screens"]},
+                {"id":2, "name":"Sousse eArena", "city":"Sousse", "addr":"Corniche Sousse", "lat":35.8256, "lng":10.63699, "featured":false, "status":"Closed", "capacity":30, "pcs":15, "price":5, "amenities":["WiFi"]},
+                {"id":3, "name":"Sfax Gaming Hub", "city":"Sfax", "addr":"Rue de la Plage, Sfax", "lat":34.7406, "lng":10.7603, "featured":false, "status":"Open", "capacity":50, "pcs":25, "price":7, "amenities":["WiFi","Screens","Drinks"]}
+            ] %}
+
+            {% for loc in (locations is defined ? locations : sample_locations) %}
+                <div class="border border-[#D4AF37]/10 rounded-lg bg-[#12121a] p-4 flex flex-col">
+                    <div class="relative">
+                        <img src="{{ asset('assets/images/venue-placeholder.jpg') }}" alt="{{ loc.name }}" class="h-44 w-full object-cover rounded" />
+                        <div class="absolute top-3 left-3 flex gap-2">
+                            {% if loc.featured %}
+                                <span class="px-3 py-1 rounded-full bg-[#D4AF37] text-[#0a0a0f] text-xs font-semibold">Featured</span>
+                            {% endif %}
+                            <span class="px-2 py-1 rounded bg-white/10 text-xs">{{ loc.city }}</span>
+                        </div>
+                        <div class="absolute top-3 right-3">
+                            <span class="px-2 py-1 rounded text-xs {{ loc.status == 'Open' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300' }}">{{ loc.status }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex-1">
+                        <h3 class="text-lg font-bold">{{ loc.name }}</h3>
+                        <p class="text-sm text-gray-400">{{ loc.addr }}</p>
+
+                        <div class="mt-3 text-sm text-gray-300 flex flex-wrap gap-2 items-center">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                                <span>4.6</span>
+                            </div>
+                            <div class="px-2 py-1 bg-[#0b0b10] rounded">Capacity: {{ loc.capacity }}</div>
+                            <div class="px-2 py-1 bg-[#0b0b10] rounded">PCs: {{ loc.pcs }}</div>
+                            <div class="px-2 py-1 bg-[#0b0b10] rounded">{{ loc.amenities|join(', ') }}</div>
+                            <div class="ml-auto font-bold text-[#D4AF37]">{{ loc.price }} DT/h</div>
+                        </div>
+
+                        <div class="mt-3 grid grid-cols-2 gap-2">
+                            <a href="{{ path('location_detail', {'id': loc.id}) }}" class="block text-center px-3 py-2 rounded bg-transparent border border-[#2a2a34] text-sm hover:bg-[#1a1a24]">Details</a>
+                            <a href="{{ path('location_book', {'id': loc.id}) }}" data-book-id="{{ loc.id }}" data-book-name="{{ loc.name }}" data-book-lat="{{ loc.lat }}" data-book-lng="{{ loc.lng }}" data-book-price="{{ loc.price }}" class="bookBtn block text-center px-3 py-2 rounded bg-gradient-to-r from-[#D4AF37] to-[#B8941F] text-[#0a0a0f] text-sm font-semibold">Book</a>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="w-full h-36 rounded overflow-hidden border border-[#2a2a34]" data-lat="{{ loc.lat }}" data-lng="{{ loc.lng }}"></div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
     <!-- Footer -->
     <footer class="border-t border-[#D4AF37]/20 bg-[#0a0a0f] mt-16">
         <div class="container mx-auto px-4 py-12">

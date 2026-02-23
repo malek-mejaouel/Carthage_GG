@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 use App\Entity\News;
+use App\Entity\Location;
+use App\Entity\Event;
 use App\Repository\NewsRepository;
 use App\Repository\GameRepository;
 use App\Repository\MatchRepository;
@@ -23,6 +25,7 @@ use App\Entity\User as AppUser;
 use App\Repository\ProductRepository;
 use Stripe\Stripe;
 use Stripe\PaymentIntent as StripePaymentIntent;
+
 #[IsGranted('ROLE_ADMIN')]
 class AdminDashboardController extends AbstractController
 {
@@ -34,6 +37,7 @@ class AdminDashboardController extends AbstractController
             'news' => $news
         ]);
     }
+    
     #[Route('/admin/dashboard', name: 'app_admin_dashboard')]
     public function index(UserRepository $users): Response
     {
@@ -165,6 +169,22 @@ class AdminDashboardController extends AbstractController
     public function placesSection(): Response
     {
         return $this->render('admin/section-places.html.twig');
+    }
+
+    #[Route('/admin/dashboard/locations', name: 'app_admin_dash_locations')]
+    public function locationsSection(EntityManagerInterface $em): Response
+    {
+        return $this->render('admin/section-locations.html.twig', [
+            'locations' => $em->getRepository(Location::class)->findAll()
+        ]);
+    }
+
+    #[Route('/admin/dashboard/events', name: 'app_admin_dash_events')]
+    public function eventsSection(EntityManagerInterface $em): Response
+    {
+        return $this->render('admin/section-events.html.twig', [
+            'events' => $em->getRepository(Event::class)->findBy([], ['startAt' => 'ASC'])
+        ]);
     }
     #[Route('/admin/news/new', name: 'app_admin_news_new', methods: ['POST'])]
     public function addNewsAdmin(

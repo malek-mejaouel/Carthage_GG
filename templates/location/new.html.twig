@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create Location - CarthageGG{% endblock %}
+
+{% block content %}
+  <h1 class="text-2xl font-bold mb-4">Create Location</h1>
+  {% for label, messages in app.flashes %}
+    {% for msg in messages %}
+      <div class="text-red-400 mb-2">{{ msg }}</div>
+    {% endfor %}
+  {% endfor %}
+
+  <form method="post" action="{{ path('location_new') }}" class="space-y-4 max-w-lg">
+    <div>
+      <label class="block mb-1">Name</label>
+      <input class="w-full px-3 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded" type="text" name="name" required>
+    </div>
+    <div>
+      <label class="block mb-1">Address</label>
+      <input class="w-full px-3 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded" type="text" name="address">
+    </div>
+    <div>
+      <label class="block mb-1">Capacity</label>
+      <input class="w-full px-3 py-2 bg-[#12121a] border border-[#D4AF37]/20 rounded" type="number" name="capacity" min="1" required>
+    </div>
+    <div class="flex gap-2">
+      <button class="px-3 py-2 bg-[#D4AF37] text-[#0a0a0f] rounded" type="submit">Create</button>
+      <a href="{{ path('location_index') }}" class="px-3 py-2 border rounded">Back</a>
+    </div>
+  </form>
+{% endblock %}

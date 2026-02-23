@@ -20,6 +20,7 @@ use Stripe\Checkout\Session as StripeCheckoutSession;
 use Stripe\PaymentIntent as StripePaymentIntent;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use App\Repository\EventRepository;
 
 class PageController extends AbstractController
 {
@@ -27,7 +28,7 @@ class PageController extends AbstractController
     public function index(
         TournamentRepository $tournamentRepository,
         TeamRepository $teamRepository,
-        MatchRepository $matchRepository,
+        MatchRepository $matchRepository,EventRepository $eventRepository,
     ): Response {
         $featuredTournaments = $tournamentRepository->findOngoingTournaments();
         if (count($featuredTournaments) === 0) {
@@ -36,11 +37,13 @@ class PageController extends AbstractController
         $topTeams = $teamRepository->findAllTeams();
         $upcomingMatches = $matchRepository->findUpcomingMatches(6);
         $recentMatches = $matchRepository->findPastMatches(6);
+        $events = $eventRepository->findBy([], ['startAt' => 'ASC'], 6);
         return $this->render('index.html.twig', [
             'featured_tournaments' => $featuredTournaments,
             'top_teams' => $topTeams,
             'upcoming_matches' => $upcomingMatches,
             'recent_matches' => $recentMatches,
+            'events' => $events,
         ]);
     }
 

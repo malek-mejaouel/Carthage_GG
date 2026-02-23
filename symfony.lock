@@ -35,6 +35,18 @@
             "./migrations/.gitignore"
         ]
     },
+    "easycorp/easyadmin-bundle": {
+        "version": "4.29",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "4.14",
+            "ref": "13b3e524d1038a6861ad6c7fc64e31b644ba0c54"
+        },
+        "files": [
+            "./config/routes/easyadmin.yaml"
+        ]
+    },
     "knpuniversity/oauth2-client-bundle": {
         "version": "2.20",
         "recipe": {
@@ -57,6 +69,18 @@
             "./phpunit.dist.xml",
             "./tests/bootstrap.php",
             "./bin/phpunit"
+        ]
+    },
+    "stripe/stripe-php": {
+        "version": "19.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "19.0",
+            "ref": "d6829c693e3927a8972c7671d74a1a5c505712b0"
+        },
+        "files": [
+            "./config/packages/stripe.yaml"
         ]
     },
     "symfony/asset-mapper": {
@@ -253,6 +277,18 @@
             "./templates/base.html.twig"
         ]
     },
+    "symfony/uid": {
+        "version": "6.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "6.2",
+            "ref": "d294ad4add3e15d7eb1bae0221588ca89b38e558"
+        },
+        "files": [
+            "./config/packages/uid.yaml"
+        ]
+    },
     "symfony/ux-turbo": {
         "version": "2.32",
         "recipe": {
@@ -261,6 +297,18 @@
             "version": "2.19",
             "ref": "9dd2778a116b6e5e01e5e1582d03d5a9e82630de"
         }
+    },
+    "symfony/ux-twig-component": {
+        "version": "2.32",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "2.13",
+            "ref": "f367ae2a1faf01c503de2171f1ec22567febeead"
+        },
+        "files": [
+            "./config/packages/twig_component.yaml"
+        ]
     },
     "symfony/validator": {
         "version": "6.4",

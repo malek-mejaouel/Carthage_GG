@@ -9,6 +9,16 @@ class PredictionService
 {
     public function __construct(private MatchRepository $matchRepo) {}
 
+    /**
+     * @return array{
+     *   winner: Team,
+     *   probability: float,
+     *   stats: array{
+     *     teamA: array{wins:int,losses:int,draws:int,win_rate:float,total_score:int,avg_score:float},
+     *     teamB: array{wins:int,losses:int,draws:int,win_rate:float,total_score:int,avg_score:float}
+     *   }
+     * }
+     */
     public function predictWinner(Team $teamA, Team $teamB): array
     {
         $statsA = $this->calculateTeamStats($teamA);
@@ -30,6 +40,9 @@ class PredictionService
         ];
     }
 
+    /**
+     * @return array{wins:int,losses:int,draws:int,win_rate:float,total_score:int,avg_score:float}
+     */
     private function calculateTeamStats(Team $team): array
     {
         $matches = $this->matchRepo->findCompletedByTeam($team);

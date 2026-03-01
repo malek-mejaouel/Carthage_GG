@@ -37,42 +37,40 @@ class EventController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         if ($request->isMethod('POST')) {
-            $title = $request->request->get('title');
-            $date = $request->request->get('date') ?? $request->request->get('start_at');
-            $endDate = $request->request->get('end_at');
-            $locationId = $request->request->get('location');
+            $title = trim((string)$request->request->get('title', ''));
+            $dateRaw = $request->request->get('date') ?? $request->request->get('start_at');
+            $date = is_string($dateRaw) ? $dateRaw : '';
+            $endDateRaw = $request->request->get('end_at');
+            $endDate = is_string($endDateRaw) ? $endDateRaw : null;
+            $locationId = $request->request->getInt('location');
 
-            $lat = $request->request->get('location_latitude');
-            $lng = $request->request->get('location_longitude');
-            $address = $request->request->get('location_address');
-            $placeId = $request->request->get('location_place_id');
+            $latRaw = $request->request->get('location_latitude');
+            $lngRaw = $request->request->get('location_longitude');
+            $lat = is_numeric($latRaw) ? (float)$latRaw : null;
+            $lng = is_numeric($lngRaw) ? (float)$lngRaw : null;
+            $addressRaw = $request->request->get('location_address');
+            $address = is_string($addressRaw) ? $addressRaw : null;
+            $placeIdRaw = $request->request->get('location_place_id');
+            $placeId = is_string($placeIdRaw) ? $placeIdRaw : null;
 
             $location = null;
             if ($locationId) {
                 $location = $em->getRepository(Location::class)->find($locationId);
-            } elseif ($lat && $lng) {
+            } elseif ($lat !== null && $lng !== null) {
                 // try to find a nearby existing location to avoid duplicates
                 $repo = $em->getRepository(Location::class);
-                if (method_exists($repo, 'findNearby')) {
-                    $existing = $repo->findNearby((float)$lat, (float)$lng, 50);
-                } else {
-                    $existing = null;
-                }
+                $existing = $repo->findNearby($lat, $lng, 50);
 
                 if ($existing) {
                     $location = $existing;
                 } else {
                     // create a new Location from provided lat/lng/address
                     $location = new Location();
-                    $location->setName($address ?: 'Selected location');
+                    $location->setName($address ? (string)$address : 'Selected location');
                     $location->setAddress($address ?: null);
-                    if (method_exists($location, 'setLatitude')) {
-                        $location->setLatitude((float)$lat);
-                    }
-                    if (method_exists($location, 'setLongitude')) {
-                        $location->setLongitude((float)$lng);
-                    }
-                    if ($placeId && method_exists($location, 'setPlaceId')) {
+                    $location->setLatitude($lat);
+                    $location->setLongitude($lng);
+                    if ($placeId !== null) {
                         $location->setPlaceId($placeId);
                     }
                     $em->persist($location);
@@ -80,14 +78,13 @@ class EventController extends AbstractController
                 }
             }
 
-            if (!$title || !$date || !$location) {
+            if ($title === '' || $date === '' || !$location) {
                 $this->addFlash('error', 'Données invalides');
             } else {
                 $event = new Event();
                 $event->setTitle($title);
                 try {
-                    $event->setStartAt(new \DateTimeImmutable($date)
-);
+                    $event->setStartAt(new \DateTimeImmutable($date));
                 } catch (\Exception $e) {
                     $this->addFlash('error', 'Date invalide');
                     return $this->redirectToRoute('event_new');
@@ -151,14 +148,16 @@ class EventController extends AbstractController
         }
 
         if ($request->isMethod('POST')) {
-            $title = $request->request->get('title');
-            $date = $request->request->get('date') ?? $request->request->get('start_at');
-            $endDate = $request->request->get('end_at');
-            $locationId = $request->request->get('location');
+            $title = trim((string)$request->request->get('title', ''));
+            $dateRaw = $request->request->get('date') ?? $request->request->get('start_at');
+            $date = is_string($dateRaw) ? $dateRaw : '';
+            $endDateRaw = $request->request->get('end_at');
+            $endDate = is_string($endDateRaw) ? $endDateRaw : null;
+            $locationId = $request->request->getInt('location');
 
             $location = $em->getRepository(Location::class)->find($locationId);
 
-            if (!$title || !$date || !$location) {
+            if ($title === '' || $date === '' || !$location) {
                 $this->addFlash('error', 'Données invalides');
             } else {
                 $event->setTitle($title);

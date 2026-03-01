@@ -41,13 +41,18 @@ class FaceRecognitionService
                 return null;
             }
 
-            return json_encode($data['descriptor']);
+            $encoded = json_encode($data['descriptor']);
+            return is_string($encoded) ? $encoded : null;
         } catch (HttpExceptionInterface|TransportExceptionInterface $e) {
              error_log('Face API error: ' . $e->getMessage());
             return null;
         }
     }
 
+    /**
+     * @param list<float> $descriptor1
+     * @param list<float> $descriptor2
+     */
     public function compareFaces(array $descriptor1, array $descriptor2): float
     {
         if (count($descriptor1) !== count($descriptor2)) {

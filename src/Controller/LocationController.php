@@ -24,11 +24,12 @@ class LocationController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         if ($request->isMethod('POST')) {
-            $name = $request->request->get('name');
-            $address = $request->request->get('address');
+            $name = trim((string)$request->request->get('name'));
+            $addressRaw = $request->request->get('address');
+            $address = is_string($addressRaw) ? trim($addressRaw) : null;
             $capacity = (int)$request->request->get('capacity');
 
-            if (!$name || !$address || $capacity <= 0) {
+            if ($name === '' || $capacity <= 0) {
                 $this->addFlash('error', 'Champs invalides');
             } else {
                 $location = new Location();
@@ -63,11 +64,12 @@ class LocationController extends AbstractController
         }
 
         if ($request->isMethod('POST')) {
-            $name = $request->request->get('name');
-            $address = $request->request->get('address');
+            $name = trim((string)$request->request->get('name'));
+            $addressRaw = $request->request->get('address');
+            $address = is_string($addressRaw) ? trim($addressRaw) : null;
             $capacity = (int)$request->request->get('capacity');
 
-            if (!$name || $capacity <= 0) {
+            if ($name === '' || $capacity <= 0) {
                 $this->addFlash('error', 'Champs invalides');
             } else {
                 $location->setName($name);

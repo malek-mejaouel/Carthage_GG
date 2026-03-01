@@ -16,7 +16,6 @@ final class TournamentController extends AbstractController
 {
     public function __construct(
         private TournamentRepository $tournamentRepository,
-        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -83,7 +82,8 @@ final class TournamentController extends AbstractController
     #[Route('/{id}', name: 'tournament_delete', methods: ['POST'])]
     public function delete(Request $request, Tournament $tournament): Response
     {
-        if ($this->isCsrfTokenValid('delete' . $tournament->getTournamentId(), $request->request->get('_token'))) {
+        $token = $request->request->get('_token');
+        if (is_string($token) && $this->isCsrfTokenValid('delete' . $tournament->getTournamentId(), $token)) {
             $this->tournamentRepository->remove($tournament, true);
         }
 

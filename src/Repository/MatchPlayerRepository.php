@@ -10,9 +10,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<MatchPlayer>
  *
  * @method MatchPlayer|null find($id, $lockMode = null, $lockVersion = null)
- * @method MatchPlayer|null findOneBy(array $criteria, array $orderBy = null)
- * @method MatchPlayer[]    findAll()
- * @method MatchPlayer[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method MatchPlayer|null findOneBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null)
+ * @method list<MatchPlayer> findAll()
+ * @method list<MatchPlayer> findBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null, $limit = null, $offset = null)
  */
 class MatchPlayerRepository extends ServiceEntityRepository
 {
@@ -42,11 +42,17 @@ class MatchPlayerRepository extends ServiceEntityRepository
         return $this->find($id);
     }
 
+    /**
+     * @return list<MatchPlayer>
+     */
     public function findAllMatchPlayers(): array
     {
         return $this->findAll();
     }
 
+    /**
+     * @return list<MatchPlayer>
+     */
     public function findByMatch(int $matchId): array
     {
         return $this->createQueryBuilder('mp')
@@ -57,6 +63,9 @@ class MatchPlayerRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<MatchPlayer>
+     */
     public function findByUser(int $userId): array
     {
         return $this->createQueryBuilder('mp')
@@ -67,6 +76,9 @@ class MatchPlayerRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<MatchPlayer>
+     */
     public function findByTeam(int $teamId): array
     {
         return $this->createQueryBuilder('mp')
@@ -77,6 +89,9 @@ class MatchPlayerRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<MatchPlayer>
+     */
     public function findByRole(string $role): array
     {
         return $this->createQueryBuilder('mp')
@@ -87,6 +102,9 @@ class MatchPlayerRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<MatchPlayer>
+     */
     public function findMatchPlayersPaginated(int $page = 1, int $limit = 10): array
     {
         $offset = ($page - 1) * $limit;
@@ -127,6 +145,9 @@ class MatchPlayerRepository extends ServiceEntityRepository
         return $this->find($id) !== null;
     }
 
+    /**
+     * @return list<MatchPlayer>
+     */
     public function findPlayersByMatchAndTeam(int $matchId, int $teamId): array
     {
         return $this->createQueryBuilder('mp')

@@ -51,11 +51,15 @@ class ProfanityFilter
      * @param string $text The text to check
      * @return array Array of matched bad words
      */
+    /**
+     * @return list<string>
+     */
     public function getMatches(string $text): array
     {
         try {
             $blocker = Builder::blocker($text);
-            return $blocker->badWords();
+            $matches = $blocker->badWords();
+            return array_values($matches);
         } catch (\Exception $e) {
             return [];
         }

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\TeamPlayer;
+use App\Entity\Team;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -10,9 +11,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<TeamPlayer>
  *
  * @method TeamPlayer|null find($id, $lockMode = null, $lockVersion = null)
- * @method TeamPlayer|null findOneBy(array $criteria, array $orderBy = null)
- * @method TeamPlayer[]    findAll()
- * @method TeamPlayer[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method TeamPlayer|null findOneBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null)
+ * @method list<TeamPlayer> findAll()
+ * @method list<TeamPlayer> findBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null, $limit = null, $offset = null)
  */
 class TeamPlayerRepository extends ServiceEntityRepository
 {
@@ -42,11 +43,17 @@ class TeamPlayerRepository extends ServiceEntityRepository
         return $this->find($id);
     }
 
+    /**
+     * @return list<TeamPlayer>
+     */
     public function findAllTeamPlayers(): array
     {
         return $this->findAll();
     }
 
+    /**
+     * @return list<TeamPlayer>
+     */
     public function findByTeam(int $teamId): array
     {
         return $this->createQueryBuilder('tp')
@@ -57,6 +64,9 @@ class TeamPlayerRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<TeamPlayer>
+     */
     public function findByUser(int $userId): array
     {
         return $this->createQueryBuilder('tp')
@@ -67,6 +77,9 @@ class TeamPlayerRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<TeamPlayer>
+     */
     public function findTeamPlayersPaginated(int $page = 1, int $limit = 10): array
     {
         $offset = ($page - 1) * $limit;
@@ -96,6 +109,9 @@ class TeamPlayerRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /**
+     * @return list<Team>
+     */
     public function getUserTeams(int $userId): array
     {
         return $this->createQueryBuilder('tp')
@@ -116,6 +132,9 @@ class TeamPlayerRepository extends ServiceEntityRepository
         return false;
     }
 
+    /**
+     * @param list<int> $teamPlayerIds
+     */
     public function deleteMultiple(array $teamPlayerIds, bool $flush = true): int
     {
         $count = 0;

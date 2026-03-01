@@ -1,0 +1,6 @@
+{
+    "require-dev": {
+        "ahmed-bhs/doctrine-doctor": "1.0.4",
+        "webmozart/assert": "1.12"
+    }
+}

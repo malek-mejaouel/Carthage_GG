@@ -16,7 +16,6 @@ final class MatchPlayerController extends AbstractController
 {
     public function __construct(
         private MatchPlayerRepository $matchPlayerRepository,
-        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -83,7 +82,9 @@ final class MatchPlayerController extends AbstractController
     #[Route('/{id}', name: 'match_player_delete', methods: ['POST'])]
     public function delete(Request $request, MatchPlayer $matchPlayer): Response
     {
-        if ($this->isCsrfTokenValid('delete' . $matchPlayer->getId(), $request->request->get('_token'))) {
+        $tokenRaw = $request->request->get('_token');
+        $token = is_string($tokenRaw) ? $tokenRaw : null;
+        if ($this->isCsrfTokenValid('delete' . $matchPlayer->getId(), $token)) {
             $this->matchPlayerRepository->remove($matchPlayer, true);
         }
 

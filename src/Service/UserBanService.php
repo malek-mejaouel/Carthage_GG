@@ -20,6 +20,9 @@ class UserBanService
 
     public function applyBan(User $admin, User $target, int $durationValue, string $durationUnit, ?string $reason = null): void
     {
+        if (!$this->security->isGranted('ROLE_ADMIN')) {
+            throw new AccessDeniedException('Only admins can apply bans');
+        }
         if ($admin->getId() === $target->getId()) {
             throw new AccessDeniedException('Admins cannot ban themselves');
         }
@@ -63,4 +66,3 @@ class UserBanService
         return $user->getRemainingBanTime();
     }
 }
-

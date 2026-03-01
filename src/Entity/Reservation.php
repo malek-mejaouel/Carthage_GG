@@ -30,12 +30,12 @@ class Reservation
     #[ORM\ManyToOne(targetEntity: Event::class, inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull]
-    private ?Event $event = null;
+    private Event $event;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 3, max: 255)]
-    private ?string $fullName = null;
+    private string $fullName = '';
 
     #[ORM\Column(type: 'integer')]
     #[Assert\Positive]
@@ -45,7 +45,7 @@ class Reservation
     private string $status = self::STATUS_CONFIRMED;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private ?\DateTimeImmutable $createdAt = null;
+    private \DateTimeImmutable $createdAt;
 
     public function __construct()
     {
@@ -59,12 +59,12 @@ class Reservation
         return $this->id;
     }
 
-    public function getEvent(): ?Event
+    public function getEvent(): Event
     {
         return $this->event;
     }
 
-    public function setEvent(?Event $event): self
+    public function setEvent(Event $event): self
     {
         $this->event = $event;
         return $this;

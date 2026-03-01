@@ -10,9 +10,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<Team>
  *
  * @method Team|null find($id, $lockMode = null, $lockVersion = null)
- * @method Team|null findOneBy(array $criteria, array $orderBy = null)
- * @method Team[]    findAll()
- * @method Team[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Team|null findOneBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null)
+ * @method list<Team> findAll()
+ * @method list<Team> findBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null, $limit = null, $offset = null)
  */
 class TeamRepository extends ServiceEntityRepository
 {
@@ -64,6 +64,9 @@ class TeamRepository extends ServiceEntityRepository
     /**
      * READ: Find all teams
      */
+    /**
+     * @return list<Team>
+     */
     public function findAllTeams(): array
     {
         return $this->findAll();
@@ -71,6 +74,9 @@ class TeamRepository extends ServiceEntityRepository
 
     /**
      * READ: Find teams with pagination
+     */
+    /**
+     * @return list<Team>
      */
     public function findTeamsPaginated(int $page = 1, int $limit = 10): array
     {
@@ -98,6 +104,9 @@ class TeamRepository extends ServiceEntityRepository
     /**
      * READ: Find teams by user
      */
+    /**
+     * @return list<Team>
+     */
     public function findByUser(?int $userId): array
     {
         return $this->createQueryBuilder('t')
@@ -112,6 +121,9 @@ class TeamRepository extends ServiceEntityRepository
     /**
      * READ: Find teams created after a specific date
      */
+    /**
+     * @return list<Team>
+     */
     public function findTeamsSince(?\DateTimeInterface $date): array
     {
         return $this->createQueryBuilder('t')
@@ -124,6 +136,9 @@ class TeamRepository extends ServiceEntityRepository
 
     /**
      * READ: Find teams by name (partial match)
+     */
+    /**
+     * @return list<Team>
      */
     public function searchByTeamName(string $keyword): array
     {
@@ -178,6 +193,9 @@ class TeamRepository extends ServiceEntityRepository
     /**
      * DELETE: Delete multiple teams
      */
+    /**
+     * @param list<int> $teamIds
+     */
     public function deleteMultiple(array $teamIds, bool $flush = true): int
     {
         $count = 0;
@@ -195,13 +213,15 @@ class TeamRepository extends ServiceEntityRepository
     /**
      * READ: Find teams with most players
      */
+    /**
+     * @return list<Team>
+     */
     public function findTeamsWithMostPlayers(int $limit = 10): array
     {
         return $this->createQueryBuilder('t')
             ->leftJoin('t.teamPlayers', 'tp')
-            ->select('t', 'COUNT(tp.id) as player_count')
             ->groupBy('t.team_id')
-            ->orderBy('player_count', 'DESC')
+            ->orderBy('COUNT(tp.id)', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();

@@ -34,7 +34,7 @@ class RegistrationController extends AbstractController
             $user->setPassword($hashedPassword);
 
             // Generate username from first and last name
-            $username = strtolower($user->getFirstName() . '_' . $user->getLastName());
+            $username = strtolower(($user->getFirstName() ?? '') . '_' . ($user->getLastName() ?? ''));
             $user->setUsername($username);
 
             // Set user as inactive initially (they haven't logged in yet)
@@ -44,9 +44,10 @@ class RegistrationController extends AbstractController
             $selectedRole = $form->get('roles')->getData();
             if ($selectedRole) {
                 if (is_array($selectedRole)) {
-                    $user->setRoles($selectedRole);
+                    $roles = array_values(array_map('strval', $selectedRole));
+                    $user->setRoles($roles);
                 } else {
-                    $user->setRoles([$selectedRole]);
+                    $user->setRoles([strval($selectedRole)]);
                 }
             }
 
@@ -77,10 +78,19 @@ class RegistrationController extends AbstractController
         // If submitted but not valid, collect detailed errors to show in template
         $formErrors = [];
         if ($form->isSubmitted() && !$form->isValid()) {
-            foreach ($form->getErrors(true) as $error) {
-                $origin = $error->getOrigin();
-                $name = $origin ? $origin->getName() : 'form';
-                $formErrors[$name][] = $error->getMessage();
+            foreach ($form->getErrors(true, true) as $error) {
+                $name = 'form';
+                $message = '';
+                if ($error instanceof \Symfony\Component\Form\FormError) {
+                    $origin = $error->getOrigin();
+                    if ($origin) {
+                        $name = $origin->getName();
+                    }
+                    $message = $error->getMessage();
+                } else {
+                    $message = (string) $error;
+                }
+                $formErrors[$name][] = $message;
             }
         }
 

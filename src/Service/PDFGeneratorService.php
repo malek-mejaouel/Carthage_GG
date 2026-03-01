@@ -41,10 +41,10 @@ class PDFGeneratorService
             });
 
             // Set headers for PDF download
-            $filename = $this->sanitizeFilename($news->getTitre()) . '.pdf';
+            $filename = $this->sanitizeFilename($news->getTitre() ?? 'News Article') . '.pdf';
             $response->headers->set('Content-Type', 'application/pdf');
             $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
-            $response->headers->set('Content-Length', strlen($pdfContent));
+            $response->headers->set('Content-Length', (string) strlen($pdfContent));
             $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
             $response->headers->set('Pragma', 'no-cache');
             $response->headers->set('Expires', '0');
@@ -190,12 +190,7 @@ class PDFGeneratorService
     /**
      * Build the page content with professional formatting
      */
-    private function buildPageContent(string $title, string $category, string $date, string $content, int $width, int $height): string
-    {
-        // This method is deprecated and kept only for reference
-        // Use buildSimplePageStream instead
-        return "";
-    }
+    /* removed deprecated buildPageContent */
 
     /**
      * Escape special characters for PDF text
@@ -203,11 +198,11 @@ class PDFGeneratorService
     private function escapePDFText(string $text): string
     {
         // Remove control characters
-        $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $text);
+        $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $text) ?? '';
         // Escape special PDF characters
         $text = str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], $text);
         // Keep only printable ASCII
-        $text = preg_replace('/[^\x20-\x7E]/', '', $text);
+        $text = preg_replace('/[^\x20-\x7E]/', '', $text) ?? '';
         return $text;
     }
 
@@ -225,13 +220,17 @@ class PDFGeneratorService
         // Decode HTML entities
         $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5);
         // Remove extra whitespace
-        $text = trim(preg_replace('/\s+/', ' ', $text));
+        $cleaned = preg_replace('/\s+/', ' ', $text) ?? '';
+        $text = trim($cleaned);
 
         return $text;
     }
 
     /**
      * Wrap text to fit PDF width
+     */
+    /**
+     * @return list<string>
      */
     private function wrapText(string $text, int $width = 80): array
     {
@@ -263,7 +262,7 @@ class PDFGeneratorService
     private function sanitizeFilename(string $title): string
     {
         $filename = strtolower($title);
-        $filename = preg_replace('/[^a-z0-9]+/', '_', $filename);
+        $filename = preg_replace('/[^a-z0-9]+/', '_', $filename) ?? '';
         $filename = trim($filename, '_');
         $filename = substr($filename, 0, 50);
 

@@ -38,7 +38,9 @@ class ProductAdminController extends AbstractController
                 $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename)->lower();
                 $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
-                $targetDir = $this->getParameter('kernel.project_dir') . '/public/uploads/products';
+                $projectDirParam = $this->getParameter('kernel.project_dir');
+                $projectDir = is_string($projectDirParam) ? $projectDirParam : getcwd();
+                $targetDir = $projectDir . '/public/uploads/products';
                 if (!is_dir($targetDir)) {
                     @mkdir($targetDir, 0775, true);
                 }
@@ -70,16 +72,16 @@ class ProductAdminController extends AbstractController
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$product->getSlug()) {
-                $product->setSlug(strtolower($slugger->slug($product->getName())->toString()));
-            }
+            // Slug handling removed (Product entity has no slug field)
             $product->setUpdatedAt(new \DateTime());
             $imageFile = $form->get('image')->getData();
             if ($imageFile) {
                 $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename)->lower();
                 $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
-                $targetDir = $this->getParameter('kernel.project_dir') . '/public/uploads/products';
+                $projectDirParam = $this->getParameter('kernel.project_dir');
+                $projectDir = is_string($projectDirParam) ? $projectDirParam : getcwd();
+                $targetDir = $projectDir . '/public/uploads/products';
                 if (!is_dir($targetDir)) {
                     @mkdir($targetDir, 0775, true);
                 }

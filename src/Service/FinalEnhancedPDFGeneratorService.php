@@ -35,14 +35,14 @@ class FinalEnhancedPDFGeneratorService
         try {
             $pdfContent = $this->buildPDF($news);
             
-            $filename = $this->sanitizeFilename($news->getTitre()) . '.pdf';
+            $filename = $this->sanitizeFilename($news->getTitre() ?? 'News Article') . '.pdf';
             
             $response = new Response($pdfContent);
             $response->headers->set('Content-Type', 'application/pdf; charset=utf-8');
             $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
             $response->headers->set('Cache-Control', 'no-cache, must-revalidate');
             $response->headers->set('Pragma', 'public');
-            $response->headers->set('Content-Length', strlen($pdfContent));
+            $response->headers->set('Content-Length', (string) strlen($pdfContent));
 
             return $response;
         } catch (\Exception $e) {
@@ -240,6 +240,9 @@ class FinalEnhancedPDFGeneratorService
     /**
      * Assemble the complete PDF with all objects and xref table
      */
+    /**
+     * @param list<string> $objects
+     */
     private function assemblePDF(array $objects): string
     {
         $pdf = "%PDF-1.4\n";
@@ -289,7 +292,7 @@ class FinalEnhancedPDFGeneratorService
         $text = str_replace(')', '\\)', $text);
         
         // Remove control characters and keep only printable ASCII
-        $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\xFF]/', '', $text);
+        $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\xFF]/', '', $text) ?? '';
         
         return $text;
     }
@@ -305,12 +308,15 @@ class FinalEnhancedPDFGeneratorService
 
         $text = strip_tags($text);
         $text = html_entity_decode($text);
-        $text = preg_replace('/\s+/', ' ', $text);
-        return trim($text);
+        $cleaned = preg_replace('/\s+/', ' ', $text) ?? '';
+        return trim($cleaned);
     }
 
     /**
      * Wrap text to specified width
+     */
+    /**
+     * @return list<string>
      */
     private function wrapText(string $text, int $width = 82): array
     {
@@ -342,8 +348,8 @@ class FinalEnhancedPDFGeneratorService
     private function sanitizeFilename(string $title): string
     {
         $name = strtolower($title);
-        $name = preg_replace('/[^a-z0-9_-]/', '_', $name);
-        $name = preg_replace('/_+/', '_', $name);
+        $name = preg_replace('/[^a-z0-9_-]/', '_', $name) ?? '';
+        $name = preg_replace('/_+/', '_', $name) ?? '';
         $name = trim($name, '_');
         return substr($name ?: 'article', 0, 60);
     }

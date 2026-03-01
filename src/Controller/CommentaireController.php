@@ -107,7 +107,9 @@ class CommentaireController extends AbstractController
                         $avatarUrl = $raw;
                     } else {
                         $path = str_starts_with($raw, '/') ? $raw : '/' . $raw;
-                        $abs = $this->getParameter('kernel.project_dir') . '/public' . $path;
+                        $pdParam = $this->getParameter('kernel.project_dir');
+                        $projectDir = is_string($pdParam) ? $pdParam : getcwd();
+                        $abs = $projectDir . '/public' . $path;
                         $avatarUrl = is_file($abs) ? $path : null;
                     }
                 }
@@ -118,8 +120,8 @@ class CommentaireController extends AbstractController
                     'gif_url' => $comment->getGifUrl(),
                     'upvotes' => $comment->getUpvotes(),
                     'downvotes' => $comment->getDownvotes(),
-                    'news_id' => $comment->getNews()?->getNewsId(),
-                    'news_title' => $comment->getNews()?->getTitre(),
+                    'news_id' => $comment->getNews()->getNewsId(),
+                    'news_title' => $comment->getNews()->getTitre(),
                     'user' => $user ? [
                         'id' => $user->getId(),
                         'username' => $user->getUsername(),
@@ -193,7 +195,7 @@ class CommentaireController extends AbstractController
                 ->findBy(['news' => $news], ['date_commentaire' => 'DESC']);
 
             $data = array_map(function(Commentaire $comment) {
-                $raw = $comment->getContenu();
+                $raw = (string) $comment->getContenu();
                 $parentId = null;
                 
                 if (str_starts_with($raw, '__PARENT__')) {
@@ -213,7 +215,9 @@ class CommentaireController extends AbstractController
                         $avatarUrl = $rawAvatar;
                     } else {
                         $path = str_starts_with($rawAvatar, '/') ? $rawAvatar : '/' . $rawAvatar;
-                        $abs = $this->getParameter('kernel.project_dir') . '/public' . $path;
+                        $pdParam = $this->getParameter('kernel.project_dir');
+                        $projectDir = is_string($pdParam) ? $pdParam : getcwd();
+                        $abs = $projectDir . '/public' . $path;
                         $avatarUrl = is_file($abs) ? $path : null;
                     }
                 }
@@ -225,7 +229,7 @@ class CommentaireController extends AbstractController
                     'gif_url' => $comment->getGifUrl(),
                     'upvotes' => $comment->getUpvotes(),
                     'downvotes' => $comment->getDownvotes(),
-                    'news_id' => $comment->getNews()?->getNewsId(),
+                    'news_id' => $comment->getNews()->getNewsId(),
                     'parent_id' => $parentId,
                     'user' => $user ? [
                         'id' => $user->getId(),
@@ -351,12 +355,12 @@ class CommentaireController extends AbstractController
                 ],
                 'data' => [
                     'commentaire_id' => $comment->getCommentaireId(),
-                    'contenu' => preg_replace('/^__PARENT__\d+\|\|/', '', $comment->getContenu()),
+                    'contenu' => preg_replace('/^__PARENT__\d+\|\|/', '', (string) $comment->getContenu()),
                     'date_commentaire' => $comment->getDateCommentaire()?->format('Y-m-d H:i:s'),
                     'gif_url' => $comment->getGifUrl(),
                     'upvotes' => $comment->getUpvotes(),
                     'downvotes' => $comment->getDownvotes(),
-                    'news_id' => $comment->getNews()?->getNewsId(),
+                    'news_id' => $comment->getNews()->getNewsId(),
                     'parent_id' => !empty($data['parent_id']) && is_numeric($data['parent_id']) ? (int)$data['parent_id'] : null,
                     'user' => $comment->getUser() ? [
                         'id' => $comment->getUser()->getId(),
@@ -475,7 +479,8 @@ class CommentaireController extends AbstractController
             }
 
             if ($request->isMethod('POST')) {
-                $token = $request->request->get('_token');
+                $tokenRaw = $request->request->get('_token');
+                $token = is_string($tokenRaw) ? $tokenRaw : null;
                 if (!$this->isCsrfTokenValid('delete_comment' . $id, $token)) {
                     return $this->json(['error' => 'Invalid CSRF token'], Response::HTTP_FORBIDDEN);
                 }
@@ -586,12 +591,13 @@ class CommentaireController extends AbstractController
     {
         try {
             // Get search query from request parameters
-            $query = $request->query->get('q');
+            $qRaw = $request->query->get('q');
+            $query = is_string($qRaw) ? $qRaw : '';
             $limit = (int)($request->query->get('limit', 20));
             $offset = (int)($request->query->get('offset', 0));
 
             // Validate query parameter
-            if (empty(trim($query))) {
+            if (trim($query) === '') {
                 return $this->json([
                     'error' => 'Search query is required',
                     'gifs' => [],

@@ -16,7 +16,6 @@ final class TeamPlayerController extends AbstractController
 {
     public function __construct(
         private TeamPlayerRepository $teamPlayerRepository,
-        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -83,7 +82,8 @@ final class TeamPlayerController extends AbstractController
     #[Route('/{id}', name: 'team_player_delete', methods: ['POST'])]
     public function delete(Request $request, TeamPlayer $teamPlayer): Response
     {
-        if ($this->isCsrfTokenValid('delete' . $teamPlayer->getId(), $request->request->get('_token'))) {
+        $token = $request->request->get('_token');
+        if (is_string($token) && $this->isCsrfTokenValid('delete' . $teamPlayer->getId(), $token)) {
             $this->teamPlayerRepository->remove($teamPlayer, true);
         }
 

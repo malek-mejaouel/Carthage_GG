@@ -31,7 +31,7 @@ class Event
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
     #[ORM\Column(type: 'datetime_immutable')]
-    private ?\DateTimeImmutable $startAt = null;
+    private \DateTimeImmutable $startAt;
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $endAt = null;
@@ -43,6 +43,9 @@ class Event
     #[ORM\ManyToOne(targetEntity: Location::class, inversedBy: 'events')]
     private ?Location $location = null;
 
+    /**
+     * @var Collection<int, Reservation>
+     */
     #[ORM\OneToMany(
         mappedBy: 'event',
         targetEntity: Reservation::class,
@@ -129,6 +132,9 @@ class Event
         return $this;
     }
 
+    /**
+     * @return Collection<int, Reservation>
+     */
     public function getReservations(): Collection
     {
         return $this->reservations;
@@ -146,9 +152,7 @@ class Event
     public function removeReservation(Reservation $reservation): self
     {
         if ($this->reservations->removeElement($reservation)) {
-            if ($reservation->getEvent() === $this) {
-                $reservation->setEvent(null);
-            }
+            // orphanRemoval takes care of dissociation/deletion; do not set event to null
         }
         return $this;
     }
@@ -158,8 +162,7 @@ class Event
     {
         $sum = 0;
         foreach ($this->reservations as $r) {
-            // Count only confirmed reservations towards occupied seats
-            if (method_exists($r, 'getStatus') && $r->getStatus() === ReservationEntity::STATUS_CONFIRMED) {
+            if ($r->getStatus() === ReservationEntity::STATUS_CONFIRMED) {
                 $sum += $r->getSeats();
             }
         }
@@ -173,7 +176,7 @@ class Event
 
         // Determine effective capacity: min(event maxSeats, location capacity if set)
         $effectiveCapacity = $this->maxSeats;
-        if ($this->location && method_exists($this->location, 'getCapacity')) {
+        if ($this->location) {
             $locCap = $this->location->getCapacity();
             if ($locCap !== null) {
                 $effectiveCapacity = min($this->maxSeats, $locCap);

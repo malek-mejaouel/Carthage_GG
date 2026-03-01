@@ -25,13 +25,14 @@ class ReservationController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em, \App\Service\ReservationService $reservationService): Response
     {
         if ($request->isMethod('POST')) {
-            $fullName = $request->request->get('fullName') ?? $request->request->get('full_name') ?? $request->request->get('username');
+            $rawFullName = $request->request->get('fullName') ?? $request->request->get('full_name') ?? $request->request->get('username');
+            $fullName = is_string($rawFullName) ? trim($rawFullName) : '';
             $eventId = $request->request->get('event');
             $seats = (int)($request->request->get('seats') ?? 1);
 
             $event = $em->getRepository(Event::class)->find($eventId);
 
-            if (!$fullName || !$event || $seats <= 0) {
+            if ($fullName === '' || !$event || $seats <= 0) {
                 $this->addFlash('error', 'Données invalides');
             } else {
                 $reservation = new Reservation();
@@ -63,9 +64,7 @@ class ReservationController extends AbstractController
         $em->flush();
 
         // After deletion, try to promote waitlist for this event
-        if ($event) {
-            $reservationService->promoteWaitlist($event);
-        }
+        $reservationService->promoteWaitlist($event);
 
         return $this->redirectToRoute('reservation_index');
     }
@@ -78,13 +77,14 @@ class ReservationController extends AbstractController
         }
 
         if ($request->isMethod('POST')) {
-            $fullName = $request->request->get('fullName') ?? $request->request->get('full_name') ?? $request->request->get('username');
+            $rawFullName = $request->request->get('fullName') ?? $request->request->get('full_name') ?? $request->request->get('username');
+            $fullName = is_string($rawFullName) ? trim($rawFullName) : '';
             $eventId = $request->request->get('event');
             $seats = (int)($request->request->get('seats') ?? 1);
 
             $event = $em->getRepository(Event::class)->find($eventId);
 
-            if (!$fullName || !$event || $seats <= 0) {
+            if ($fullName === '' || !$event || $seats <= 0) {
                 $this->addFlash('error', 'Données invalides');
             } else {
                 $reservation->setFullName($fullName);

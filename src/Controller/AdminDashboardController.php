@@ -278,8 +278,10 @@ class AdminDashboardController extends AbstractController
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
 
                 try {
+                    $pdParam = $this->getParameter('kernel.project_dir');
+                    $projectDir = is_string($pdParam) ? $pdParam : getcwd();
                     $imageFile->move(
-                        $this->getParameter('kernel.project_dir') . '/public/uploads/news',
+                        $projectDir . '/public/uploads/news',
                         $newFilename
                     );
                     $imagePath = $newFilename;
@@ -336,9 +338,9 @@ class AdminDashboardController extends AbstractController
 
         if ($request->isMethod('POST')) {
             try {
-                $titre = trim($request->request->get('titre'));
-                $contenu = trim($request->request->get('contenu'));
-                $categorie = trim($request->request->get('categorie'));
+                $titre = trim((string)$request->request->get('titre', ''));
+                $contenu = trim((string)$request->request->get('contenu', ''));
+                $categorie = trim((string)$request->request->get('categorie', ''));
                 
                 $errors = [];
                 if (empty($titre) || strlen($titre) < 3 || strlen($titre) > 255) {
@@ -368,8 +370,10 @@ class AdminDashboardController extends AbstractController
                     $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
 
                     try {
+                        $pdParam = $this->getParameter('kernel.project_dir');
+                        $projectDir = is_string($pdParam) ? $pdParam : getcwd();
                         $imageFile->move(
-                            $this->getParameter('kernel.project_dir') . '/public/uploads/news',
+                            $projectDir . '/public/uploads/news',
                             $newFilename
                         );
                         $news->setImage($newFilename);
@@ -415,7 +419,9 @@ class AdminDashboardController extends AbstractController
 
         try {
             // Verify CSRF token
-            if (!$this->isCsrfTokenValid('delete' . $newsId, $request->request->get('_token'))) {
+            $tokenRaw = $request->request->get('_token');
+            $token = is_string($tokenRaw) ? $tokenRaw : null;
+            if (!$this->isCsrfTokenValid('delete' . $newsId, $token)) {
                 $this->addFlash('error', 'Invalid request token');
                 return $this->redirectToRoute('app_admin_dash_news');
             }
@@ -478,7 +484,8 @@ class AdminDashboardController extends AbstractController
     #[Route('/admin/dashboard/sales', name: 'app_admin_dash_sales')]
     public function salesSection(): Response
     {
-        $secretKey = (string)$this->getParameter('stripe.secret_key');
+        $secretParam = $this->getParameter('stripe.secret_key');
+        $secretKey = is_string($secretParam) ? $secretParam : '';
         $revenueLabels = [];
         $revenueData = [];
         $paymentLabels = [];
@@ -553,7 +560,8 @@ class AdminDashboardController extends AbstractController
     #[Route('/admin/dashboard/sales/export/pdf', name: 'app_admin_sales_export_pdf')]
     public function salesExportPdf(): Response
     {
-        $secretKey = (string)$this->getParameter('stripe.secret_key');
+        $secretParam = $this->getParameter('stripe.secret_key');
+        $secretKey = is_string($secretParam) ? $secretParam : '';
         $transactions = [];
         if ($secretKey) {
             Stripe::setApiKey($secretKey);
@@ -646,7 +654,9 @@ class AdminDashboardController extends AbstractController
             $safeFilename = $slugger->slug($originalFilename);
             $newFilename = $safeFilename . '-' . uniqid() . '.' . $thumbFile->guessExtension();
             try {
-                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/streams';
+                $pdParam = $this->getParameter('kernel.project_dir');
+                $projectDir = is_string($pdParam) ? $pdParam : getcwd();
+                $uploadDir = $projectDir . '/public/uploads/streams';
                 if (!is_dir($uploadDir)) { @mkdir($uploadDir, 0775, true); }
                 $thumbFile->move($uploadDir, $newFilename);
                 $s->setThumbnail('/uploads/streams/' . $newFilename);
@@ -725,7 +735,9 @@ class AdminDashboardController extends AbstractController
             $safeFilename = $slugger->slug($originalFilename);
             $newFilename = $safeFilename . '-' . uniqid() . '.' . $thumbFile->guessExtension();
             try {
-                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/streams';
+                $pdParam = $this->getParameter('kernel.project_dir');
+                $projectDir = is_string($pdParam) ? $pdParam : getcwd();
+                $uploadDir = $projectDir . '/public/uploads/streams';
                 if (!is_dir($uploadDir)) { @mkdir($uploadDir, 0775, true); }
                 $thumbFile->move($uploadDir, $newFilename);
                 $s->setThumbnail('/uploads/streams/' . $newFilename);
@@ -751,7 +763,11 @@ class AdminDashboardController extends AbstractController
         }
         return $this->redirectToRoute('app_admin_dash_streams');
     }
-     private function normalizeStreamFields(array $streamData): array
+    /**
+     * @param array<string, mixed> $streamData
+     * @return array<string, string>
+     */
+    private function normalizeStreamFields(array $streamData): array
     {
         $out = [];
         $url = isset($streamData['url']) ? trim((string)$streamData['url']) : '';
@@ -803,7 +819,7 @@ class AdminDashboardController extends AbstractController
         }
         if ($host && str_contains($host, 'youtube.com')) {
             parse_str($query, $qs);
-            if (!empty($qs['v'])) {
+            if (isset($qs['v']) && is_string($qs['v'])) {
                 return $qs['v'];
             }
             $parts = array_values(array_filter(explode('/', $path)));

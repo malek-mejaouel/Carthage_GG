@@ -14,10 +14,6 @@ class ReservationService
     {
         $event = $reservation->getEvent();
 
-        if (!$event) {
-            throw new \Exception("Event obligatoire.");
-        }
-
         $availableSeats = $event->getAvailableSeats();
 
         // If no seats available, place automatically on WAITING list

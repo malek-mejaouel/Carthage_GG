@@ -33,7 +33,7 @@ class Commentaire
      * Also supports emoji and text mixing
      */
     #[ORM\Column(type:"text")]
-    private ?string $contenu = null;
+    private string $contenu = '';
 
     /**
      * Date and time when the comment was created
@@ -41,7 +41,7 @@ class Commentaire
      * Format: DateTime object (e.g., 2026-02-06 15:30:00)
      */
     #[ORM\Column(type:"datetime")]
-    private ?\DateTimeInterface $date_commentaire = null;
+    private \DateTimeInterface $date_commentaire;
 
     /**
      * URL to an optional GIF image
@@ -77,7 +77,7 @@ class Commentaire
      */
     #[ORM\ManyToOne(targetEntity: News::class)]
     #[ORM\JoinColumn(name:"news_id", referencedColumnName:"news_id", nullable:false)]
-    private ?News $news = null;
+    private News $news;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'comments')]
     #[ORM\JoinColumn(name:"user_id", referencedColumnName:"user_id", nullable:true, onDelete:"SET NULL")]
@@ -213,21 +213,21 @@ class Commentaire
 
     /**
      * Get the news article this comment belongs to
-     * 
-     * @return ?News The news article object or null
+     *
+     * @return News
      */
-    public function getNews(): ?News
+    public function getNews(): News
     {
         return $this->news;
     }
 
     /**
      * Set the news article this comment belongs to
-     * 
-     * @param ?News $news The news article this comment is for
+     *
+     * @param News $news The news article this comment is for
      * @return self Returns this object for method chaining
      */
-    public function setNews(?News $news): self
+    public function setNews(News $news): self
     {
         $this->news = $news;
         return $this;

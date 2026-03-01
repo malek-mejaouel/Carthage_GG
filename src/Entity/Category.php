@@ -33,6 +33,7 @@ class Category
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $createdAt;
 
+    /** @var Collection<int, Product> */
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Product::class)]
     private Collection $products;
 
@@ -80,6 +81,9 @@ class Category
         return $this;
     }
 
+    /**
+     * @return Collection<int, Product>
+     */
     public function getProducts(): Collection
     {
         return $this->products;

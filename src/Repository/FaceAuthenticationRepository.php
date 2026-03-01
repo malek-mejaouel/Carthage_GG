@@ -6,6 +6,9 @@ use App\Entity\FaceAuthentication;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<FaceAuthentication>
+ */
 class FaceAuthenticationRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -23,4 +26,3 @@ class FaceAuthenticationRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 }
-

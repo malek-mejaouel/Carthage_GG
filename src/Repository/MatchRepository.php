@@ -11,9 +11,9 @@ use App\Entity\Team;
  * @extends ServiceEntityRepository<GameMatch>
  *
  * @method GameMatch|null find($id, $lockMode = null, $lockVersion = null)
- * @method GameMatch|null findOneBy(array $criteria, array $orderBy = null)
- * @method GameMatch[]    findAll()
- * @method GameMatch[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method GameMatch|null findOneBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null)
+ * @method list<GameMatch> findAll()
+ * @method list<GameMatch> findBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null, $limit = null, $offset = null)
  */
 class MatchRepository extends ServiceEntityRepository
 {
@@ -43,11 +43,17 @@ class MatchRepository extends ServiceEntityRepository
         return $this->find($id);
     }
 
+    /**
+     * @return list<GameMatch>
+     */
     public function findAllMatches(): array
     {
         return $this->findAll();
     }
 
+    /**
+     * @return list<GameMatch>
+     */
     public function findMatchesPaginated(int $page = 1, int $limit = 10): array
     {
         $offset = ($page - 1) * $limit;
@@ -67,6 +73,9 @@ class MatchRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /**
+     * @return list<GameMatch>
+     */
     public function findByTournament(int $tournamentId): array
     {
         return $this->createQueryBuilder('m')
@@ -77,6 +86,9 @@ class MatchRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<GameMatch>
+     */
     public function findByGame(int $gameId): array
     {
         return $this->createQueryBuilder('m')
@@ -87,6 +99,9 @@ class MatchRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<GameMatch>
+     */
     public function findByTeamA(int $teamId): array
     {
         return $this->createQueryBuilder('m')
@@ -97,6 +112,9 @@ class MatchRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<GameMatch>
+     */
     public function findByTeamB(int $teamId): array
     {
         return $this->createQueryBuilder('m')
@@ -107,6 +125,9 @@ class MatchRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<GameMatch>
+     */
     public function findByTeam(int $teamId): array
     {
         return $this->createQueryBuilder('m')
@@ -117,6 +138,9 @@ class MatchRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<GameMatch>
+     */
     public function findByDateRange(\DateTimeInterface $startDate, \DateTimeInterface $endDate): array
     {
         return $this->createQueryBuilder('m')
@@ -156,6 +180,9 @@ class MatchRepository extends ServiceEntityRepository
         return $this->find($id) !== null;
     }
 
+    /**
+     * @return list<GameMatch>
+     */
     public function findUpcomingMatches(int $limit = 10): array
     {
         return $this->createQueryBuilder('m')
@@ -167,6 +194,9 @@ class MatchRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<GameMatch>
+     */
     public function findPastMatches(int $limit = 10): array
     {
         return $this->createQueryBuilder('m')
@@ -178,6 +208,9 @@ class MatchRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<GameMatch>
+     */
     public function findCompletedByTeam(Team $team): array
     {
         return $this->createQueryBuilder('m')
@@ -189,13 +222,14 @@ class MatchRepository extends ServiceEntityRepository
             ->getResult();
     }
     public function countPreviousMeetings(Team $teamA, Team $teamB): int
-{
-    return $this->createQueryBuilder('m')
-        ->select('COUNT(m.match_id)')
-        ->where('(m.teamA = :teamA AND m.teamB = :teamB) OR (m.teamA = :teamB AND m.teamB = :teamA)')
-        ->setParameter('teamA', $teamA)
-        ->setParameter('teamB', $teamB)
-        ->getQuery()
-        ->getSingleScalarResult();
-}
+    {
+        $res = $this->createQueryBuilder('m')
+            ->select('COUNT(m.match_id)')
+            ->where('(m.teamA = :teamA AND m.teamB = :teamB) OR (m.teamA = :teamB AND m.teamB = :teamA)')
+            ->setParameter('teamA', $teamA)
+            ->setParameter('teamB', $teamB)
+            ->getQuery()
+            ->getSingleScalarResult();
+        return (int) $res;
+    }
 }

@@ -19,7 +19,7 @@ class Game
     private ?int $game_id = null;
 
     #[ORM\Column(length: 150)]
-    private ?string $name = null;
+    private string $name = '';
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $genre = null;
@@ -27,9 +27,11 @@ class Game
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    /** @var Collection<int, Tournament> */
     #[ORM\OneToMany(mappedBy: 'game', targetEntity: Tournament::class)]
     private Collection $tournaments;
 
+    /** @var Collection<int, GameMatch> */
     #[ORM\OneToMany(mappedBy: 'game', targetEntity: GameMatch::class)]
     private Collection $matches;
 
@@ -77,6 +79,9 @@ class Game
         return $this;
     }
 
+    /**
+     * @return Collection<int, Tournament>
+     */
     public function getTournaments(): Collection
     {
         return $this->tournaments;
@@ -101,6 +106,9 @@ class Game
         return $this;
     }
 
+    /**
+     * @return Collection<int, GameMatch>
+     */
     public function getMatches(): Collection
     {
         return $this->matches;

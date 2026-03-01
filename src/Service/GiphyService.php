@@ -40,6 +40,16 @@ class GiphyService
      * 
      * @return array Array of GIF objects with url, name, and thumbnail
      */
+    /**
+     * @return list<array{
+     *   id: ?string,
+     *   name: string,
+     *   url: ?string,
+     *   thumbnail: ?string,
+     *   width: ?string,
+     *   height: ?string
+     * }>
+     */
     public function searchGifs(string $query, int $limit = 20, int $offset = 0): array
     {
         if (empty(trim($query))) {
@@ -114,6 +124,16 @@ class GiphyService
      * @param int $offset Pagination offset (default: 0)
      * 
      * @return array Array of trending GIF objects
+     */
+    /**
+     * @return list<array{
+     *   id: ?string,
+     *   name: string,
+     *   url: ?string,
+     *   thumbnail: ?string,
+     *   width: ?string,
+     *   height: ?string
+     * }>
      */
     public function getTrendingGifs(int $limit = 20, int $offset = 0): array
     {

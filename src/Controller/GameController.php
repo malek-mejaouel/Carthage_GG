@@ -16,7 +16,6 @@ final class GameController extends AbstractController
 {
     public function __construct(
         private GameRepository $gameRepository,
-        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -85,7 +84,9 @@ final class GameController extends AbstractController
     #[Route('/{id}', name: 'game_delete', methods: ['POST'])]
     public function delete(Request $request, Game $game): Response
     {
-        if ($this->isCsrfTokenValid('delete' . $game->getGameId(), $request->request->get('_token'))) {
+        $tokenRaw = $request->request->get('_token');
+        $token = is_string($tokenRaw) ? $tokenRaw : null;
+        if ($this->isCsrfTokenValid('delete' . $game->getGameId(), $token)) {
             $this->gameRepository->remove($game, true);
         }
 
@@ -95,7 +96,8 @@ final class GameController extends AbstractController
     #[Route('/search', name: 'game_search', methods: ['GET'])]
     public function search(Request $request): Response
     {
-        $keyword = $request->query->get('q', '');
+        $keywordRaw = $request->query->get('q', '');
+        $keyword = is_string($keywordRaw) ? $keywordRaw : '';
         $games = [];
 
         if ($keyword) {

@@ -10,9 +10,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<Tournament>
  *
  * @method Tournament|null find($id, $lockMode = null, $lockVersion = null)
- * @method Tournament|null findOneBy(array $criteria, array $orderBy = null)
- * @method Tournament[]    findAll()
- * @method Tournament[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Tournament|null findOneBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null)
+ * @method list<Tournament> findAll()
+ * @method list<Tournament> findBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null, $limit = null, $offset = null)
  */
 class TournamentRepository extends ServiceEntityRepository
 {
@@ -47,11 +47,17 @@ class TournamentRepository extends ServiceEntityRepository
         return $this->findOneBy(['tournament_name' => $name]);
     }
 
+    /**
+     * @return list<Tournament>
+     */
     public function findAllTournaments(): array
     {
         return $this->findAll();
     }
 
+    /**
+     * @return list<Tournament>
+     */
     public function findTournamentsPaginated(int $page = 1, int $limit = 10): array
     {
         $offset = ($page - 1) * $limit;
@@ -71,6 +77,9 @@ class TournamentRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /**
+     * @return list<Tournament>
+     */
     public function findByGame(int $gameId): array
     {
         return $this->createQueryBuilder('t')
@@ -81,6 +90,9 @@ class TournamentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<Tournament>
+     */
     public function findByUser(int $userId): array
     {
         return $this->createQueryBuilder('t')
@@ -91,6 +103,9 @@ class TournamentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<Tournament>
+     */
     public function findByLocation(string $location): array
     {
         return $this->createQueryBuilder('t')
@@ -101,6 +116,9 @@ class TournamentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<Tournament>
+     */
     public function findByDateRange(\DateTimeInterface $startDate, \DateTimeInterface $endDate): array
     {
         return $this->createQueryBuilder('t')
@@ -112,6 +130,9 @@ class TournamentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<Tournament>
+     */
     public function searchByName(string $keyword): array
     {
         return $this->createQueryBuilder('t')
@@ -155,6 +176,9 @@ class TournamentRepository extends ServiceEntityRepository
         return $this->find($id) !== null;
     }
 
+    /**
+     * @return list<Tournament>
+     */
     public function findUpcomingTournaments(int $limit = 10): array
     {
         return $this->createQueryBuilder('t')
@@ -167,12 +191,16 @@ class TournamentRepository extends ServiceEntityRepository
     }
     public function sumPrizePool(): int|float
     {
-    return $this->createQueryBuilder('t')
-        ->select('COALESCE(SUM(t.prizePool), 0)')
-        ->getQuery()
-        ->getSingleScalarResult();
+        $res = $this->createQueryBuilder('t')
+            ->select('COALESCE(SUM(t.prizePool), 0)')
+            ->getQuery()
+            ->getSingleScalarResult();
+        return is_numeric($res) ? ($res + 0) : 0;
     }
 
+    /**
+     * @return list<Tournament>
+     */
     public function findOngoingTournaments(): array
     {
         return $this->createQueryBuilder('t')
@@ -183,6 +211,9 @@ class TournamentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<Tournament>
+     */
     public function findCompletedTournaments(int $limit = 10): array
     {
         return $this->createQueryBuilder('t')

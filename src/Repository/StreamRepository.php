@@ -6,6 +6,9 @@ use App\Entity\Stream;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Stream>
+ */
 class StreamRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -13,7 +16,7 @@ class StreamRepository extends ServiceEntityRepository
         parent::__construct($registry, Stream::class);
     }
 
-    /** @return Stream[] */
+    /** @return list<Stream> */
     public function findLatest(int $limit = 20): array
     {
         return $this->createQueryBuilder('s')
@@ -23,7 +26,7 @@ class StreamRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    /** @return Stream[] */
+    /** @return list<Stream> */
     public function findLive(int $limit = 20): array
     {
         return $this->createQueryBuilder('s')
@@ -34,4 +37,3 @@ class StreamRepository extends ServiceEntityRepository
             ->getResult();
     }
 }
-

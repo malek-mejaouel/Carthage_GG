@@ -22,8 +22,8 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 class NewsController extends AbstractController
 {
     // Injected dependencies for file handling and database operations
-    private $slugger;              // Converts filenames to safe slugs
-    private $entityManager;        // Doctrine ORM entity manager for database operations
+    private SluggerInterface $slugger;              // Converts filenames to safe slugs
+    private EntityManagerInterface $entityManager;        // Doctrine ORM entity manager for database operations
     private string $recaptchaSiteKey;
 
     /**
@@ -74,9 +74,9 @@ class NewsController extends AbstractController
         try {
             // ==================== 1. EXTRACT FORM DATA ====================
             // Trim whitespace from input to prevent empty spaces
-            $titre = trim($request->request->get('titre'));
-            $contenu = trim($request->request->get('contenu'));
-            $categorie = trim($request->request->get('categorie'));
+            $titre = trim((string)$request->request->get('titre'));
+            $contenu = trim((string)$request->request->get('contenu'));
+            $categorie = trim((string)$request->request->get('categorie'));
             
             // ==================== 2. VALIDATE INPUT DATA ====================
             // Initialize errors array to collect validation messages
@@ -135,10 +135,9 @@ class NewsController extends AbstractController
 
                 try {
                     // Move uploaded file to the news uploads directory
-                    $imageFile->move(
-                        $this->getParameter('kernel.project_dir') . '/public/uploads/news',
-                        $newFilename
-                    );
+                    $pdParam = $this->getParameter('kernel.project_dir');
+                    $projectDir = is_string($pdParam) ? $pdParam : getcwd();
+                    $imageFile->move($projectDir . '/public/uploads/news', $newFilename);
                     // Store filename (not full path) in database
                     $imagePath = $newFilename;
                 } catch (FileException $e) {
@@ -185,9 +184,9 @@ class NewsController extends AbstractController
             // Catch any unexpected errors and return error response
             return $this->render('News/add.html.twig', [
                 'errors' => ['general' => 'Error: ' . $e->getMessage()],
-                'titre' => $titre ?? '',
-                'categorie' => $categorie ?? '',
-                'contenu' => $contenu ?? '',
+                'titre' => $titre,
+                'categorie' => $categorie,
+                'contenu' => $contenu,
             ]);
         }
     }
@@ -206,9 +205,12 @@ class NewsController extends AbstractController
     {
         try {
             // Get filter parameters from query string
-            $search = $request->query->get('search', '');
-            $category = $request->query->get('category', '');
-            $sort = $request->query->get('sort', 'newest'); // 'newest' or 'oldest'
+            $searchRaw = $request->query->get('search', '');
+            $categoryRaw = $request->query->get('category', '');
+            $sortRaw = $request->query->get('sort', 'newest'); // 'newest' or 'oldest'
+            $search = is_string($searchRaw) ? $searchRaw : '';
+            $category = is_string($categoryRaw) ? $categoryRaw : '';
+            $sort = is_string($sortRaw) ? $sortRaw : 'newest';
             $page = max(1, (int)$request->query->get('page', 1)); // Get page number, minimum 1
             
             // Pagination settings
@@ -224,14 +226,16 @@ class NewsController extends AbstractController
             if (!empty($search)) {
                 $searchLower = strtolower($search);
                 $newsList = array_filter($newsList, function(News $news) use ($searchLower) {
-                    return strpos(strtolower($news->getTitre()), $searchLower) !== false;
+                    $title = (string) ($news->getTitre() ?? '');
+                    return strpos(strtolower($title), $searchLower) !== false;
                 });
             }
             
             // Filter by category
             if (!empty($category)) {
                 $newsList = array_filter($newsList, function(News $news) use ($category) {
-                    return strtolower($news->getCategorie()) === strtolower($category);
+                    $cat = (string) ($news->getCategorie() ?? '');
+                    return strtolower($cat) === strtolower($category);
                 });
             }
             
@@ -498,9 +502,9 @@ class NewsController extends AbstractController
             }
 
             // ==================== 2. EXTRACT UPDATED DATA ====================
-            $titre = trim($request->request->get('titre'));
-            $contenu = trim($request->request->get('contenu'));
-            $categorie = trim($request->request->get('categorie'));
+            $titre = trim((string)$request->request->get('titre'));
+            $contenu = trim((string)$request->request->get('contenu'));
+            $categorie = trim((string)$request->request->get('categorie'));
 
             // ==================== 3. VALIDATE UPDATED DATA ====================
             $errors = [];
@@ -548,10 +552,9 @@ class NewsController extends AbstractController
 
                 try {
                     // Move new image to uploads folder
-                    $imageFile->move(
-                        $this->getParameter('kernel.project_dir') . '/public/uploads/news',
-                        $newFilename
-                    );
+                    $pdParam = $this->getParameter('kernel.project_dir');
+                    $projectDir = is_string($pdParam) ? $pdParam : getcwd();
+                    $imageFile->move($projectDir . '/public/uploads/news', $newFilename);
                     // Update the image field
                     $news->setImage($newFilename);
                 } catch (FileException $e) {

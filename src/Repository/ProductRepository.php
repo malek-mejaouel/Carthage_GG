@@ -7,6 +7,9 @@ use App\Entity\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Product>
+ */
 class ProductRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -14,6 +17,9 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+    /**
+     * @return list<Product>
+     */
     public function search(?string $q, ?int $categoryId, ?string $sort): array
     {
         $qb = $this->createQueryBuilder('p')
@@ -53,6 +59,9 @@ class ProductRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @return list<Product>
+     */
     public function searchPaginated(?string $q, ?int $categoryId, ?string $sort, int $page, int $perPage, bool $onlyFeatured = false): array
     {
         $qb = $this->createQueryBuilder('p')

@@ -28,7 +28,7 @@ class EnhancedPDFGeneratorService
         try {
             $pdfContent = $this->generatePDF($news);
             
-            $filename = $this->sanitizeFilename($news->getTitre()) . '.pdf';
+            $filename = $this->sanitizeFilename($news->getTitre() ?? 'News Article') . '.pdf';
             
             $response = new Response($pdfContent);
             $response->headers->set('Content-Type', 'application/pdf');
@@ -99,16 +99,7 @@ class EnhancedPDFGeneratorService
         return $pdf;
     }
 
-    /**
-     * Load image and create PDF XObject
-     */
-    private function loadAndEmbedImage(string $imagePath): ?array
-    {
-        // For now, skip image embedding - focus on design first
-        // Image embedding requires proper JPEG/PNG stream handling
-        // This will be enhanced in a future update
-        return null;
-    }
+    /* removed unused loadAndEmbedImage */
 
     /**
      * Build PDF content stream with enhanced styling and colors
@@ -186,7 +177,7 @@ class EnhancedPDFGeneratorService
         $stream .= "0.5 0.5 0.5 rg\n"; // Gray text
         $stream .= "/F1 8 Tf\n";
         $stream .= "50 8 Td\n";
-        $stream .= "(CarthageGG News Platform • Generated: " . date('M d, Y H:i') . ") Tj\n";
+        $stream .= "(CarthageGG News Platform • Generated: " . date('M d, Y H:i') . " • " . basename($this->projectDir) . ") Tj\n";
         $stream .= "ET\n";
 
         return $stream;
@@ -199,19 +190,23 @@ class EnhancedPDFGeneratorService
         $str = str_replace('\\', '\\\\', $str);
         $str = str_replace('(', '\\(', $str);
         $str = str_replace(')', '\\)', $str);
-        $str = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $str);
-        $str = preg_replace('/[^\x20-\x7E]/', '', $str);
+        $str = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $str) ?? '';
+        $str = preg_replace('/[^\x20-\x7E]/', '', $str) ?? '';
         return $str;
     }
 
-    private function cleanText($text): string
+    private function cleanText(?string $text): string
     {
         if (!$text) return '';
         $text = strip_tags($text);
         $text = html_entity_decode($text);
-        return trim(preg_replace('/\s+/', ' ', $text));
+        $cleaned = preg_replace('/\s+/', ' ', $text) ?? '';
+        return trim($cleaned);
     }
 
+    /**
+     * @return list<string>
+     */
     private function wrapText(string $text, int $width = 75): array
     {
         $lines = [];
@@ -234,8 +229,8 @@ class EnhancedPDFGeneratorService
     private function sanitizeFilename(string $title): string
     {
         $name = strtolower($title);
-        $name = preg_replace('/[^a-z0-9_-]/', '_', $name);
-        $name = preg_replace('/_+/', '_', $name);
+        $name = preg_replace('/[^a-z0-9_-]/', '_', $name) ?? '';
+        $name = preg_replace('/_+/', '_', $name) ?? '';
         $name = trim($name, '_');
         return substr($name, 0, 50) ?: 'article';
     }

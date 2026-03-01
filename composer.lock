@@ -4,8 +4,331 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8c3498484b7ad8fbe636609531e1bfe3",
+    "content-hash": "d3eb335bcaf7ef0e873f3b2973fe6ed3",
     "packages": [
+        {
+            "name": "ahmed-bhs/doctrine-doctor",
+            "version": "v1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ahmed-bhs/doctrine-doctor.git",
+                "reference": "b19d58e19316f557e0166185df161d8fb49a687c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ahmed-bhs/doctrine-doctor/zipball/b19d58e19316f557e0166185df161d8fb49a687c",
+                "reference": "b19d58e19316f557e0166185df161d8fb49a687c",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/doctrine-bundle": "^2.12",
+                "doctrine/orm": "^2.10|^3.0|^4.0",
+                "nikic/php-parser": "^5.6",
+                "php": "^8.2",
+                "phpmyadmin/sql-parser": "^6.0",
+                "symfony/framework-bundle": "^6.0|^7.0",
+                "webmozart/assert": "^1.11"
+            },
+            "require-dev": {
+                "bitbag/coding-standard": "^3.0",
+                "deptrac/deptrac": "^4.2",
+                "php-parallel-lint/php-parallel-lint": "^1.4",
+                "phpmd/phpmd": "^2.15",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-doctrine": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^10.0",
+                "symfony/stopwatch": "^6.0|^7.0",
+                "symfony/var-dumper": "^6.0|^7.0",
+                "symfony/var-exporter": "^6.4|^7.0",
+                "symplify/easy-coding-standard": "^12.6",
+                "twig/twig": "^3.0"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "symfony": {
+                    "require": "^6.0|^7.0",
+                    "allow-contrib": false
+                },
+                "branch-alias": {
+                    "dev-main": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AhmedBhs\\DoctrineDoctor\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ahmed EBEN HASSINE",
+                    "email": "ahmedbhs123@gmail.com",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "Runtime analysis tool for Doctrine ORM integrated into Symfony Web Profiler. Unlike static linters, it analyzes actual query execution at runtime to detect performance bottlenecks, security vulnerabilities, and best practice violations during development with real execution context and data.",
+            "homepage": "https://github.com/ahmed-bhs/doctrine-doctor",
+            "keywords": [
+                "Best-Practices",
+                "analyzer",
+                "code-quality",
+                "database-performance",
+                "debugging",
+                "developer-tools",
+                "development-tools",
+                "doctrine",
+                "doctrine-analyzer",
+                "doctrine-orm",
+                "dql",
+                "missing-indexes",
+                "n-plus-one",
+                "n-plus-one-detection",
+                "orm-debugging",
+                "performance",
+                "performance-monitoring",
+                "profiler",
+                "query-analysis",
+                "query-analyzer",
+                "query-optimization",
+                "runtime-analysis",
+                "security",
+                "slow-queries",
+                "sql-profiler",
+                "symfony",
+                "symfony-bundle",
+                "web-profiler"
+            ],
+            "support": {
+                "issues": "https://github.com/ahmed-bhs/doctrine-doctor/issues",
+                "source": "https://github.com/ahmed-bhs/doctrine-doctor"
+            },
+            "time": "2026-02-26T09:32:04+00:00"
+        },
+        {
+            "name": "api-platform/core",
+            "version": "v4.2.19",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/api-platform/core.git",
+                "reference": "8994a1580e072b52a632ebb697e0aeea5f2a057d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/api-platform/core/zipball/8994a1580e072b52a632ebb697e0aeea5f2a057d",
+                "reference": "8994a1580e072b52a632ebb697e0aeea5f2a057d",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/inflector": "^2.0",
+                "php": ">=8.2",
+                "psr/cache": "^1.0 || ^2.0 || ^3.0",
+                "psr/container": "^1.0 || ^2.0",
+                "symfony/deprecation-contracts": "^3.1",
+                "symfony/http-foundation": "^6.4.14 || ^7.0 || ^8.0",
+                "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0",
+                "symfony/property-access": "^6.4 || ^7.0 || ^8.0",
+                "symfony/property-info": "^6.4 || ^7.1 || ^8.0",
+                "symfony/serializer": "^6.4 || ^7.0 || ^8.0",
+                "symfony/translation-contracts": "^3.3",
+                "symfony/type-info": "^7.4 || ^8.0",
+                "symfony/validator": "^6.4.11 || ^7.1 || ^8.0",
+                "symfony/web-link": "^6.4 || ^7.1 || ^8.0",
+                "willdurand/negotiation": "^3.1"
+            },
+            "conflict": {
+                "doctrine/common": "<3.2.2",
+                "doctrine/dbal": "<2.10",
+                "doctrine/mongodb-odm": "<2.4",
+                "doctrine/orm": "<2.14.0",
+                "doctrine/persistence": "<1.3",
+                "phpspec/prophecy": "<1.15",
+                "phpunit/phpunit": "<9.5",
+                "symfony/framework-bundle": "6.4.6 || 7.0.6",
+                "symfony/object-mapper": "<7.3.4",
+                "symfony/var-exporter": "<6.1.1"
+            },
+            "replace": {
+                "api-platform/doctrine-common": "self.version",
+                "api-platform/doctrine-odm": "self.version",
+                "api-platform/doctrine-orm": "self.version",
+                "api-platform/documentation": "self.version",
+                "api-platform/elasticsearch": "self.version",
+                "api-platform/graphql": "self.version",
+                "api-platform/hal": "self.version",
+                "api-platform/http-cache": "self.version",
+                "api-platform/hydra": "self.version",
+                "api-platform/json-api": "self.version",
+                "api-platform/json-schema": "self.version",
+                "api-platform/jsonld": "self.version",
+                "api-platform/laravel": "self.version",
+                "api-platform/metadata": "self.version",
+                "api-platform/openapi": "self.version",
+                "api-platform/parameter-validator": "self.version",
+                "api-platform/ramsey-uuid": "self.version",
+                "api-platform/serializer": "self.version",
+                "api-platform/state": "self.version",
+                "api-platform/symfony": "self.version",
+                "api-platform/validator": "self.version"
+            },
+            "require-dev": {
+                "behat/behat": "^3.11",
+                "behat/mink": "^1.9",
+                "doctrine/common": "^3.2.2",
+                "doctrine/dbal": "^4.0",
+                "doctrine/doctrine-bundle": "^2.11 || ^3.1",
+                "doctrine/orm": "^2.17 || ^3.0",
+                "elasticsearch/elasticsearch": "^7.17 || ^8.4 || ^9.0",
+                "friends-of-behat/mink-browserkit-driver": "^1.3.1",
+                "friends-of-behat/mink-extension": "^2.2",
+                "friends-of-behat/symfony-extension": "^2.1",
+                "friendsofphp/php-cs-fixer": "^3.93",
+                "guzzlehttp/guzzle": "^6.0 || ^7.0",
+                "illuminate/config": "^11.0 || ^12.0",
+                "illuminate/contracts": "^11.0 || ^12.0",
+                "illuminate/database": "^11.0 || ^12.0",
+                "illuminate/http": "^11.0 || ^12.0",
+                "illuminate/pagination": "^11.0 || ^12.0",
+                "illuminate/routing": "^11.0 || ^12.0",
+                "illuminate/support": "^11.0 || ^12.0",
+                "jangregor/phpstan-prophecy": "^2.1.11",
+                "justinrainbow/json-schema": "^6.5.2",
+                "laravel/framework": "^11.0 || ^12.0",
+                "orchestra/testbench": "^10.9",
+                "phpspec/prophecy-phpunit": "^2.2",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpdoc-parser": "^1.29 || ^2.0",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-doctrine": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^12.2",
+                "psr/log": "^1.0 || ^2.0 || ^3.0",
+                "ramsey/uuid": "^4.7",
+                "ramsey/uuid-doctrine": "^2.0",
+                "soyuka/contexts": "^3.3.10",
+                "soyuka/pmu": "^0.2.0",
+                "soyuka/stubs-mongodb": "^1.0",
+                "symfony/asset": "^6.4 || ^7.0 || ^8.0",
+                "symfony/browser-kit": "^6.4 || ^7.0 || ^8.0",
+                "symfony/cache": "^6.4 || ^7.0 || ^8.0",
+                "symfony/config": "^6.4 || ^7.0 || ^8.0",
+                "symfony/console": "^6.4 || ^7.0 || ^8.0",
+                "symfony/css-selector": "^6.4 || ^7.0 || ^8.0",
+                "symfony/dependency-injection": "^6.4 || ^7.0 || ^8.0",
+                "symfony/doctrine-bridge": "^6.4.2 || ^7.1 || ^8.0",
+                "symfony/dom-crawler": "^6.4 || ^7.0 || ^8.0",
+                "symfony/error-handler": "^6.4 || ^7.0 || ^8.0",
+                "symfony/event-dispatcher": "^6.4 || ^7.0 || ^8.0",
+                "symfony/expression-language": "^6.4 || ^7.0 || ^8.0",
+                "symfony/finder": "^6.4 || ^7.0 || ^8.0",
+                "symfony/form": "^6.4 || ^7.0 || ^8.0",
+                "symfony/framework-bundle": "^6.4 || ^7.0 || ^8.0",
+                "symfony/http-client": "^6.4 || ^7.0 || ^8.0",
+                "symfony/intl": "^6.4 || ^7.0 || ^8.0",
+                "symfony/json-streamer": "^7.4 || ^8.0",
+                "symfony/maker-bundle": "^1.24",
+                "symfony/mercure-bundle": "*",
+                "symfony/messenger": "^6.4 || ^7.0 || ^8.0",
+                "symfony/object-mapper": "^7.4 || ^8.0",
+                "symfony/routing": "^6.4 || ^7.0 || ^8.0",
+                "symfony/security-bundle": "^6.4 || ^7.0 || ^8.0",
+                "symfony/security-core": "^6.4 || ^7.0 || ^8.0",
+                "symfony/stopwatch": "^6.4 || ^7.0 || ^8.0",
+                "symfony/string": "^6.4 || ^7.0 || ^8.0",
+                "symfony/twig-bundle": "^6.4 || ^7.0 || ^8.0",
+                "symfony/uid": "^6.4 || ^7.0 || ^8.0",
+                "symfony/var-exporter": "^7.4 || ^8.0",
+                "symfony/web-profiler-bundle": "^6.4 || ^7.0 || ^8.0",
+                "symfony/yaml": "^6.4 || ^7.0 || ^8.0",
+                "twig/twig": "^1.42.3 || ^2.12 || ^3.0",
+                "webonyx/graphql-php": "^15.0"
+            },
+            "suggest": {
+                "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",
+                "elasticsearch/elasticsearch": "To support Elasticsearch.",
+                "phpstan/phpdoc-parser": "To support extracting metadata from PHPDoc.",
+                "psr/cache-implementation": "To use metadata caching.",
+                "ramsey/uuid": "To support Ramsey's UUID identifiers.",
+                "symfony/cache": "To have metadata caching when using Symfony integration.",
+                "symfony/config": "To load XML configuration files.",
+                "symfony/expression-language": "To use authorization features.",
+                "symfony/http-client": "To use the HTTP cache invalidation system.",
+                "symfony/json-streamer": "To use the JSON Streamer component.",
+                "symfony/messenger": "To support messenger integration.",
+                "symfony/security": "To use authorization features.",
+                "symfony/twig-bundle": "To use the Swagger UI integration.",
+                "symfony/uid": "To support Symfony UUID/ULID identifiers.",
+                "symfony/web-profiler-bundle": "To use the data collector.",
+                "webonyx/graphql-php": "To support GraphQL."
+            },
+            "type": "library",
+            "extra": {
+                "pmu": {
+                    "projects": [
+                        "./src/*/composer.json",
+                        "src/Doctrine/*/composer.json"
+                    ]
+                },
+                "thanks": {
+                    "url": "https://github.com/api-platform/api-platform",
+                    "name": "api-platform/api-platform"
+                },
+                "symfony": {
+                    "require": "^6.4 || ^7.1 || ^8.0"
+                },
+                "branch-alias": {
+                    "dev-3.4": "3.4.x-dev",
+                    "dev-4.1": "4.1.x-dev",
+                    "dev-4.2": "4.2.x-dev",
+                    "dev-main": "4.3.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/JsonLd/HydraContext.php"
+                ],
+                "psr-4": {
+                    "ApiPlatform\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kévin Dunglas",
+                    "email": "kevin@dunglas.fr",
+                    "homepage": "https://dunglas.fr"
+                }
+            ],
+            "description": "Build a fully-featured hypermedia or GraphQL API in minutes!",
+            "homepage": "https://api-platform.com",
+            "keywords": [
+                "Hydra",
+                "JSON-LD",
+                "api",
+                "graphql",
+                "hal",
+                "jsonapi",
+                "laravel",
+                "openapi",
+                "rest",
+                "swagger",
+                "symfony"
+            ],
+            "support": {
+                "issues": "https://github.com/api-platform/core/issues",
+                "source": "https://github.com/api-platform/core/tree/v4.2.19"
+            },
+            "time": "2026-02-27T16:05:25+00:00"
+        },
         {
             "name": "carbonphp/carbon-doctrine-types",
             "version": "3.2.0",
@@ -2640,6 +2963,64 @@
             "time": "2026-01-29T09:26:29+00:00"
         },
         {
+            "name": "nikic/php-parser",
+            "version": "v5.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nikic/PHP-Parser.git",
+                "reference": "dca41cd15c2ac9d055ad70dbfd011130757d1f82"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/dca41cd15c2ac9d055ad70dbfd011130757d1f82",
+                "reference": "dca41cd15c2ac9d055ad70dbfd011130757d1f82",
+                "shasum": ""
+            },
+            "require": {
+                "ext-ctype": "*",
+                "ext-json": "*",
+                "ext-tokenizer": "*",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "ircmaxell/php-yacc": "^0.0.7",
+                "phpunit/phpunit": "^9.0"
+            },
+            "bin": [
+                "bin/php-parse"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PhpParser\\": "lib/PhpParser"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Nikita Popov"
+                }
+            ],
+            "description": "A PHP parser written in PHP",
+            "keywords": [
+                "parser",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/nikic/PHP-Parser/issues",
+                "source": "https://github.com/nikic/PHP-Parser/tree/v5.7.0"
+            },
+            "time": "2025-12-06T11:56:16+00:00"
+        },
+        {
             "name": "phpdocumentor/reflection-common",
             "version": "2.2.0",
             "source": {
@@ -2813,6 +3194,96 @@
                 "source": "https://github.com/phpDocumentor/TypeResolver/tree/1.12.0"
             },
             "time": "2025-11-21T15:09:14+00:00"
+        },
+        {
+            "name": "phpmyadmin/sql-parser",
+            "version": "6.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpmyadmin/sql-parser.git",
+                "reference": "75397801ef687ef6b850e907a40c60b9d6b755db"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpmyadmin/sql-parser/zipball/75397801ef687ef6b850e907a40c60b9d6b755db",
+                "reference": "75397801ef687ef6b850e907a40c60b9d6b755db",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.2",
+                "symfony/polyfill-mbstring": "^1.24"
+            },
+            "conflict": {
+                "phpmyadmin/motranslator": "<5.2"
+            },
+            "require-dev": {
+                "phpbench/phpbench": "^1.2",
+                "phpmyadmin/coding-standard": "^4.0",
+                "phpmyadmin/motranslator": "^5.3",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^11.5",
+                "psalm/plugin-phpunit": "^0.19.2",
+                "vimeo/psalm": "^6.0",
+                "zumba/json-serializer": "^3.2"
+            },
+            "suggest": {
+                "ext-mbstring": "For best performance",
+                "phpmyadmin/motranslator": "Translate messages to your favorite locale"
+            },
+            "bin": [
+                "bin/sql-parser"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "6.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PhpMyAdmin\\SqlParser\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "The phpMyAdmin Team",
+                    "email": "developers@phpmyadmin.net",
+                    "homepage": "https://www.phpmyadmin.net/team/"
+                }
+            ],
+            "description": "A validating SQL lexer and parser with a focus on MySQL dialect.",
+            "homepage": "https://github.com/phpmyadmin/sql-parser",
+            "keywords": [
+                "analysis",
+                "lexer",
+                "parser",
+                "query linter",
+                "sql",
+                "sql lexer",
+                "sql linter",
+                "sql parser",
+                "sql syntax highlighter",
+                "sql tokenizer"
+            ],
+            "support": {
+                "issues": "https://github.com/phpmyadmin/sql-parser/issues",
+                "source": "https://github.com/phpmyadmin/sql-parser"
+            },
+            "funding": [
+                {
+                    "url": "https://www.phpmyadmin.net/donate/",
+                    "type": "other"
+                }
+            ],
+            "time": "2025-10-31T22:05:33+00:00"
         },
         {
             "name": "phpstan/phpdoc-parser",
@@ -8757,6 +9228,89 @@
             "time": "2026-01-05T12:44:39+00:00"
         },
         {
+            "name": "symfony/type-info",
+            "version": "v7.4.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/type-info.git",
+                "reference": "4855ceea609b2c09e48ff76e12a97a3955531735"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/type-info/zipball/4855ceea609b2c09e48ff76e12a97a3955531735",
+                "reference": "4855ceea609b2c09e48ff76e12a97a3955531735",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2",
+                "psr/container": "^1.1|^2.0",
+                "symfony/deprecation-contracts": "^2.5|^3"
+            },
+            "conflict": {
+                "phpstan/phpdoc-parser": "<1.30"
+            },
+            "require-dev": {
+                "phpstan/phpdoc-parser": "^1.30|^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\TypeInfo\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mathias Arlaud",
+                    "email": "mathias.arlaud@gmail.com"
+                },
+                {
+                    "name": "Baptiste LEDUC",
+                    "email": "baptiste.leduc@gmail.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Extracts PHP types information.",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "PHPStan",
+                "phpdoc",
+                "symfony",
+                "type"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/type-info/tree/v7.4.6"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-02-17T14:00:31+00:00"
+        },
+        {
             "name": "symfony/uid",
             "version": "v6.4.32",
             "source": {
@@ -9754,33 +10308,33 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "2.1.3",
+            "version": "1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/assert.git",
-                "reference": "6976757ba8dd70bf8cbaea0914ad84d8b51a9f46"
+                "reference": "11cb2199493b2f8a3b53e7f19068fc6aac760991"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/assert/zipball/6976757ba8dd70bf8cbaea0914ad84d8b51a9f46",
-                "reference": "6976757ba8dd70bf8cbaea0914ad84d8b51a9f46",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/11cb2199493b2f8a3b53e7f19068fc6aac760991",
+                "reference": "11cb2199493b2f8a3b53e7f19068fc6aac760991",
                 "shasum": ""
             },
             "require": {
                 "ext-ctype": "*",
-                "ext-date": "*",
-                "ext-filter": "*",
-                "php": "^8.2"
+                "php": "^7.2 || ^8.0"
             },
-            "suggest": {
-                "ext-intl": "",
-                "ext-simplexml": "",
-                "ext-spl": ""
+            "conflict": {
+                "phpstan/phpstan": "<0.12.20",
+                "vimeo/psalm": "<4.6.1 || 4.6.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.5.13"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-feature/2-0": "2.0-dev"
+                    "dev-master": "1.10-dev"
                 }
             },
             "autoload": {
@@ -9796,10 +10350,6 @@
                 {
                     "name": "Bernhard Schussek",
                     "email": "bschussek@gmail.com"
-                },
-                {
-                    "name": "Woody Gilk",
-                    "email": "woody.gilk@gmail.com"
                 }
             ],
             "description": "Assertions to validate method input/output with nice error messages.",
@@ -9810,12 +10360,125 @@
             ],
             "support": {
                 "issues": "https://github.com/webmozarts/assert/issues",
-                "source": "https://github.com/webmozarts/assert/tree/2.1.3"
+                "source": "https://github.com/webmozarts/assert/tree/1.11.0"
             },
-            "time": "2026-02-13T21:01:40+00:00"
+            "time": "2022-06-03T18:03:27+00:00"
+        },
+        {
+            "name": "willdurand/negotiation",
+            "version": "3.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/willdurand/Negotiation.git",
+                "reference": "68e9ea0553ef6e2ee8db5c1d98829f111e623ec2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/willdurand/Negotiation/zipball/68e9ea0553ef6e2ee8db5c1d98829f111e623ec2",
+                "reference": "68e9ea0553ef6e2ee8db5c1d98829f111e623ec2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1.0"
+            },
+            "require-dev": {
+                "symfony/phpunit-bridge": "^5.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Negotiation\\": "src/Negotiation"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "William Durand",
+                    "email": "will+git@drnd.me"
+                }
+            ],
+            "description": "Content Negotiation tools for PHP provided as a standalone library.",
+            "homepage": "http://williamdurand.fr/Negotiation/",
+            "keywords": [
+                "accept",
+                "content",
+                "format",
+                "header",
+                "negotiation"
+            ],
+            "support": {
+                "issues": "https://github.com/willdurand/Negotiation/issues",
+                "source": "https://github.com/willdurand/Negotiation/tree/3.1.0"
+            },
+            "time": "2022-01-30T20:08:53+00:00"
         }
     ],
     "packages-dev": [
+        {
+            "name": "bamarni/composer-bin-plugin",
+            "version": "1.9.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bamarni/composer-bin-plugin.git",
+                "reference": "641d0663f5ac270b1aeec4337b7856f76204df47"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bamarni/composer-bin-plugin/zipball/641d0663f5ac270b1aeec4337b7856f76204df47",
+                "reference": "641d0663f5ac270b1aeec4337b7856f76204df47",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.0",
+                "php": "^7.2.5 || ^8.0"
+            },
+            "require-dev": {
+                "composer/composer": "^2.2.26",
+                "ext-json": "*",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^1.8 || ^2.0",
+                "phpstan/phpstan-phpunit": "^1.1 || ^2.0",
+                "phpunit/phpunit": "^8.5 || ^9.6 || ^10.0",
+                "symfony/console": "^2.8.52 || ^3.4.35 || ^4.4 || ^5.0 || ^6.0",
+                "symfony/finder": "^2.8.52 || ^3.4.35 || ^4.4 || ^5.0 || ^6.0",
+                "symfony/process": "^2.8.52 || ^3.4.35 || ^4.4 || ^5.0 || ^6.0"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Bamarni\\Composer\\Bin\\BamarniBinPlugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bamarni\\Composer\\Bin\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "No conflicts for your bin dependencies",
+            "keywords": [
+                "composer",
+                "conflict",
+                "dependency",
+                "executable",
+                "isolation",
+                "tool"
+            ],
+            "support": {
+                "issues": "https://github.com/bamarni/composer-bin-plugin/issues",
+                "source": "https://github.com/bamarni/composer-bin-plugin/tree/1.9.1"
+            },
+            "time": "2026-02-04T10:18:12+00:00"
+        },
         {
             "name": "masterminds/html5",
             "version": "2.10.0",
@@ -9944,64 +10607,6 @@
             "time": "2025-08-01T08:46:24+00:00"
         },
         {
-            "name": "nikic/php-parser",
-            "version": "v5.7.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "dca41cd15c2ac9d055ad70dbfd011130757d1f82"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/dca41cd15c2ac9d055ad70dbfd011130757d1f82",
-                "reference": "dca41cd15c2ac9d055ad70dbfd011130757d1f82",
-                "shasum": ""
-            },
-            "require": {
-                "ext-ctype": "*",
-                "ext-json": "*",
-                "ext-tokenizer": "*",
-                "php": ">=7.4"
-            },
-            "require-dev": {
-                "ircmaxell/php-yacc": "^0.0.7",
-                "phpunit/phpunit": "^9.0"
-            },
-            "bin": [
-                "bin/php-parse"
-            ],
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "5.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "PhpParser\\": "lib/PhpParser"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Nikita Popov"
-                }
-            ],
-            "description": "A PHP parser written in PHP",
-            "keywords": [
-                "parser",
-                "php"
-            ],
-            "support": {
-                "issues": "https://github.com/nikic/PHP-Parser/issues",
-                "source": "https://github.com/nikic/PHP-Parser/tree/v5.7.0"
-            },
-            "time": "2025-12-06T11:56:16+00:00"
-        },
-        {
             "name": "phar-io/manifest",
             "version": "2.0.4",
             "source": {
@@ -10118,6 +10723,135 @@
                 "source": "https://github.com/phar-io/version/tree/3.2.1"
             },
             "time": "2022-02-21T01:04:05+00:00"
+        },
+        {
+            "name": "phpstan/phpstan",
+            "version": "2.1.40",
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9b2c7aeb83a75d8680ea5e7c9b7fca88052b766b",
+                "reference": "9b2c7aeb83a75d8680ea5e7c9b7fca88052b766b",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4|^8.0"
+            },
+            "conflict": {
+                "phpstan/phpstan-shim": "*"
+            },
+            "bin": [
+                "phpstan",
+                "phpstan.phar"
+            ],
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHPStan - PHP Static Analysis Tool",
+            "keywords": [
+                "dev",
+                "static analysis"
+            ],
+            "support": {
+                "docs": "https://phpstan.org/user-guide/getting-started",
+                "forum": "https://github.com/phpstan/phpstan/discussions",
+                "issues": "https://github.com/phpstan/phpstan/issues",
+                "security": "https://github.com/phpstan/phpstan/security/policy",
+                "source": "https://github.com/phpstan/phpstan-src"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/ondrejmirtes",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/phpstan",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-02-23T15:04:35+00:00"
+        },
+        {
+            "name": "phpstan/phpstan-doctrine",
+            "version": "2.0.18",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpstan/phpstan-doctrine.git",
+                "reference": "44a216a5cd9fe52be489dcf1e2d565c473daa1ca"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/phpstan-doctrine/zipball/44a216a5cd9fe52be489dcf1e2d565c473daa1ca",
+                "reference": "44a216a5cd9fe52be489dcf1e2d565c473daa1ca",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 || ^8.0",
+                "phpstan/phpstan": "^2.1.34"
+            },
+            "conflict": {
+                "doctrine/collections": "<1.0",
+                "doctrine/common": "<2.7",
+                "doctrine/mongodb-odm": "<1.2",
+                "doctrine/orm": "<2.5",
+                "doctrine/persistence": "<1.3"
+            },
+            "require-dev": {
+                "cache/array-adapter": "^1.1",
+                "composer/semver": "^3.3.2",
+                "cweagans/composer-patches": "^1.7.3",
+                "doctrine/annotations": "^2.0",
+                "doctrine/collections": "^1.6 || ^2.1",
+                "doctrine/common": "^2.7 || ^3.0",
+                "doctrine/dbal": "^3.3.8",
+                "doctrine/lexer": "^2.0 || ^3.0",
+                "doctrine/mongodb-odm": "^2.4.3",
+                "doctrine/orm": "^2.16.0",
+                "doctrine/persistence": "^2.2.1 || ^3.4.3",
+                "gedmo/doctrine-extensions": "^3.8",
+                "nesbot/carbon": "^2.49",
+                "php-parallel-lint/php-parallel-lint": "^1.2",
+                "phpstan/phpstan-deprecation-rules": "^2.0.2",
+                "phpstan/phpstan-phpunit": "^2.0.8",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^9.6.20",
+                "ramsey/uuid": "^4.2",
+                "symfony/cache": "^5.4",
+                "symfony/uid": "^5.4 || ^6.4 || ^7.3"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "extension.neon",
+                        "rules.neon"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PHPStan\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Doctrine extensions for PHPStan",
+            "keywords": [
+                "static analysis"
+            ],
+            "support": {
+                "issues": "https://github.com/phpstan/phpstan-doctrine/issues",
+                "source": "https://github.com/phpstan/phpstan-doctrine/tree/2.0.18"
+            },
+            "time": "2026-02-24T10:01:00+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",

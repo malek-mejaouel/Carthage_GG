@@ -19,7 +19,7 @@ class Tournament
     private ?int $tournament_id = null;
 
     #[ORM\Column(length: 150)]
-    private ?string $tournament_name = null;
+    private string $tournament_name = '';
 
     #[ORM\ManyToOne(targetEntity: Game::class, inversedBy: 'tournaments')]
     #[ORM\JoinColumn(name: 'game_id', referencedColumnName: 'game_id')]
@@ -41,6 +41,7 @@ class Tournament
     #[ORM\Column(type: Types::STRING, length: 10, nullable: true)]
     private ?string $location = null;
 
+    /** @var Collection<int, GameMatch> */
     #[ORM\OneToMany(mappedBy: 'tournament', targetEntity: GameMatch::class)]
     private Collection $matches;
 

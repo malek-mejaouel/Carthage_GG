@@ -16,7 +16,7 @@ class Order
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id', nullable: false, onDelete: 'CASCADE')]
-    private ?User $user = null;
+    private User $user;
 
     #[ORM\Column(length: 3)]
     private string $currency = 'usd';
@@ -24,6 +24,9 @@ class Order
     #[ORM\Column(type: 'float')]
     private float $amount = 0.0;
 
+    /**
+     * @var list<array{id: int, name: string, qty: int, unit_price: float, total: float}>
+     */
     #[ORM\Column(type: 'json')]
     private array $items = [];
 
@@ -54,13 +57,19 @@ class Order
     }
 
     public function getId(): ?int { return $this->id; }
-    public function getUser(): ?User { return $this->user; }
+    public function getUser(): User { return $this->user; }
     public function setUser(User $user): self { $this->user = $user; return $this; }
     public function getCurrency(): string { return $this->currency; }
     public function setCurrency(string $currency): self { $this->currency = $currency; return $this; }
     public function getAmount(): float { return $this->amount; }
     public function setAmount(float $amount): self { $this->amount = $amount; return $this; }
+    /**
+     * @return list<array{id: int, name: string, qty: int, unit_price: float, total: float}>
+     */
     public function getItems(): array { return $this->items; }
+    /**
+     * @param list<array{id: int, name: string, qty: int, unit_price: float, total: float}> $items
+     */
     public function setItems(array $items): self { $this->items = $items; return $this; }
     public function getShippingMethod(): string { return $this->shippingMethod; }
     public function setShippingMethod(string $shippingMethod): self { $this->shippingMethod = $shippingMethod; return $this; }

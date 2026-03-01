@@ -32,7 +32,7 @@ class News
      * Example: "New Tournament Announced"
      */
     #[ORM\Column(type:"string", length:255)]
-    private ?string $titre = null;
+    private string $titre = '';
 
     /**
      * Main content/body of the news article
@@ -40,7 +40,7 @@ class News
      * Supports multiple paragraphs and detailed information
      */
     #[ORM\Column(type:"text")]
-    private ?string $contenu = null;
+    private string $contenu = '';
 
     /**
      * Filename of the featured image for this news article
@@ -48,7 +48,7 @@ class News
      * Full path: /public/uploads/news/{image}
      */
     #[ORM\Column(type:"string", length:255)]
-    private ?string $image = null;
+    private string $image = '';
 
     /**
      * Category of the news article
@@ -56,7 +56,7 @@ class News
      * Maximum length: 100 characters
      */
     #[ORM\Column(type:"string", length:100)]
-    private ?string $categorie = null;
+    private string $categorie = '';
 
     /**
      * Publication date and time of the news article
@@ -64,7 +64,7 @@ class News
      * Format: DateTime object (e.g., 2026-02-06 15:30:00)
      */
     #[ORM\Column(type:"datetime")]
-    private ?\DateTimeInterface $date_publication = null;
+    private \DateTimeInterface $date_publication;
 
     // ==================== GETTER METHODS ====================
     

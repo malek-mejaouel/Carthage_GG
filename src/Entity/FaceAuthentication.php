@@ -26,7 +26,7 @@ class FaceAuthentication
 
     #[ORM\OneToOne(inversedBy: 'faceAuthentication', targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id', nullable: false, onDelete: 'CASCADE')]
-    private ?User $user = null;
+    private User $user;
 
     public function getId(): ?int
     {
@@ -69,7 +69,7 @@ class FaceAuthentication
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }

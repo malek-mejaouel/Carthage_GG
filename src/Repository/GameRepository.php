@@ -10,9 +10,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<Game>
  *
  * @method Game|null find($id, $lockMode = null, $lockVersion = null)
- * @method Game|null findOneBy(array $criteria, array $orderBy = null)
- * @method Game[]    findAll()
- * @method Game[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Game|null findOneBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null)
+ * @method list<Game> findAll()
+ * @method list<Game> findBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null, $limit = null, $offset = null)
  */
 class GameRepository extends ServiceEntityRepository
 {
@@ -47,11 +47,17 @@ class GameRepository extends ServiceEntityRepository
         return $this->findOneBy(['name' => $name]);
     }
 
+    /**
+     * @return list<Game>
+     */
     public function findAllGames(): array
     {
         return $this->findAll();
     }
 
+    /**
+     * @return list<Game>
+     */
     public function findGamesPaginated(int $page = 1, int $limit = 10): array
     {
         $offset = ($page - 1) * $limit;
@@ -71,6 +77,9 @@ class GameRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /**
+     * @return list<Game>
+     */
     public function findByGenre(string $genre): array
     {
         return $this->createQueryBuilder('g')
@@ -81,6 +90,9 @@ class GameRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<Game>
+     */
     public function searchByName(string $keyword): array
     {
         return $this->createQueryBuilder('g')
@@ -119,6 +131,9 @@ class GameRepository extends ServiceEntityRepository
         return false;
     }
 
+    /**
+     * @param list<int> $gameIds
+     */
     public function deleteMultiple(array $gameIds, bool $flush = true): int
     {
         $count = 0;
@@ -138,6 +153,9 @@ class GameRepository extends ServiceEntityRepository
         return $this->find($id) !== null;
     }
 
+    /**
+     * @return list<Game>
+     */
     public function findGamesByTournament(int $tournamentId): array
     {
         return $this->createQueryBuilder('g')

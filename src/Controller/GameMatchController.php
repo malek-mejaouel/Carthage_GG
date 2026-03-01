@@ -19,7 +19,6 @@ final class GameMatchController extends AbstractController
 
     public function __construct(
         private MatchRepository $matchRepository,
-        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -68,7 +67,10 @@ final class GameMatchController extends AbstractController
         }
 
         // Calcul du flag de rivalité pour ce match
-        $count = $this->matchRepository->countPreviousMeetings($match->getTeamA(), $match->getTeamB());
+        $count = 0;
+        if ($match->getTeamA() && $match->getTeamB()) {
+            $count = $this->matchRepository->countPreviousMeetings($match->getTeamA(), $match->getTeamB());
+        }
         $isRivalry = $count >= self::RIVALRY_THRESHOLD;
 
         return $this->render('Matches/show.html.twig', [
@@ -98,7 +100,9 @@ final class GameMatchController extends AbstractController
     #[Route('/{id}', name: 'match_delete', methods: ['POST'])]
     public function delete(Request $request, GameMatch $match): Response
     {
-        if ($this->isCsrfTokenValid('delete' . $match->getMatchId(), $request->request->get('_token'))) {
+        $tokenRaw = $request->request->get('_token');
+        $token = is_string($tokenRaw) ? $tokenRaw : null;
+        if ($this->isCsrfTokenValid('delete' . $match->getMatchId(), $token)) {
             $this->matchRepository->remove($match, true);
         }
 
@@ -141,9 +145,9 @@ final class GameMatchController extends AbstractController
         foreach ($matches as $match) {
             if ($match->getTeamA() && $match->getTeamB()) {
                 $count = $this->matchRepository->countPreviousMeetings($match->getTeamA(), $match->getTeamB());
-                $flags[$match->getMatchId()] = $count >= self::RIVALRY_THRESHOLD;
+                $flags[(int) $match->getMatchId()] = $count >= self::RIVALRY_THRESHOLD;
             } else {
-                $flags[$match->getMatchId()] = false;
+                $flags[(int) $match->getMatchId()] = false;
             }
         }
         return $flags;

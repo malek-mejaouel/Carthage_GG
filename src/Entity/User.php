@@ -23,17 +23,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 150, unique: true)]
     #[Assert\Email]
     #[Assert\NotBlank]
-    private ?string $email = null;
+    private string $email = '';
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    private ?string $password = null;
+    private string $password = '';
 
+    /** @var list<string> */
     #[ORM\Column(type: 'json')]
     private array $roles = [];
 
     #[ORM\Column(length: 100)]
-    private ?string $username = null;
+    private string $username = '';
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $firstName = null;
@@ -54,10 +55,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeInterface $lastLoginAt = null;
 
     #[ORM\Column(type: 'datetime')]
-    private ?\DateTimeInterface $createdAt = null;
+    private \DateTimeInterface $createdAt;
 
     #[ORM\Column(type: 'datetime')]
-    private ?\DateTimeInterface $updatedAt = null;
+    private \DateTimeInterface $updatedAt;
 
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: FaceAuthentication::class, cascade: ['persist', 'remove'])]
     private ?FaceAuthentication $faceAuthentication = null;
@@ -77,6 +78,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: 'ban_reason', length: 255, nullable: true)]
     private ?string $banReason = null;
 
+    /** @var Collection<int, Commentaire> */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Commentaire::class)]
     private Collection $comments;
 
@@ -155,6 +157,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
+    /**
+     * @return list<string>
+     */
     public function getRoles(): array
     {
         $roles = $this->roles;
@@ -163,9 +168,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $roles[] = 'ROLE_USER';
         }
 
-        return array_unique($roles);
+        return array_values(array_unique($roles));
     }
 
+    /**
+     * @param list<string> $roles
+     */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
@@ -343,6 +351,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return implode(' ', $parts) ?: '0s';
     }
 
+    /**
+     * @return Collection<int, Commentaire>
+     */
     public function getComments(): Collection
     {
         return $this->comments;

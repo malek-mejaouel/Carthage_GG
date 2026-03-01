@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Dto\GenerationResult;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class VerificationDocumentGenerator
@@ -13,9 +14,13 @@ class VerificationDocumentGenerator
         $this->params = $params;
     }
 
-    public function generateTemplate(): array
+    public function generateTemplate(): GenerationResult
     {
-        $projectDir = (string) $this->params->get('kernel.project_dir');
+        $projectDirVal = $this->params->get('kernel.project_dir');
+        if (!is_string($projectDirVal)) {
+            return new GenerationResult(false, null, 'Invalid project dir');
+        }
+        $projectDir = $projectDirVal;
         $validationDir = $projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'validation';
         $verifyDir = $projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'verification';
         if (!is_dir($verifyDir)) {
@@ -24,19 +29,19 @@ class VerificationDocumentGenerator
         $logoPath = $validationDir . DIRECTORY_SEPARATOR . 'logo.png';
         $signPath = $validationDir . DIRECTORY_SEPARATOR . 'signature.png';
         if (!is_file($logoPath) || !is_file($signPath)) {
-            return ['success' => false, 'message' => 'Missing validation assets'];
+            return new GenerationResult(false, null, 'Missing validation assets');
         }
         if (!function_exists('imagecreatetruecolor')) {
-            return ['success' => false, 'message' => 'GD extension not available'];
+            return new GenerationResult(false, null, 'GD extension not available');
         }
         $width = 1200;
         $height = 800;
-        $im = imagecreatetruecolor($width, $height);
-        $white = imagecolorallocate($im, 255, 255, 255);
-        $black = imagecolorallocate($im, 20, 24, 31);
-        $gold = imagecolorallocate($im, 212, 175, 55);
+        $im = imagecreatetruecolor(1200, 800);
+        $white = (int) imagecolorallocate($im, 255, 255, 255);
+        $black = (int) imagecolorallocate($im, 20, 24, 31);
+        $gold = (int) imagecolorallocate($im, 212, 175, 55);
         imagefilledrectangle($im, 0, 0, $width, $height, $white);
-        $borderColor = imagecolorallocate($im, 230, 230, 230);
+        $borderColor = (int) imagecolorallocate($im, 230, 230, 230);
         imagesetthickness($im, 4);
         imagerectangle($im, 10, 10, $width - 10, $height - 10, $borderColor);
         imagesetthickness($im, 1);
@@ -62,12 +67,16 @@ class VerificationDocumentGenerator
         }
         imagepng($im, $outPath);
         imagedestroy($im);
-        return ['success' => true, 'path' => $outPath];
+        return new GenerationResult(true, $outPath);
     }
 
-    public function generateTestDocument(): array
+    public function generateTestDocument(): GenerationResult
     {
-        $projectDir = (string) $this->params->get('kernel.project_dir');
+        $projectDirVal = $this->params->get('kernel.project_dir');
+        if (!is_string($projectDirVal)) {
+            return new GenerationResult(false, null, 'Invalid project dir');
+        }
+        $projectDir = $projectDirVal;
         $validationDir = $projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'validation';
         $verifyDir = $projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'verification';
         if (!is_dir($verifyDir)) {
@@ -76,19 +85,19 @@ class VerificationDocumentGenerator
         $logoPath = $validationDir . DIRECTORY_SEPARATOR . 'logo.png';
         $signPath = $validationDir . DIRECTORY_SEPARATOR . 'signature.png';
         if (!is_file($logoPath) || !is_file($signPath)) {
-            return ['success' => false, 'message' => 'Missing validation assets'];
+            return new GenerationResult(false, null, 'Missing validation assets');
         }
         if (!function_exists('imagecreatetruecolor')) {
-            return ['success' => false, 'message' => 'GD extension not available'];
+            return new GenerationResult(false, null, 'GD extension not available');
         }
         $width = 1200;
         $height = 800;
-        $im = imagecreatetruecolor($width, $height);
-        $white = imagecolorallocate($im, 255, 255, 255);
-        $black = imagecolorallocate($im, 20, 24, 31);
-        $gold = imagecolorallocate($im, 212, 175, 55);
+        $im = imagecreatetruecolor(1200, 800);
+        $white = (int) imagecolorallocate($im, 255, 255, 255);
+        $black = (int) imagecolorallocate($im, 20, 24, 31);
+        $gold = (int) imagecolorallocate($im, 212, 175, 55);
         imagefilledrectangle($im, 0, 0, $width, $height, $white);
-        $borderColor = imagecolorallocate($im, 230, 230, 230);
+        $borderColor = (int) imagecolorallocate($im, 230, 230, 230);
         imagesetthickness($im, 4);
         imagerectangle($im, 10, 10, $width - 10, $height - 10, $borderColor);
         imagesetthickness($im, 1);
@@ -114,12 +123,16 @@ class VerificationDocumentGenerator
         }
         imagepng($im, $outPath);
         imagedestroy($im);
-        return ['success' => true, 'path' => $outPath];
+        return new GenerationResult(true, $outPath);
     }
 
-    public function generateCustomDocument(string $firstName, string $lastName, string $role): array
+    public function generateCustomDocument(string $firstName, string $lastName, string $role): GenerationResult
     {
-        $projectDir = (string) $this->params->get('kernel.project_dir');
+        $projectDirVal = $this->params->get('kernel.project_dir');
+        if (!is_string($projectDirVal)) {
+            return new GenerationResult(false, null, 'Invalid project dir');
+        }
+        $projectDir = $projectDirVal;
         $validationDir = $projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'validation';
         $verifyDir = $projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'verification';
         if (!is_dir($verifyDir)) {
@@ -128,19 +141,19 @@ class VerificationDocumentGenerator
         $logoPath = $validationDir . DIRECTORY_SEPARATOR . 'logo.png';
         $signPath = $validationDir . DIRECTORY_SEPARATOR . 'signature.png';
         if (!is_file($logoPath) || !is_file($signPath)) {
-            return ['success' => false, 'message' => 'Missing validation assets'];
+            return new GenerationResult(false, null, 'Missing validation assets');
         }
         if (!function_exists('imagecreatetruecolor')) {
-            return ['success' => false, 'message' => 'GD extension not available'];
+            return new GenerationResult(false, null, 'GD extension not available');
         }
         $width = 1200;
         $height = 800;
-        $im = imagecreatetruecolor($width, $height);
-        $white = imagecolorallocate($im, 255, 255, 255);
-        $black = imagecolorallocate($im, 20, 24, 31);
-        $gold = imagecolorallocate($im, 212, 175, 55);
+        $im = imagecreatetruecolor(1200, 800);
+        $white = (int) imagecolorallocate($im, 255, 255, 255);
+        $black = (int) imagecolorallocate($im, 20, 24, 31);
+        $gold = (int) imagecolorallocate($im, 212, 175, 55);
         imagefilledrectangle($im, 0, 0, $width, $height, $white);
-        $borderColor = imagecolorallocate($im, 230, 230, 230);
+        $borderColor = (int) imagecolorallocate($im, 230, 230, 230);
         imagesetthickness($im, 4);
         imagerectangle($im, 10, 10, $width - 10, $height - 10, $borderColor);
         imagesetthickness($im, 1);
@@ -167,10 +180,10 @@ class VerificationDocumentGenerator
         }
         imagepng($im, $outPath);
         imagedestroy($im);
-        return ['success' => true, 'path' => $outPath];
+        return new GenerationResult(true, $outPath);
     }
 
-    private function drawText($im, int $size, int $color, int $x, int $y, string $text, bool $center = false): void
+    private function drawText(\GdImage $im, int $size, int $color, int $x, int $y, string $text, bool $center = false): void
     {
         if ($center) {
             $width = imagefontwidth(5) * strlen($text);
@@ -179,16 +192,17 @@ class VerificationDocumentGenerator
         imagestring($im, 5, $x, $y, $text, $color);
     }
 
-    private function placeImage($dst, $src, int $x, int $y, int $w, int $h): void
+    private function placeImage(\GdImage $dst, \GdImage $src, int $x, int $y, int $w, int $h): void
     {
         $sw = imagesx($src);
         $sh = imagesy($src);
-        $tmp = imagecreatetruecolor($w, $h);
+        $tw = max(1, $w);
+        $th = max(1, $h);
+        $tmp = imagecreatetruecolor($tw, $th);
         imagealphablending($tmp, false);
         imagesavealpha($tmp, true);
-        imagecopyresampled($tmp, $src, 0, 0, 0, 0, $w, $h, $sw, $sh);
-        imagecopy($dst, $tmp, $x, $y, 0, 0, $w, $h);
+        imagecopyresampled($tmp, $src, 0, 0, 0, 0, $tw, $th, $sw, $sh);
+        imagecopy($dst, $tmp, $x, $y, 0, 0, $tw, $th);
         imagedestroy($tmp);
     }
 }
-

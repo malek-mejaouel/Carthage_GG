@@ -21,13 +21,24 @@ class RoleVerificationService
         $this->logger = $logger;
     }
 
+    /**
+     * @return array{
+     *   success: bool,
+     *   code: string,
+     *   message: string,
+     *   badge?: string,
+     *   timestamp?: \DateTimeImmutable,
+     *   trace?: array<string, mixed>
+     * }
+     */
     public function verify(User $user, UploadedFile $file, ?string $roleName): array
     {
         if (!$this->isAllowedMime($file) || !$this->isAllowedSize($file)) {
             return ['success' => false, 'code' => 'invalid_format', 'message' => 'Invalid file format or size'];
         }
 
-        $projectDir = (string) $this->params->get('kernel.project_dir');
+        $pd = $this->params->get('kernel.project_dir');
+        $projectDir = is_string($pd) ? $pd : '';
         $refLogo = $projectDir . '/public/assets/images/validation/logo.png';
         $refSign = $projectDir . '/public/assets/images/validation/signature.png';
 
@@ -36,11 +47,11 @@ class RoleVerificationService
             return ['success' => false, 'code' => 'processing_error', 'message' => 'Unable to read uploaded file'];
         }
 
-        $requireBoth = $this->params->has('role_verification_require_both') ? (bool) $this->params->get('role_verification_require_both') : true;
+        $requireBoth = $this->boolParam('role_verification_require_both', true);
         $logoTrace = $this->matchReference($tmpPath, $refLogo, null);
         $signTrace = $this->matchReference($tmpPath, $refSign, null);
-        $logoOk = (bool) ($logoTrace['matched'] ?? false);
-        $signOk = (bool) ($signTrace['matched'] ?? false);
+        $logoOk = (bool) $logoTrace['matched'];
+        $signOk = (bool) $signTrace['matched'];
         if (!$signOk) {
             if ($this->containsBrand($tmpPath)) {
                 $signOk = true;
@@ -52,7 +63,7 @@ class RoleVerificationService
             $this->logger->warning('role_verification.logo_signature_invalid', [
                 'user_id' => $user->getId(),
                 'trace' => [
-                    'threshold' => $logoTrace['threshold'] ?? null,
+                    'threshold' => $logoTrace['threshold'],
                     'logo' => $logoTrace,
                     'signature' => $signTrace,
                     'require_both' => $requireBoth,
@@ -63,7 +74,7 @@ class RoleVerificationService
                 'code' => 'logo_signature_invalid',
                 'message' => 'Logo/signature invalid',
                 'trace' => [
-                    'threshold' => $logoTrace['threshold'] ?? null,
+                    'threshold' => $logoTrace['threshold'],
                     'logo' => $logoTrace,
                     'signature' => $signTrace,
                     'require_both' => $requireBoth,
@@ -72,15 +83,15 @@ class RoleVerificationService
         }
 
         $names = $this->extractNames($tmpPath, $file->getClientOriginalName());
-        $thName = $this->params->has('role_verification_name_similarity_threshold') ? (float) $this->params->get('role_verification_name_similarity_threshold') : 0.75;
+        $thName = $this->floatParam('role_verification_name_similarity_threshold', 0.75);
         $uf = $this->normalizeName((string) ($user->getFirstName() ?? ''));
         $ul = $this->normalizeName((string) ($user->getLastName() ?? ''));
         $uu = $this->normalizeName((string) ($user->getUsername() ?? ''));
-        $nFirst = $this->normalizeName((string) ($names['first'] ?? ''));
-        $nLast = $this->normalizeName((string) ($names['last'] ?? ''));
-        $nUsername = $this->normalizeName((string) ($names['username'] ?? ''));
-        $nRole = strtoupper(trim((string) ($names['role'] ?? '')));
-        if (($nFirst === '' || $nLast === '') && isset($names['text'])) {
+        $nFirst = $this->normalizeName($names['first']);
+        $nLast = $this->normalizeName($names['last']);
+        $nUsername = $this->normalizeName($names['username']);
+        $nRole = strtoupper(trim($names['role']));
+        if (($nFirst === '' || $nLast === '') && trim($names['text']) !== '') {
             $parsed = $this->parseNamesFromText((string) $names['text']);
             if ($nFirst === '') { $nFirst = $this->normalizeName((string) ($parsed['first'] ?? '')); }
             if ($nLast === '') { $nLast = $this->normalizeName((string) ($parsed['last'] ?? '')); }
@@ -93,9 +104,9 @@ class RoleVerificationService
         $simLast = $this->nameSimilarity($ul, $nLast);
         $simFull = $this->nameSimilarity($userFull, $certFull);
         $simUser = $this->nameSimilarity($uu, $nUsername !== '' ? $nUsername : $certFull);
-        $skipNameCheckIfNoOcr = $this->params->has('role_verification_skip_name_check_if_no_ocr') ? (bool) $this->params->get('role_verification_skip_name_check_if_no_ocr') : false;
-        $strictNames = $this->params->has('role_verification_strict_names') ? (bool) $this->params->get('role_verification_strict_names') : true;
-        $requireRoleMatch = $this->params->has('role_verification_require_role_match') ? (bool) $this->params->get('role_verification_require_role_match') : true;
+        $skipNameCheckIfNoOcr = $this->boolParam('role_verification_skip_name_check_if_no_ocr', false);
+        $strictNames = $this->boolParam('role_verification_strict_names', true);
+        $requireRoleMatch = $this->boolParam('role_verification_require_role_match', true);
         $ocrConfigured = $this->hasOcrConfigured();
         $nameCheckSkipped = false;
         if ($skipNameCheckIfNoOcr && !$ocrConfigured) {
@@ -131,12 +142,12 @@ class RoleVerificationService
                                 'last' => $ul !== '',
                                 'username' => $uu !== '',
                             ],
-                            'document' => [
-                                'first' => $nFirst !== '',
-                                'last' => $nLast !== '',
-                                'username' => $nUsername !== '',
-                                'text' => isset($names['text']) && trim((string) $names['text']) !== '',
-                            ],
+                        'document' => [
+                            'first' => $nFirst !== '',
+                            'last' => $nLast !== '',
+                            'username' => $nUsername !== '',
+                            'text' => trim($names['text']) !== '',
+                        ],
                             'ocr_configured' => $ocrConfigured,
                         ],
                         'strict_names' => $strictNames,
@@ -168,12 +179,12 @@ class RoleVerificationService
                                 'last' => $ul !== '',
                                 'username' => $uu !== '',
                             ],
-                            'document' => [
-                                'first' => $nFirst !== '',
-                                'last' => $nLast !== '',
-                                'username' => $nUsername !== '',
-                                'text' => isset($names['text']) && trim((string) $names['text']) !== '',
-                            ],
+                        'document' => [
+                            'first' => $nFirst !== '',
+                            'last' => $nLast !== '',
+                            'username' => $nUsername !== '',
+                            'text' => trim($names['text']) !== '',
+                        ],
                             'ocr_configured' => $ocrConfigured,
                         ],
                         'strict_names' => $strictNames,
@@ -222,7 +233,7 @@ class RoleVerificationService
             'user_id' => $user->getId(),
             'badge' => $badge,
             'trace' => [
-                'threshold' => $logoTrace['threshold'] ?? null,
+                'threshold' => $logoTrace['threshold'],
                 'logo' => $logoTrace,
                 'signature' => $signTrace,
                 'require_both' => $requireBoth,
@@ -235,7 +246,7 @@ class RoleVerificationService
             'badge' => $badge,
             'timestamp' => $timestamp,
             'trace' => [
-                'threshold' => $logoTrace['threshold'] ?? null,
+                'threshold' => $logoTrace['threshold'],
                 'logo' => $logoTrace,
                 'signature' => $signTrace,
                 'require_both' => $requireBoth,
@@ -263,12 +274,31 @@ class RoleVerificationService
         return $file->getSize() <= 5 * 1024 * 1024;
     }
 
+    /**
+     * @return array{
+     *   matched: bool,
+     *   distance: float|null,
+     *   correlation: float|null,
+     *   hist_sim: float|null,
+     *   edge_corr: float|null,
+     *   scale: float|null,
+     *   x: int|null,
+     *   y: int|null,
+     *   scanned: int,
+     *   threshold: float,
+     *   corr_threshold: float,
+     *   hist_threshold: float,
+     *   edge_threshold: float,
+     *   hint: string,
+     *   error: string|null
+     * }
+     */
     private function matchReference(string $uploadedPath, string $refPath, ?string $hint = null): array
     {
-        $th = $this->params->has('role_verification_threshold') ? (float) $this->params->get('role_verification_threshold') : 0.28;
-        $corrTh = $this->params->has('role_verification_corr_threshold') ? (float) $this->params->get('role_verification_corr_threshold') : 0.78;
-        $histTh = $this->params->has('role_verification_hist_threshold') ? (float) $this->params->get('role_verification_hist_threshold') : 0.6;
-        $edgeTh = $this->params->has('role_verification_edge_threshold') ? (float) $this->params->get('role_verification_edge_threshold') : 0.65;
+        $th = $this->floatParam('role_verification_threshold', 0.28);
+        $corrTh = $this->floatParam('role_verification_corr_threshold', 0.78);
+        $histTh = $this->floatParam('role_verification_hist_threshold', 0.6);
+        $edgeTh = $this->floatParam('role_verification_edge_threshold', 0.65);
         $res = ['matched' => false, 'distance' => null, 'correlation' => null, 'hist_sim' => null, 'edge_corr' => null, 'scale' => null, 'x' => null, 'y' => null, 'scanned' => 0, 'threshold' => $th, 'corr_threshold' => $corrTh, 'hist_threshold' => $histTh, 'edge_threshold' => $edgeTh, 'hint' => $hint ?: '', 'error' => null];
         if (!is_file($refPath)) {
             $res['error'] = 'ref_missing';
@@ -333,7 +363,7 @@ class RoleVerificationService
             $cornerHistSim = $this->histogramIntersection($cornerHist, $refHist);
             $cornerGrad = $this->gradientFingerprintPatchNormalized($uIm, $px, $py, $patchW, $patchH);
             $cornerEdgeCorr = $this->correlation($cornerGrad, $refGrad);
-            $sCorner = $rw > 0 ? ($patchW / $rw) : 1.0;
+            $sCorner = $patchW / max(1, $rw);
             if ($cornerDist < $best) {
                 $best = $cornerDist;
                 $bestX = $px;
@@ -520,40 +550,15 @@ class RoleVerificationService
         return $res;
     }
 
-    private function fingerprint(string $path): ?array
-    {
-        $data = @file_get_contents($path);
-        if ($data === false) {
-            return null;
-        }
-        if (!function_exists('imagecreatefromstring')) {
-            return null;
-        }
-        $im = @imagecreatefromstring($data);
-        if (!$im) {
-            return null;
-        }
-        $w = 32;
-        $h = 32;
-        $small = imagecreatetruecolor($w, $h);
-        imagecopyresampled($small, $im, 0, 0, 0, 0, $w, $h, imagesx($im), imagesy($im));
-        $out = [];
-        for ($y = 0; $y < $h; $y++) {
-            for ($x = 0; $x < $w; $x++) {
-                $rgb = imagecolorat($small, $x, $y);
-                $r = ($rgb >> 16) & 0xFF;
-                $g = ($rgb >> 8) & 0xFF;
-                $b = $rgb & 0xFF;
-                $gray = ($r + $g + $b) / 3.0 / 255.0;
-                $out[] = $gray;
-            }
-        }
-        imagedestroy($small);
-        imagedestroy($im);
-        return $out;
-    }
+    /* removed unused fingerprint(path) helper */
 
-    private function fingerprintResource($im): array
+    /**
+     * @return list<float>
+     */
+    /**
+     * @return list<float>
+     */
+    private function fingerprintResource(\GdImage $im): array
     {
         $w = 32;
         $h = 32;
@@ -574,7 +579,13 @@ class RoleVerificationService
         return $out;
     }
 
-    private function fingerprintResourceNormalized($im): array
+    /**
+     * @return list<float>
+     */
+    /**
+     * @return list<float>
+     */
+    private function fingerprintResourceNormalized(\GdImage $im): array
     {
         $w = 32;
         $h = 32;
@@ -600,13 +611,20 @@ class RoleVerificationService
         foreach ($out as $v) { $std += ($v - $mean) * ($v - $mean); }
         $std = sqrt($std / $n);
         if ($std <= 1e-6) { $std = 1.0; }
+        $res = [];
         for ($i = 0; $i < $n; $i++) {
-            $out[$i] = ($out[$i] - $mean) / $std;
+            $res[] = ($out[$i] - $mean) / $std;
         }
-        return $out;
+        return $res;
     }
 
-    private function fingerprintPatch($im, int $x, int $y, int $w, int $h): array
+    /**
+     * @return list<float>
+     */
+    /**
+     * @return list<float>
+     */
+    private function fingerprintPatch(\GdImage $im, int $x, int $y, int $w, int $h): array
     {
         $w32 = 32;
         $h32 = 32;
@@ -627,7 +645,13 @@ class RoleVerificationService
         return $out;
     }
 
-    private function fingerprintPatchNormalized($im, int $x, int $y, int $w, int $h): array
+    /**
+     * @return list<float>
+     */
+    /**
+     * @return list<float>
+     */
+    private function fingerprintPatchNormalized(\GdImage $im, int $x, int $y, int $w, int $h): array
     {
         $w32 = 32;
         $h32 = 32;
@@ -653,11 +677,16 @@ class RoleVerificationService
         foreach ($out as $v) { $std += ($v - $mean) * ($v - $mean); }
         $std = sqrt($std / $n);
         if ($std <= 1e-6) { $std = 1.0; }
+        $res = [];
         for ($i = 0; $i < $n; $i++) {
-            $out[$i] = ($out[$i] - $mean) / $std;
+            $res[] = ($out[$i] - $mean) / $std;
         }
-        return $out;
+        return $res;
     }
+    /**
+     * @param list<float> $a
+     * @param list<float> $b
+     */
     private function distance(array $a, array $b): float
     {
         $sum = 0.0;
@@ -669,6 +698,10 @@ class RoleVerificationService
         return sqrt($sum / max(1, $n));
     }
 
+    /**
+     * @param list<float> $a
+     * @param list<float> $b
+     */
     private function correlation(array $a, array $b): float
     {
         $n = min(count($a), count($b));
@@ -685,12 +718,21 @@ class RoleVerificationService
         return $dot / $den;
     }
 
-    private function histogramResourceNormalized($im): array
+    /**
+     * @return list<float>
+     */
+    /**
+     * @return list<float>
+     */
+    private function histogramResourceNormalized(\GdImage $im): array
     {
         return $this->histogramPatchNormalized($im, 0, 0, imagesx($im), imagesy($im));
     }
 
-    private function histogramPatchNormalized($im, int $x, int $y, int $w, int $h): array
+    /**
+     * @return list<float>
+     */
+    private function histogramPatchNormalized(\GdImage $im, int $x, int $y, int $w, int $h): array
     {
         $bins = 8;
         $hist = array_fill(0, $bins * $bins * $bins, 0.0);
@@ -733,9 +775,13 @@ class RoleVerificationService
                 $hist[$i] /= $sum;
             }
         }
-        return $hist;
+        return array_values($hist);
     }
 
+    /**
+     * @param list<float> $a
+     * @param list<float> $b
+     */
     private function histogramIntersection(array $a, array $b): float
     {
         $n = min(count($a), count($b));
@@ -759,7 +805,7 @@ class RoleVerificationService
         $orig = $s;
         if (function_exists('transliterator_transliterate')) {
             $s2 = @transliterator_transliterate('Any-Latin; Latin-ASCII; [\u0300-\u036f] Remove; Lower()', $s);
-            if (is_string($s2) && $s2 !== '') { $s = $s2; }
+            if (is_string($s2)) { $s = $s2; }
         } elseif (function_exists('iconv')) {
             $s2 = @iconv('UTF-8', 'ASCII//TRANSLIT', $s);
             if ($s2 !== false) { $s = strtolower($s2); }
@@ -767,7 +813,7 @@ class RoleVerificationService
         $s = preg_replace('/[^\p{L}\p{N}]+/u', ' ', $s);
         $s = preg_replace('/\s+/', ' ', (string) $s);
         $s = trim((string) $s);
-        if ($s === '' && $orig !== '') {
+        if ($s === '') {
             $s = preg_replace('/[^\p{L}\p{N}]+/u', ' ', $orig);
             $s = preg_replace('/\s+/', ' ', (string) $s);
             $s = trim((string) $s);
@@ -787,14 +833,14 @@ class RoleVerificationService
         if ($a === '' || $b === '') return 0.0;
         if ($a === $b) return 1.0;
         $len = max(strlen($a), strlen($b));
-        $lev = $len > 0 ? max(0.0, 1.0 - (levenshtein($a, $b) / $len)) : 0.0;
+        $lev = max(0.0, 1.0 - (levenshtein($a, $b) / max(1, $len)));
         $ta = array_values(array_unique(array_filter(explode(' ', $a), function ($x) { return $x !== ''; })));
         $tb = array_values(array_unique(array_filter(explode(' ', $b), function ($x) { return $x !== ''; })));
         $j = 0.0;
         if (count($ta) > 0 && count($tb) > 0) {
             $inter = count(array_intersect($ta, $tb));
             $union = count(array_unique(array_merge($ta, $tb)));
-            $j = $union > 0 ? ($inter / $union) : 0.0;
+            $j = $inter / max(1, $union);
         }
         $contain = 0.0;
         if (str_contains($a, $b) || str_contains($b, $a)) {
@@ -805,6 +851,9 @@ class RoleVerificationService
         return max($lev, $j, $contain);
     }
 
+    /**
+     * @return array{first: ?string, last: ?string, username: ?string, role: ?string}
+     */
     private function parseNamesFromText(string $text): array
     {
         $out = ['first' => null, 'last' => null, 'username' => null, 'role' => null];
@@ -837,7 +886,10 @@ class RoleVerificationService
         return $out;
     }
 
-    private function gradientFingerprintResourceNormalized($im): array
+    /**
+     * @return list<float>
+     */
+    private function gradientFingerprintResourceNormalized(\GdImage $im): array
     {
         $w = 32;
         $h = 32;
@@ -875,10 +927,13 @@ class RoleVerificationService
         for ($i = 0; $i < $n; $i++) {
             $grad[$i] = ($grad[$i] - $mean) / $std;
         }
-        return $grad;
+        return array_values($grad);
     }
 
-    private function gradientFingerprintPatchNormalized($im, int $x, int $y, int $w, int $h): array
+    /**
+     * @return list<float>
+     */
+    private function gradientFingerprintPatchNormalized(\GdImage $im, int $x, int $y, int $w, int $h): array
     {
         $w32 = 32;
         $h32 = 32;
@@ -916,24 +971,29 @@ class RoleVerificationService
         for ($i = 0; $i < $n; $i++) {
             $grad[$i] = ($grad[$i] - $mean) / $std;
         }
-        return $grad;
+        return array_values($grad);
     }
 
+    /**
+     * @return array{first: string, last: string, username: string, role: string, text: string}
+     */
     private function extractNames(string $path, ?string $originalName = null): array
     {
         $data = @file_get_contents($path);
         if ($data === false) {
-            return [];
+            return ['first' => '', 'last' => '', 'username' => '', 'role' => '', 'text' => ''];
         }
         $base64 = 'data:image/png;base64,' . base64_encode($data);
-        $provider = (string) ($this->params->has('role_verification_ocr_provider') ? $this->params->get('role_verification_ocr_provider') : '');
+        $pv = $this->params->has('role_verification_ocr_provider') ? $this->params->get('role_verification_ocr_provider') : '';
+        $provider = is_string($pv) ? $pv : '';
         if ($provider === 'optiic') {
             try {
                 return $this->extractWithOptiic($base64);
             } catch (\Throwable $e) {
             }
         }
-        $baseUrl = (string) ($this->params->has('role_verification_ocr_base_url') ? $this->params->get('role_verification_ocr_base_url') : '');
+        $ba = $this->params->has('role_verification_ocr_base_url') ? $this->params->get('role_verification_ocr_base_url') : '';
+        $baseUrl = is_string($ba) ? $ba : '';
         if ($baseUrl !== '') {
             try {
                 $res = $this->httpClient->request('POST', rtrim($baseUrl, '/') . '/ocr', [
@@ -942,11 +1002,16 @@ class RoleVerificationService
                 ]);
                 if ($res->getStatusCode() === 200) {
                     $arr = $res->toArray(false);
-                    $first = (string) ($arr['first'] ?? '');
-                    $last = (string) ($arr['last'] ?? '');
-                    $username = (string) ($arr['username'] ?? '');
-                    $role = (string) ($arr['role'] ?? '');
-                    $text = (string) ($arr['text'] ?? '');
+                    $firstRaw = $arr['first'] ?? '';
+                    $lastRaw = $arr['last'] ?? '';
+                    $userRaw = $arr['username'] ?? '';
+                    $roleRaw = $arr['role'] ?? '';
+                    $textRaw = $arr['text'] ?? '';
+                    $first = is_scalar($firstRaw) ? (string) $firstRaw : '';
+                    $last = is_scalar($lastRaw) ? (string) $lastRaw : '';
+                    $username = is_scalar($userRaw) ? (string) $userRaw : '';
+                    $role = is_scalar($roleRaw) ? (string) $roleRaw : '';
+                    $text = is_scalar($textRaw) ? (string) $textRaw : '';
                     return ['first' => $first, 'last' => $last, 'username' => $username, 'role' => $role, 'text' => $text];
                 }
             } catch (\Throwable $e) {
@@ -959,8 +1024,10 @@ class RoleVerificationService
                 $nameOnly = substr($nameOnly, 0, $pos);
             }
             $nameOnly = (string) preg_replace('/[_\\-\\.]+/u', ' ', $nameOnly);
-            $tokens = array_values(array_filter(preg_split('/[^\\p{L}\\p{N}]+/u', $nameOnly), function ($t) {
-                return is_string($t) && trim($t) !== '';
+            $spl = preg_split('/[^\\p{L}\\p{N}]+/u', $nameOnly);
+            $arr = is_array($spl) ? $spl : [];
+            $tokens = array_values(array_filter($arr, function ($t) {
+                return trim((string) $t) !== '';
             }));
             $role = '';
             $lowerAll = strtolower($nameOnly);
@@ -975,7 +1042,7 @@ class RoleVerificationService
                 return ['first' => '', 'last' => '', 'username' => (string) $tokens[0], 'role' => $role, 'text' => ''];
             }
         }
-        return [];
+        return ['first' => '', 'last' => '', 'username' => '', 'role' => '', 'text' => ''];
     }
 
     private function containsBrand(string $path): bool
@@ -985,17 +1052,19 @@ class RoleVerificationService
             return false;
         }
         $base64 = 'data:image/png;base64,' . base64_encode($data);
-        $provider = (string) ($this->params->has('role_verification_ocr_provider') ? $this->params->get('role_verification_ocr_provider') : '');
+        $pv2 = $this->params->has('role_verification_ocr_provider') ? $this->params->get('role_verification_ocr_provider') : '';
+        $provider = is_string($pv2) ? $pv2 : '';
         if ($provider === 'optiic') {
             try {
                 $arr = $this->extractWithOptiic($base64);
-                $text = strtolower((string) ($arr['text'] ?? ''));
+                $text = strtolower($arr['text']);
                 return $text !== '' && (str_contains($text, 'carthagegg') || str_contains($text, 'carthage gg'));
             } catch (\Throwable $e) {
                 return false;
             }
         }
-        $baseUrl = (string) ($this->params->has('role_verification_ocr_base_url') ? $this->params->get('role_verification_ocr_base_url') : '');
+        $bu = $this->params->has('role_verification_ocr_base_url') ? $this->params->get('role_verification_ocr_base_url') : '';
+        $baseUrl = is_string($bu) ? $bu : '';
         if ($baseUrl === '') {
             return false;
         }
@@ -1006,7 +1075,8 @@ class RoleVerificationService
             ]);
             if ($res->getStatusCode() === 200) {
                 $arr = $res->toArray(false);
-                $text = strtolower((string) ($arr['text'] ?? ''));
+                $raw = $arr['text'] ?? '';
+                $text = is_scalar($raw) ? strtolower((string) $raw) : '';
                 return $text !== '' && (str_contains($text, 'carthagegg') || str_contains($text, 'carthage gg'));
             }
         } catch (\Throwable $e) {
@@ -1016,21 +1086,30 @@ class RoleVerificationService
 
     private function hasOcrConfigured(): bool
     {
-        $provider = (string) ($this->params->has('role_verification_ocr_provider') ? $this->params->get('role_verification_ocr_provider') : '');
+        $pv = $this->params->has('role_verification_ocr_provider') ? $this->params->get('role_verification_ocr_provider') : '';
+        $provider = is_string($pv) ? $pv : '';
         if ($provider === 'optiic') {
-            $endpoint = (string) ($this->params->has('role_verification_ocr_endpoint') ? $this->params->get('role_verification_ocr_endpoint') : '');
-            $apiKey = (string) ($this->params->has('role_verification_ocr_api_key') ? $this->params->get('role_verification_ocr_api_key') : '');
+            $ep = $this->params->has('role_verification_ocr_endpoint') ? $this->params->get('role_verification_ocr_endpoint') : '';
+            $ak = $this->params->has('role_verification_ocr_api_key') ? $this->params->get('role_verification_ocr_api_key') : '';
+            $endpoint = is_string($ep) ? $ep : '';
+            $apiKey = is_string($ak) ? $ak : '';
             return $endpoint !== '' && $apiKey !== '';
         }
-        return $this->params->has('role_verification_ocr_base_url') && (string) $this->params->get('role_verification_ocr_base_url') !== '';
+        $bb = $this->params->has('role_verification_ocr_base_url') ? $this->params->get('role_verification_ocr_base_url') : '';
+        return $this->params->has('role_verification_ocr_base_url') && is_string($bb) && $bb !== '';
     }
 
+    /**
+     * @return array{first: string, last: string, username: string, role: string, text: string}
+     */
     private function extractWithOptiic(string $dataUrl): array
     {
-        $endpoint = (string) ($this->params->has('role_verification_ocr_endpoint') ? $this->params->get('role_verification_ocr_endpoint') : 'https://api.optiic.dev/process');
-        $apiKey = (string) ($this->params->has('role_verification_ocr_api_key') ? $this->params->get('role_verification_ocr_api_key') : '');
+        $ep = $this->params->has('role_verification_ocr_endpoint') ? $this->params->get('role_verification_ocr_endpoint') : 'https://api.optiic.dev/process';
+        $ak = $this->params->has('role_verification_ocr_api_key') ? $this->params->get('role_verification_ocr_api_key') : '';
+        $endpoint = is_string($ep) ? $ep : 'https://api.optiic.dev/process';
+        $apiKey = is_string($ak) ? $ak : '';
         if ($apiKey === '') {
-            return [];
+            return ['first' => '', 'last' => '', 'username' => '', 'role' => '', 'text' => ''];
         }
         $payload = ['apiKey' => $apiKey, 'url' => $dataUrl];
         $res = $this->httpClient->request('POST', $endpoint, [
@@ -1039,22 +1118,27 @@ class RoleVerificationService
             'headers' => ['Content-Type' => 'application/json'],
         ]);
         if ($res->getStatusCode() !== 200) {
-            return [];
+            return ['first' => '', 'last' => '', 'username' => '', 'role' => '', 'text' => ''];
         }
         $arr = $res->toArray(false);
-        $text = (string) ($arr['text'] ?? ($arr['result']['text'] ?? ''));
+        $rawText = $arr['text'] ?? ($arr['result']['text'] ?? '');
+        $text = is_scalar($rawText) ? (string) $rawText : '';
         $out = ['first' => '', 'last' => '', 'username' => '', 'role' => '', 'text' => $text];
         if ($text !== '') {
             $parsed = $this->parseNamesFromText($text);
-            $out['first'] = (string) ($parsed['first'] ?? '');
-            $out['last'] = (string) ($parsed['last'] ?? '');
-            $out['username'] = (string) ($parsed['username'] ?? '');
-            $out['role'] = (string) ($parsed['role'] ?? '');
+            $pf = $parsed['first'] ?? null;
+            $pl = $parsed['last'] ?? null;
+            $pu = $parsed['username'] ?? null;
+            $pr = $parsed['role'] ?? null;
+            $out['first'] = $pf ?? '';
+            $out['last'] = $pl ?? '';
+            $out['username'] = $pu ?? '';
+            $out['role'] = $pr ?? '';
         }
         return $out;
     }
 
-    private function cropToContent($im)
+    private function cropToContent(\GdImage $im): ?\GdImage
     {
         $w = imagesx($im);
         $h = imagesy($im);
@@ -1077,11 +1161,30 @@ class RoleVerificationService
         if ($maxX <= $minX || $maxY <= $minY) {
             return null;
         }
-        $nw = $maxX - $minX + 1;
-        $nh = $maxY - $minY + 1;
+        $nw = max(1, $maxX - $minX + 1);
+        $nh = max(1, $maxY - $minY + 1);
         $dst = imagecreatetruecolor($nw, $nh);
         imagecopy($dst, $im, 0, 0, $minX, $minY, $nw, $nh);
         return $dst;
+    }
+
+    private function boolParam(string $name, bool $default): bool
+    {
+        if (!$this->params->has($name)) return $default;
+        $v = $this->params->get($name);
+        if (is_bool($v)) return $v;
+        if (is_int($v)) return $v !== 0;
+        if (is_string($v)) {
+            $t = strtolower(trim($v));
+            return in_array($t, ['1', 'true', 'yes', 'on'], true);
+        }
+        return $default;
+    }
+
+    private function floatParam(string $name, float $default): float
+    {
+        $v = $this->params->has($name) ? $this->params->get($name) : null;
+        return is_numeric($v) ? (float) $v : $default;
     }
     private function defaultBadge(User $user): string
     {
@@ -1095,4 +1198,3 @@ class RoleVerificationService
         return 'PLAYER';
     }
 }
-

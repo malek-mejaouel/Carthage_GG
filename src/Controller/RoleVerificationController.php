@@ -59,7 +59,7 @@ class RoleVerificationController extends AbstractController
             return $this->redirectToRoute('app_profile_edit', ['id' => $id]);
         }
         $submittedToken = $request->request->get('_token');
-        if (!$this->isCsrfTokenValid('verify_role_' . $id, $submittedToken)) {
+        if (!is_string($submittedToken) || !$this->isCsrfTokenValid('verify_role_' . $id, $submittedToken)) {
             if ($isAjax) {
                 return $this->json(['success' => false, 'code' => 'invalid_csrf', 'message' => 'Invalid CSRF token'], Response::HTTP_FORBIDDEN);
             }
@@ -95,14 +95,14 @@ class RoleVerificationController extends AbstractController
             $em->persist($user);
             $em->flush();
             if ($isAjax) {
-                return $this->json(['success' => false, 'code' => $result['code'] ?? 'failed', 'message' => $result['message'] ?? 'Verification failed', 'trace' => $result['trace'] ?? null], Response::HTTP_OK);
+                return $this->json(['success' => false, 'code' => $result['code'], 'message' => $result['message'], 'trace' => $result['trace'] ?? null], Response::HTTP_OK);
             }
-            $this->addFlash('error', $result['message'] ?? 'Verification failed');
+            $this->addFlash('error', $result['message']);
             return $this->redirectToRoute('app_profile_edit', ['id' => $id]);
         }
         $user->setIsVerified(true);
-        $user->setVerifiedRoleBadge((string) $result['badge']);
-        $verAt = $result['timestamp'] instanceof \DateTimeInterface ? \DateTime::createFromInterface($result['timestamp']) : new \DateTime();
+        $user->setVerifiedRoleBadge(isset($result['badge']) ? (string) $result['badge'] : '');
+        $verAt = isset($result['timestamp']) ? \DateTime::createFromImmutable($result['timestamp']) : new \DateTime();
         $user->setVerificationDate($verAt);
         $em->persist($user);
         $em->flush();

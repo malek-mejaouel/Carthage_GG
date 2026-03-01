@@ -18,7 +18,7 @@ class Team
     private ?int $team_id = null;
 
     #[ORM\Column(length: 150)]
-    private ?string $team_name = null;
+    private string $team_name = '';
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
@@ -30,15 +30,19 @@ class Team
     #[ORM\Column(type: 'date', nullable: true)]
     private ?\DateTimeInterface $creation_date = null;
 
+    /** @var Collection<int, TeamPlayer> */
     #[ORM\OneToMany(mappedBy: 'team', targetEntity: TeamPlayer::class)]
     private Collection $teamPlayers;
 
+    /** @var Collection<int, GameMatch> */
     #[ORM\OneToMany(mappedBy: 'teamA', targetEntity: GameMatch::class)]
     private Collection $matchesAsTeamA;
 
+    /** @var Collection<int, GameMatch> */
     #[ORM\OneToMany(mappedBy: 'teamB', targetEntity: GameMatch::class)]
     private Collection $matchesAsTeamB;
 
+    /** @var Collection<int, MatchPlayer> */
     #[ORM\OneToMany(mappedBy: 'team', targetEntity: MatchPlayer::class)]
     private Collection $matchPlayers;
 
@@ -99,6 +103,9 @@ class Team
         return $this;
     }
 
+    /**
+     * @return Collection<int, TeamPlayer>
+     */
     public function getTeamPlayers(): Collection
     {
         return $this->teamPlayers;
@@ -123,16 +130,25 @@ class Team
         return $this;
     }
 
+    /**
+     * @return Collection<int, GameMatch>
+     */
     public function getMatchesAsTeamA(): Collection
     {
         return $this->matchesAsTeamA;
     }
 
+    /**
+     * @return Collection<int, GameMatch>
+     */
     public function getMatchesAsTeamB(): Collection
     {
         return $this->matchesAsTeamB;
     }
 
+    /**
+     * @return Collection<int, MatchPlayer>
+     */
     public function getMatchPlayers(): Collection
     {
         return $this->matchPlayers;

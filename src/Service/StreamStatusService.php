@@ -21,25 +21,25 @@ class StreamStatusService
         $this->youtubeApiKey = $youtubeApiKey;
     }
 
+    /**
+     * @param array<\App\Entity\Stream> $streams
+     */
     public function refreshForList(array $streams, EntityManagerInterface $em, int $minIntervalSeconds = 60): void
     {
         $changed = false;
         $now = new \DateTimeImmutable();
         foreach ($streams as $s) {
-            if (!$s instanceof Stream) { continue; }
             $updatedAt = $s->getUpdatedAt();
-            if ($updatedAt instanceof \DateTimeInterface) {
-                $diff = $now->getTimestamp() - $updatedAt->getTimestamp();
-                if ($diff < $minIntervalSeconds) {
-                    continue;
-                }
+            $diff = $now->getTimestamp() - $updatedAt->getTimestamp();
+            if ($diff < $minIntervalSeconds) {
+                continue;
             }
             $wasLive = $s->isLive();
             $viewers = $s->getViewerCount();
             $status = $this->getStatus($s);
             if ($status !== null) {
                 $s->setIsLive((bool)$status['live']);
-                $s->setViewerCount((int)($status['viewers'] ?? $viewers));
+                $s->setViewerCount($status['viewers']);
                 $s->setUpdatedAt($now);
                 $changed = true;
             }
@@ -49,6 +49,9 @@ class StreamStatusService
         }
     }
 
+    /**
+     * @return array{live: bool, viewers: int}|null
+     */
     public function getStatus(Stream $s): ?array
     {
         $platform = $s->getPlatform();
@@ -61,6 +64,9 @@ class StreamStatusService
         return null;
     }
 
+    /**
+     * @return array{live: bool, viewers: int}|null
+     */
     private function fetchTwitchStatus(string $channel): ?array
     {
         if (!$this->twitchClientId) { $this->twitchClientId = getenv('TWITCH_CLIENT_ID') ?: null; }
@@ -87,6 +93,9 @@ class StreamStatusService
         return ['live' => false, 'viewers' => 0];
     }
 
+    /**
+     * @return array{live: bool, viewers: int}|null
+     */
     private function fetchYouTubeStatus(string $videoId): ?array
     {
         if (!$this->youtubeApiKey) { $this->youtubeApiKey = getenv('YOUTUBE_API_KEY') ?: null; }
@@ -111,8 +120,14 @@ class StreamStatusService
         ];
     }
 
+    /**
+     * @param array<string> $headers
+     */
     private function curlGet(string $url, array $headers = []): ?string
     {
+        if ($url === '') {
+            return null;
+        }
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

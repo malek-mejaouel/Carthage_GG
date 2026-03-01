@@ -26,7 +26,7 @@ class SimplePDFGeneratorService
         try {
             $pdfContent = $this->createBasicPDF($news);
             
-            $filename = $this->sanitizeFilename($news->getTitre()) . '.pdf';
+            $filename = $this->sanitizeFilename($news->getTitre() ?? 'News Article') . '.pdf';
             
             $response = new StreamedResponse(function () use ($pdfContent) {
                 echo $pdfContent;
@@ -34,7 +34,7 @@ class SimplePDFGeneratorService
 
             $response->headers->set('Content-Type', 'application/pdf');
             $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
-            $response->headers->set('Content-Length', strlen($pdfContent));
+            $response->headers->set('Content-Length', (string) strlen($pdfContent));
             $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
             $this->logger->info('PDF generated', ['filename' => $filename, 'size' => strlen($pdfContent)]);
@@ -164,10 +164,10 @@ class SimplePDFGeneratorService
         $text = str_replace(')', '\\)', $text);
         
         // Remove control characters but keep newlines
-        $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $text);
+        $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $text) ?? '';
         
         // Keep only printable ASCII
-        $text = preg_replace('/[^\x20-\x7E]/', '', $text);
+        $text = preg_replace('/[^\x20-\x7E]/', '', $text) ?? '';
         
         return $text;
     }
@@ -181,13 +181,17 @@ class SimplePDFGeneratorService
         
         $text = strip_tags($text);
         $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5);
-        $text = trim(preg_replace('/\s+/', ' ', $text));
+        $cleaned = preg_replace('/\s+/', ' ', $text) ?? '';
+        $text = trim($cleaned);
         
         return $text;
     }
 
     /**
      * Wrap text to specified width
+     */
+    /**
+     * @return list<string>
      */
     private function wrapText(string $text, int $width = 70): array
     {
@@ -219,8 +223,8 @@ class SimplePDFGeneratorService
     private function sanitizeFilename(string $title): string
     {
         $filename = strtolower($title);
-        $filename = preg_replace('/[^a-z0-9_-]/', '_', $filename);
-        $filename = preg_replace('/_+/', '_', $filename);
+        $filename = preg_replace('/[^a-z0-9_-]/', '_', $filename) ?? '';
+        $filename = preg_replace('/_+/', '_', $filename) ?? '';
         $filename = trim($filename, '_');
         $filename = substr($filename, 0, 50);
 

@@ -17,11 +17,11 @@ class StreamMessage
 
     #[ORM\ManyToOne(targetEntity: Stream::class)]
     #[ORM\JoinColumn(name: 'stream_id', referencedColumnName: 'stream_id', nullable: false, onDelete: 'CASCADE')]
-    private ?Stream $stream = null;
+    private Stream $stream;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id', nullable: false, onDelete: 'CASCADE')]
-    private ?User $user = null;
+    private User $user;
 
     #[ORM\Column(type: Types::TEXT)]
     private string $message;
@@ -39,11 +39,11 @@ class StreamMessage
 
     public function getMessageId(): ?int { return $this->message_id; }
 
-    public function getStream(): ?Stream { return $this->stream; }
-    public function setStream(?Stream $stream): self { $this->stream = $stream; return $this; }
+    public function getStream(): Stream { return $this->stream; }
+    public function setStream(Stream $stream): self { $this->stream = $stream; return $this; }
 
-    public function getUser(): ?User { return $this->user; }
-    public function setUser(?User $user): self { $this->user = $user; return $this; }
+    public function getUser(): User { return $this->user; }
+    public function setUser(User $user): self { $this->user = $user; return $this; }
 
     public function getMessage(): string { return $this->message; }
     public function setMessage(string $message): self { $this->message = $message; return $this; }
@@ -54,4 +54,3 @@ class StreamMessage
     public function getCreatedAt(): \DateTimeInterface { return $this->created_at; }
     public function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
 }
-

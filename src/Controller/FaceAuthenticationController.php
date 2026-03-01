@@ -123,10 +123,11 @@ class FaceAuthenticationController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'Face recognition service unavailable'], Response::HTTP_BAD_GATEWAY);
         }
 
-        $loginDescriptor = json_decode($descriptorJson, true);
-        if (!is_array($loginDescriptor)) {
+        $loginDescriptorRaw = json_decode($descriptorJson, true);
+        if (!is_array($loginDescriptorRaw)) {
              return new JsonResponse(['success' => false, 'message' => 'Invalid face descriptor received'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+        $loginDescriptor = array_values(array_map(static fn($v) => (float) $v, $loginDescriptorRaw));
 
         $email = isset($data['email']) ? trim((string) $data['email']) : null;
         $faceAuths = [];
@@ -152,11 +153,11 @@ class FaceAuthenticationController extends AbstractController
                 continue;
             }
 
-            $storedDescriptor = json_decode($storedDescriptorJson, true);
-            if (!is_array($storedDescriptor)) {
+            $storedDescriptorRaw = json_decode($storedDescriptorJson, true);
+            if (!is_array($storedDescriptorRaw)) {
                 continue;
             }
-
+            $storedDescriptor = array_values(array_map(static fn($v) => (float) $v, $storedDescriptorRaw));
             $distance = $this->faceRecognitionService->compareFaces($loginDescriptor, $storedDescriptor);
 
             if ($distance < $minDistance) {
@@ -175,13 +176,6 @@ class FaceAuthenticationController extends AbstractController
         }
 
         $user = $bestMatchUser;
-        if (!$user instanceof User) {
-             $attempts[] = $now;
-            $session->set('face_login_attempts', $attempts);
-
-            return new JsonResponse(['success' => false, 'message' => 'User not found'], Response::HTTP_UNAUTHORIZED);
-        }
-
         $this->security->login($user, 'security.authenticator.form_login.main');
 
         $session->set('face_login_attempts', []);
@@ -206,7 +200,7 @@ class FaceAuthenticationController extends AbstractController
             $base64 = $parts[1];
 
             $metaParts = explode(';', $meta);
-            if (count($metaParts) > 0 && str_starts_with($metaParts[0], 'data:')) {
+            if (str_starts_with($metaParts[0], 'data:')) {
                 $mimeType = substr($metaParts[0], 5);
             }
         }

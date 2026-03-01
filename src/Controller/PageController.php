@@ -193,7 +193,9 @@ public function admin(
             if ($uploaded) {
                 $ext = $uploaded->guessExtension() ?: 'bin';
                 $filename = bin2hex(random_bytes(8)).'.'.$ext;
-                $targetDir = $this->getParameter('kernel.project_dir').DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'avatars';
+                $pdParam = $this->getParameter('kernel.project_dir');
+                $projectDir = is_string($pdParam) ? $pdParam : getcwd();
+                $targetDir = $projectDir.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'avatars';
                 if (!is_dir($targetDir)) {
                     mkdir($targetDir, 0775, true);
                 }
@@ -214,7 +216,8 @@ public function admin(
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
-        $submittedToken = $request->request->get('_token');
+        $submittedTokenRaw = $request->request->get('_token');
+        $submittedToken = is_string($submittedTokenRaw) ? $submittedTokenRaw : null;
         if (!$this->isCsrfTokenValid('change_password_' . $id, $submittedToken)) {
             throw $this->createAccessDeniedException('Invalid CSRF token');
         }
@@ -256,7 +259,8 @@ public function admin(
             throw $this->createNotFoundException('User not found');
         }
 
-        $submittedToken = $request->request->get('_token');
+        $submittedTokenRaw = $request->request->get('_token');
+        $submittedToken = is_string($submittedTokenRaw) ? $submittedTokenRaw : null;
         if (!$this->isCsrfTokenValid('delete_user_' . $id, $submittedToken)) {
             throw $this->createAccessDeniedException('Invalid CSRF token');
         }
@@ -270,7 +274,8 @@ public function admin(
 
         // Delete user's avatar file if exists
         if ($user->getAvatar()) {
-            $projectDir = $this->getParameter('kernel.project_dir');
+            $pdParam = $this->getParameter('kernel.project_dir');
+            $projectDir = is_string($pdParam) ? $pdParam : getcwd();
             $avatarPath = $projectDir . '/public/' . $user->getAvatar();
             if (file_exists($avatarPath) && is_file($avatarPath)) {
                 unlink($avatarPath);
@@ -307,9 +312,11 @@ public function admin(
         \App\Repository\ProductRepository $products,
         \App\Repository\CategoryRepository $categories
     ): Response {
-        $q = $request->query->get('q');
+        $qRaw = $request->query->get('q');
+        $q = is_string($qRaw) ? $qRaw : null;
         $categoryId = $request->query->getInt('category');
-        $sort = $request->query->get('sort', 'newest');
+        $sortRaw = $request->query->get('sort', 'newest');
+        $sort = is_string($sortRaw) ? $sortRaw : null;
         $featuredOnly = $request->query->getBoolean('featured', false);
         $page = max(1, $request->query->getInt('page', 1));
         $perPage = 8;
@@ -418,9 +425,12 @@ public function admin(
     #[Route('/store/checkout', name: 'app_store_checkout', methods: ['POST'])]
     public function storeCheckout(Request $request, \App\Repository\ProductRepository $products): Response
     {
-        $secretKey = (string)$this->getParameter('stripe.secret_key');
-        $successUrl = (string)$this->getParameter('stripe.success_url');
-        $cancelUrl = (string)$this->getParameter('stripe.cancel_url');
+        $secretParam = $this->getParameter('stripe.secret_key');
+        $successParam = $this->getParameter('stripe.success_url');
+        $cancelParam = $this->getParameter('stripe.cancel_url');
+        $secretKey = is_string($secretParam) ? $secretParam : '';
+        $successUrl = is_string($successParam) ? $successParam : '';
+        $cancelUrl = is_string($cancelParam) ? $cancelParam : '';
         if (!$secretKey) {
             $this->addFlash('error', 'Stripe is not configured.');
             return $this->redirectToRoute('app_store_cart');
@@ -485,22 +495,45 @@ public function admin(
         try {
             $emailForReceipt = null;
             $user = $this->getUser();
-            if ($user instanceof \App\Entity\User && method_exists($user, 'getEmail') && $user->getEmail()) {
+            if ($user instanceof \App\Entity\User && $user->getEmail()) {
                 $emailForReceipt = (string)$user->getEmail();
             } elseif ($checkoutEmail) {
                 $emailForReceipt = (string)$checkoutEmail;
             }
-            $checkoutSession = StripeCheckoutSession::create([
+            $customerEmail = null;
+            if (is_string($emailForReceipt)) {
+                $maybe = trim($emailForReceipt);
+                if ($maybe !== '' && filter_var($maybe, FILTER_VALIDATE_EMAIL)) {
+                    $customerEmail = $maybe;
+                }
+            }
+            $params = [
                 'mode' => 'payment',
                 'line_items' => $lineItems,
                 'success_url' => rtrim($successUrl, '/') . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => $cancelUrl,
-                'customer_email' => $emailForReceipt ?: null,
-                'payment_intent_data' => $emailForReceipt ? [
-                    'receipt_email' => $emailForReceipt,
-                ] : null,
-            ]);
-            return $this->redirect($checkoutSession->url);
+            ];
+            if ($customerEmail !== null) {
+                $params['customer_email'] = $customerEmail;
+            }
+            if ($customerEmail === null) {
+                $checkoutSession = StripeCheckoutSession::create([
+                    'mode' => 'payment',
+                    'line_items' => $lineItems,
+                    'success_url' => rtrim($successUrl, '/') . '?session_id={CHECKOUT_SESSION_ID}',
+                    'cancel_url' => $cancelUrl,
+                ]);
+            } else {
+                $checkoutSession = StripeCheckoutSession::create([
+                    'mode' => 'payment',
+                    'line_items' => $lineItems,
+                    'success_url' => rtrim($successUrl, '/') . '?session_id={CHECKOUT_SESSION_ID}',
+                    'cancel_url' => $cancelUrl,
+                    'customer_email' => $customerEmail,
+                ]);
+            }
+            $redir = is_string($checkoutSession->url) ? $checkoutSession->url : $domain;
+            return $this->redirect($redir);
         } catch (\Throwable $e) {
             $this->addFlash('error', 'Stripe error: ' . $e->getMessage());
             return $this->redirectToRoute('app_store_cart');
@@ -512,9 +545,11 @@ public function admin(
     {
         $sessionParam = (string) $request->query->get('session_id', '');
         $receiptUrl = null;
-        $secretKey = (string)$this->getParameter('stripe.secret_key');
+        $secretParam = $this->getParameter('stripe.secret_key');
+        $secretKey = is_string($secretParam) ? $secretParam : '';
         $stripePaymentIntentId = null;
-        $n8nWebhook = (string)$this->getParameter('n8n.receipt_webhook_url');
+        $n8nParam = $this->getParameter('n8n.receipt_webhook_url');
+        $n8nWebhook = is_string($n8nParam) ? $n8nParam : '';
         if ($secretKey && $sessionParam) {
             Stripe::setApiKey($secretKey);
             try {
@@ -571,7 +606,7 @@ public function admin(
         }
         $recipient = null;
         $user = $this->getUser();
-        if ($user instanceof \App\Entity\User && method_exists($user, 'getEmail') && $user->getEmail()) {
+        if ($user instanceof \App\Entity\User && $user->getEmail()) {
             $recipient = (string)$user->getEmail();
         } else {
             $recipient = (string)$cartSession->get('checkout_email', '');

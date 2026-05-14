@@ -120,4 +120,19 @@ class ProductRepository extends ServiceEntityRepository
         }
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
+
+    /**
+     * @return list<Product>
+     */
+    public function findTrending(int $limit = 8): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->andWhere('p.status = :active')
+            ->setParameter('active', 'active')
+            ->addOrderBy('p.salesCount', 'DESC')
+            ->addOrderBy('p.averageRating', 'DESC')
+            ->addOrderBy('p.createdAt', 'DESC')
+            ->setMaxResults($limit);
+        return $qb->getQuery()->getResult();
+    }
 }

@@ -322,7 +322,7 @@ public function admin(
         $perPage = 8;
         $items = $products->searchPaginated($q, $categoryId ?: null, $sort, $page, $perPage, $featuredOnly);
         $total = $products->countSearch($q, $categoryId ?: null, $featuredOnly);
-        $featured = $featuredOnly ? [] : $products->findBy(['status' => 'active', 'isFeatured' => true], ['createdAt' => 'DESC'], 8);
+        $featured = $featuredOnly ? [] : $products->findTrending(8);
         $session = $request->getSession();
         $cart = $session->get('cart', []);
         $cartCount = 0;
@@ -602,6 +602,22 @@ public function admin(
             $order->setStripeSessionId($sessionParam ?: null);
             $order->setStripePaymentIntentId($stripePaymentIntentId);
             $em->persist($order);
+            $em->flush();
+        }
+        if ($total > 0) {
+            foreach ($itemsSnapshot as $it) {
+                $pid = (int)$it['id'];
+                $qty = (int)$it['qty'];
+                $product = $products->find($pid);
+                if (!$product) { continue; }
+                $product->setSalesCount($product->getSalesCount() + $qty);
+                $product->setStock(max(0, $product->getStock() - $qty));
+                if ($product->getSalesCount() >= 5 && !$product->isFeatured()) {
+                    $product->setIsFeatured(true);
+                }
+                $product->setUpdatedAt(new \DateTime());
+                $em->persist($product);
+            }
             $em->flush();
         }
         $recipient = null;

@@ -118,7 +118,7 @@
                         {% if e.location %}
                             <div class="px-2 py-1 bg-[#0b0b10] rounded">Location: {{ e.location.name }}</div>
                         {% endif %}
-                        <div class="px-2 py-1 bg-[#0b0b10] rounded">Seats left: {{ e.availableSeats }}</div>
+                      
                     </div>
                     <div class="mt-3">
                         <a href="{{ path('event_show', {'id': e.id}) }}" class="px-3 py-2 rounded bg-transparent border border-[#2a2a34] text-sm hover:bg-[#1a1a24]">View</a>

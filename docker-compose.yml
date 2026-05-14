@@ -1,0 +1,71 @@
+version: "3.9"
+services:
+  php:
+    build: ./docker/php
+    container_name: carthagegg-php
+    volumes:
+      - ./:/var/www/html
+    environment:
+      APP_ENV: dev
+    networks:
+      - app_net
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: carthagegg-nginx
+    depends_on:
+      - php
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx:/etc/nginx/conf.d:ro
+    ports:
+      - "8088:80"
+    networks:
+      - app_net
+
+  mysql:
+    image: mysql:8.0
+    container_name: carthagegg-mysql
+    command:
+      - --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: carthagegg
+      MYSQL_USER: carthage
+      MYSQL_PASSWORD: carthage
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - app_net
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: carthagegg-phpmyadmin
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: carthage
+      PMA_PASSWORD: carthage
+    ports:
+      - "8081:80"
+    networks:
+      - app_net
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: carthagegg-mailhog
+    ports:
+      - "8025:8025"
+    networks:
+      - app_net
+
+volumes:
+  db_data:
+
+networks:
+  app_net:
+    name: carthagegg_net
+    driver: bridge

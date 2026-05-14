@@ -35,8 +35,11 @@ RUN mkdir -p var/cache var/log public/bundles public/assets \
 # Set environment to prod for build
 ENV APP_ENV=prod
 
+# Fix composer config for Docker (remove Windows-specific settings)
+RUN composer config --unset cafile && composer config --unset disable-tls
+
 # Install composer dependencies
-RUN composer install --no-dev --optimize-autoloader --no-ansi --no-interaction
+RUN composer install --no-dev --optimize-autoloader --no-ansi --no-interaction --no-scripts
 
 # Set permissions again
 RUN chown -R www-data:www-data /var/www/html/var /var/www/html/public

@@ -28,13 +28,17 @@ COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Copy application files
 COPY . .
 
+# Create necessary directories and set permissions early
+RUN mkdir -p var/cache var/log public/bundles public/assets \
+    && chown -R www-data:www-data var public
+
+# Set environment to prod for build
+ENV APP_ENV=prod
+
 # Install composer dependencies
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+RUN composer install --no-dev --optimize-autoloader --no-ansi --no-interaction
 
-# Run Symfony post-install scripts
-RUN composer run-script post-install-cmd
-
-# Set permissions
+# Set permissions again
 RUN chown -R www-data:www-data /var/www/html/var /var/www/html/public
 
 EXPOSE 80
